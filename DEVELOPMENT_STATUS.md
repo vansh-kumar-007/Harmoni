@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 2B: PostgreSQL Migration, Schema Audit & Database Verification** (COMPLETED & VERIFIED)
+**Milestone 2C: Invitation Redemption Integrity Test Correction** (COMPLETED & VERIFIED)
 
 ---
 
@@ -53,26 +53,27 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - `conversation_canonical_ordering_check` (`"userAId" < "userBId"`)
   - `conversation_no_self_check` (`"userAId" <> "userBId"`)
 - [x] Applied migration to local PostgreSQL 18.4 database (`harmoni`) using `prisma migrate deploy` under dedicated role `harmoni_app`.
-- [x] Created automated database integration test suite (`scripts/verify-db.mjs`, executable via `pnpm db:test`) verifying:
-  - Active connection and metadata without exposing credentials.
-  - All 13 tables in `public` schema.
-  - Presence and definitions of all custom CHECK constraints.
-  - User creation and unique username constraint enforcement (SQLSTATE 23505).
-  - Single-use invite code issuance, redemption, and reuse prevention (SQLSTATE 23505).
-  - Canonical friendship ordering and rejection of inverted pairs, self-friendships, and outsider initiators.
-  - Canonical conversation ordering and rejection of inverted pairs and self-conversations.
-  - Message creation linked to conversation and sender.
-  - Cascading deletion across Conversations, Messages, Friendships, and InviteCodes upon user deletion.
-  - 100% database cleanliness post-run (0 leftover test fixtures).
+- [x] Created automated database integration test suite (`scripts/verify-db.mjs`, executable via `pnpm db:test`).
 - [x] Added `db:migrate:status`, `db:migrate:deploy`, and `db:test` scripts to `package.json`.
 - [x] Confirmed `.env` is properly gitignored and credentials remain secret.
 - [x] Verified full pipeline: `pnpm db:validate`, `pnpm db:generate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 2C: Invitation Redemption Integrity Test Correction
+- [x] Corrected invitation redemption test suite in `scripts/verify-db.mjs` to rigorously test atomic conditional redemption semantics:
+  - **Test 5.1 (Unused Invitation):** Atomic conditional `UPDATE ... WHERE "codeHash" = $2 AND "usedById" IS NULL AND ("expiresAt" IS NULL OR "expiresAt" > NOW()) RETURNING "id"` updates exactly 1 row and associates `usedById`.
+  - **Test 5.2 (Sequential Re-Redemption):** Attempt by a second user to redeem an already-consumed invitation matches 0 rows (returns 0 rows), rejecting consumption while preserving the original redeemer.
+  - **Test 5.3 (Simultaneous Concurrent Redemption Race):** Genuine concurrency test using two independent PostgreSQL client connections via `Promise.all` confirms row-level locks serialize redemption: exactly 1 user succeeds (returns 1 row) and the other is atomically rejected (returns 0 rows).
+  - **Test 5.4 (Expired Invitation):** Attempt to redeem an invitation where `expiresAt < NOW()` matches 0 rows (returns 0 rows; `usedById` remains `NULL`).
+  - **Test 5.5 (Multi-Redemption Policy):** Attempt by a user who already redeemed an invitation to redeem another is blocked by PostgreSQL unique constraint on `usedById` (SQLSTATE 23505; second invite `usedById` remains `NULL`).
+- [x] Documented mandatory architecture requirement for Milestone 3 authentication: user creation and invitation consumption MUST run within a single atomic database transaction with verification that exactly 1 row was updated.
+- [x] Confirmed database schema and existing migration remain safe and unchanged.
+- [x] Re-verified all checks: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
 - **Milestone 3: Invitation-Based Authentication & User Profiles**
-  - Implement invite code validation and Argon2id password hashing.
+  - **Atomic Registration Transaction:** Combine user record creation, Argon2id password hashing, and atomic conditional invitation consumption in one single database transaction. If the invitation redemption returns 0 rows (expired/already used/invalid), automatically roll back the transaction.
   - Set up secure HTTP-only cookie session management and auth middleware.
   - Build public user profile page (`/@username`) with customizable preset SVG avatars.
 - **Milestone 4: Music Discovery Engine & Jamendo API Integration**

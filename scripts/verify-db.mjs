@@ -12,13 +12,17 @@ async function runTests() {
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 5,
+    max: 10,
     connectionTimeoutMillis: 5000,
   });
 
   const client = await pool.connect();
 
   try {
+    // Ensure clean state before tests
+    await client.query(`DELETE FROM "User" WHERE "id" LIKE 'test_%' OR "username" LIKE 'test_%';`);
+    await client.query(`DELETE FROM "InviteCode" WHERE "id" LIKE 'test_%' OR "codeHash" LIKE 'hash_%';`);
+
     // -------------------------------------------------------------
     // 1. Connection & Safe Metadata Test
     // -------------------------------------------------------------
@@ -100,20 +104,26 @@ async function runTests() {
     const timestamp = Date.now();
     const u1Id = `test_u1_${timestamp}`;
     const u2Id = `test_u2_${timestamp}`;
+    const u3Id = `test_u3_${timestamp}`;
+    const u4Id = `test_u4_${timestamp}`;
+    const u5Id = `test_u5_${timestamp}`;
+
     const username1 = `test_alice_${timestamp}`;
     const username2 = `test_bob_${timestamp}`;
+    const username3 = `test_charlie_${timestamp}`;
+    const username4 = `test_dana_${timestamp}`;
+    const username5 = `test_evan_${timestamp}`;
 
     await client.query(`
       INSERT INTO "User" ("id", "username", "displayName", "passwordHash", "updatedAt")
-      VALUES ($1, $2, 'Alice Tester', '$argon2id$v=19$m=65536,t=3,p=4$dummyhash1', NOW());
-    `, [u1Id, username1]);
-    console.log(`[PASS] Created user 1: ${username1} (${u1Id})`);
-
-    await client.query(`
-      INSERT INTO "User" ("id", "username", "displayName", "passwordHash", "updatedAt")
-      VALUES ($1, $2, 'Bob Tester', '$argon2id$v=19$m=65536,t=3,p=4$dummyhash2', NOW());
-    `, [u2Id, username2]);
-    console.log(`[PASS] Created user 2: ${username2} (${u2Id})`);
+      VALUES 
+        ($1, $2, 'Alice Tester', '$argon2id$v=19$dummy1', NOW()),
+        ($3, $4, 'Bob Tester', '$argon2id$v=19$dummy2', NOW()),
+        ($5, $6, 'Charlie Tester', '$argon2id$v=19$dummy3', NOW()),
+        ($7, $8, 'Dana Tester', '$argon2id$v=19$dummy4', NOW()),
+        ($9, $10, 'Evan Tester', '$argon2id$v=19$dummy5', NOW());
+    `, [u1Id, username1, u2Id, username2, u3Id, username3, u4Id, username4, u5Id, username5]);
+    console.log(`[PASS] Created test users: ${username1}, ${username2}, ${username3}, ${username4}, ${username5}`);
 
     // Duplicate username test
     let duplicateRejected = false;
@@ -135,45 +145,157 @@ async function runTests() {
     console.log("[PASS] Unique username constraint successfully prevented duplicate user creation (SQLSTATE 23505).");
 
     // -------------------------------------------------------------
-    // 5. Single-Use Invitation Code Test
+    // 5. ATOMIC SINGLE-USE INVITATION REDEMPTION INTEGRITY TESTS
     // -------------------------------------------------------------
+    // Architecture Requirement for Milestone 3:
+    // Registration must perform user creation and invitation redemption
+    // in one single database transaction. The invitation MUST be consumed
+    // atomically via a conditional UPDATE:
+    //   UPDATE "InviteCode"
+    //   SET "usedById" = $1
+    //   WHERE "codeHash" = $2
+    //     AND "usedById" IS NULL
+    //     AND ("expiresAt" IS NULL OR "expiresAt" > NOW())
+    //   RETURNING "id";
+    // Exactly 1 row returned indicates success. 0 rows indicates failure/expiration/reuse,
+    // requiring the registration transaction to roll back immediately.
+    // Never implement invitation validation using a prior SELECT query.
+    // -------------------------------------------------------------
+
+    const atomicRedeemSql = `
+      UPDATE "InviteCode"
+      SET "usedById" = $1
+      WHERE "codeHash" = $2
+        AND "usedById" IS NULL
+        AND ("expiresAt" IS NULL OR "expiresAt" > NOW())
+      RETURNING "id";
+    `;
+
+    // --- Test 5.1: Unused invitation can be redeemed successfully ---
     const invId1 = `test_inv1_${timestamp}`;
-    const invId2 = `test_inv2_${timestamp}`;
     const codeHash1 = `hash_inv1_${timestamp}`;
-    const codeHash2 = `hash_inv2_${timestamp}`;
 
     await client.query(`
       INSERT INTO "InviteCode" ("id", "codeHash", "createdById", "createdAt")
       VALUES ($1, $2, $3, NOW());
     `, [invId1, codeHash1, u1Id]);
-    console.log(`[PASS] Created single-use invite code created by ${username1}`);
 
-    // User 2 redeems the invite
+    const redeemRes1 = await client.query(atomicRedeemSql, [u2Id, codeHash1]);
+    if (redeemRes1.rowCount !== 1 || redeemRes1.rows[0].id !== invId1) {
+      throw new Error(`Expected 1 row returned for valid redemption, got ${redeemRes1.rowCount}`);
+    }
+
+    const checkDb1 = await client.query(`SELECT "usedById" FROM "InviteCode" WHERE "id" = $1;`, [invId1]);
+    if (checkDb1.rows[0].usedById !== u2Id) {
+      throw new Error(`Expected usedById to be ${u2Id}, got ${checkDb1.rows[0].usedById}`);
+    }
+    console.log(`[PASS] Test 5.1: Unused invitation redeemed successfully by ${username2} (returned 1 row).`);
+
+    // --- Test 5.2: The same invitation cannot be redeemed by another user ---
+    const redeemRes2 = await client.query(atomicRedeemSql, [u3Id, codeHash1]);
+    if (redeemRes2.rowCount !== 0 || redeemRes2.rows.length !== 0) {
+      throw new Error(`Expected 0 rows returned for duplicate redemption attempt, got ${redeemRes2.rowCount}`);
+    }
+
+    const checkDb2 = await client.query(`SELECT "usedById" FROM "InviteCode" WHERE "id" = $1;`, [invId1]);
+    if (checkDb2.rows[0].usedById !== u2Id) {
+      throw new Error(`Invitation usedById was modified on failed re-redemption!`);
+    }
+    console.log(`[PASS] Test 5.2: Sequential re-redemption of consumed invitation rejected atomically (returned 0 rows; preserved original redeemer).`);
+
+    // --- Test 5.3: Simultaneous concurrent attempts to redeem the same invitation ---
+    // Genuine concurrency test using two distinct database client connections
+    const invConcurrentId = `test_inv_concurrent_${timestamp}`;
+    const codeHashConcurrent = `hash_concurrent_${timestamp}`;
+
     await client.query(`
-      UPDATE "InviteCode"
-      SET "usedById" = $1
-      WHERE "id" = $2;
-    `, [u2Id, invId1]);
-    console.log(`[PASS] Invite code redeemed successfully by ${username2}`);
+      INSERT INTO "InviteCode" ("id", "codeHash", "createdById", "createdAt")
+      VALUES ($1, $2, $3, NOW());
+    `, [invConcurrentId, codeHashConcurrent, u1Id]);
 
-    // Attempt second redemption: user 2 tries to redeem a second invite code
-    let reusePrevented = false;
+    const clientA = await pool.connect();
+    const clientB = await pool.connect();
+
+    let concurrentResults;
     try {
-      await client.query(`
-        INSERT INTO "InviteCode" ("id", "codeHash", "createdById", "usedById", "createdAt")
-        VALUES ($1, $2, $3, $4, NOW());
-      `, [invId2, codeHash2, u1Id, u2Id]);
+      concurrentResults = await Promise.all([
+        clientA.query(atomicRedeemSql, [u3Id, codeHashConcurrent]),
+        clientB.query(atomicRedeemSql, [u4Id, codeHashConcurrent]),
+      ]);
+    } finally {
+      clientA.release();
+      clientB.release();
+    }
+
+    const [resA, resB] = concurrentResults;
+    const totalSuccessful = (resA.rowCount === 1 ? 1 : 0) + (resB.rowCount === 1 ? 1 : 0);
+    const totalRejected = (resA.rowCount === 0 ? 1 : 0) + (resB.rowCount === 0 ? 1 : 0);
+
+    if (totalSuccessful !== 1 || totalRejected !== 1) {
+      throw new Error(`Concurrent race condition failed! Successful: ${totalSuccessful}, Rejected: ${totalRejected}`);
+    }
+
+    const winnerId = resA.rowCount === 1 ? u3Id : u4Id;
+    const winnerUsername = resA.rowCount === 1 ? username3 : username4;
+    const loserUsername = resA.rowCount === 1 ? username4 : username3;
+
+    const checkConcurrentDb = await client.query(`SELECT "usedById" FROM "InviteCode" WHERE "id" = $1;`, [invConcurrentId]);
+    if (checkConcurrentDb.rows[0].usedById !== winnerId) {
+      throw new Error(`Database state mismatch: expected winner ${winnerId}, got ${checkConcurrentDb.rows[0].usedById}`);
+    }
+    console.log(`[PASS] Test 5.3: Concurrent simultaneous redemption race test succeeded across independent DB connections! Winner: ${winnerUsername} (1 row), Loser: ${loserUsername} rejected (0 rows).`);
+
+    // --- Test 5.4: An expired invitation cannot be redeemed ---
+    const invExpiredId = `test_inv_expired_${timestamp}`;
+    const codeHashExpired = `hash_expired_${timestamp}`;
+
+    await client.query(`
+      INSERT INTO "InviteCode" ("id", "codeHash", "createdById", "expiresAt", "createdAt")
+      VALUES ($1, $2, $3, NOW() - INTERVAL '1 hour', NOW());
+    `, [invExpiredId, codeHashExpired, u1Id]);
+
+    const redeemExpiredRes = await client.query(atomicRedeemSql, [u5Id, codeHashExpired]);
+    if (redeemExpiredRes.rowCount !== 0) {
+      throw new Error(`Expired invitation was redeemed! Expected 0 rows, got ${redeemExpiredRes.rowCount}`);
+    }
+
+    const checkExpiredDb = await client.query(`SELECT "usedById" FROM "InviteCode" WHERE "id" = $1;`, [invExpiredId]);
+    if (checkExpiredDb.rows[0].usedById !== null) {
+      throw new Error(`Expired invitation usedById is not null!`);
+    }
+    console.log(`[PASS] Test 5.4: Expired invitation redemption rejected atomically (returned 0 rows; usedById remained NULL).`);
+
+    // --- Test 5.5: An account cannot be associated with multiple redeemed invitations (unique usedById policy) ---
+    // User 2 already redeemed codeHash1 in Test 5.1.
+    const invPolicyId = `test_inv_policy_${timestamp}`;
+    const codeHashPolicy = `hash_policy_${timestamp}`;
+
+    await client.query(`
+      INSERT INTO "InviteCode" ("id", "codeHash", "createdById", "createdAt")
+      VALUES ($1, $2, $3, NOW());
+    `, [invPolicyId, codeHashPolicy, u1Id]);
+
+    let policyViolationCaught = false;
+    try {
+      // User 2 tries to redeem a second invite code
+      await client.query(atomicRedeemSql, [u2Id, codeHashPolicy]);
     } catch (err) {
       if (err.code === "23505") { // unique_violation on usedById
-        reusePrevented = true;
+        policyViolationCaught = true;
       } else {
         throw err;
       }
     }
-    if (!reusePrevented) {
-      throw new Error("Invite code @unique usedById was not enforced!");
+
+    if (!policyViolationCaught) {
+      throw new Error("Multiple invite redemption by the same user was not rejected by unique usedById constraint!");
     }
-    console.log("[PASS] Single-use invite constraint: each user can only redeem at most one invite code (SQLSTATE 23505).");
+
+    const checkPolicyDb = await client.query(`SELECT "usedById" FROM "InviteCode" WHERE "id" = $1;`, [invPolicyId]);
+    if (checkPolicyDb.rows[0].usedById !== null) {
+      throw new Error(`Failed policy redemption left usedById populated!`);
+    }
+    console.log(`[PASS] Test 5.5: Single-user multiple-redemption rejected by PostgreSQL unique constraint on usedById (SQLSTATE 23505; usedById remained NULL).`);
 
     // -------------------------------------------------------------
     // 6. Friendship Canonical Ordering & Self-Friendship Prevention
@@ -349,26 +471,31 @@ async function runTests() {
     }
     console.log("[PASS] Cascade deletion verified across Conversation, Message, Friendship, and InviteCode.");
 
-    // Delete user 2 (Bob)
-    await client.query(`DELETE FROM "User" WHERE "id" = $1;`, [u2Id]);
-    console.log(`[PASS] Deleted user 2 (${u2Id})`);
+    // Delete remaining users
+    await client.query(`DELETE FROM "User" WHERE "id" IN ($1, $2, $3, $4);`, [u2Id, u3Id, u4Id, u5Id]);
+    console.log(`[PASS] Deleted remaining test users (${u2Id}, ${u3Id}, ${u4Id}, ${u5Id})`);
 
     // -------------------------------------------------------------
     // 10. Cleanliness Verification
     // -------------------------------------------------------------
-    const cleanCheck = await client.query(`
-      SELECT count(*) as count FROM "User" WHERE "id" IN ($1, $2);
-    `, [u1Id, u2Id]);
-    if (parseInt(cleanCheck.rows[0].count, 10) !== 0) {
-      throw new Error("Temporary test users were not completely cleaned up!");
+    const cleanUserCheck = await client.query(`
+      SELECT count(*) as count FROM "User" WHERE "id" LIKE 'test_%' OR "username" LIKE 'test_%';
+    `);
+    const cleanInvCheck = await client.query(`
+      SELECT count(*) as count FROM "InviteCode" WHERE "id" LIKE 'test_%' OR "codeHash" LIKE 'hash_%';
+    `);
+
+    if (parseInt(cleanUserCheck.rows[0].count, 10) !== 0 || parseInt(cleanInvCheck.rows[0].count, 10) !== 0) {
+      throw new Error("Temporary test records were not completely cleaned up!");
     }
-    console.log("[PASS] Database cleanliness verified: 0 temporary test records remain.");
+    console.log("[PASS] Database cleanliness verified: 0 temporary test records remain in User and InviteCode.");
 
     console.log("=== ALL INTEGRATION & INTEGRITY TESTS PASSED SUCCESSFULLY ===");
   } finally {
     // Ensure any leftover test records starting with test_ are safely wiped
     try {
       await client.query(`DELETE FROM "User" WHERE "id" LIKE 'test_%' OR "username" LIKE 'test_%';`);
+      await client.query(`DELETE FROM "InviteCode" WHERE "id" LIKE 'test_%' OR "codeHash" LIKE 'hash_%';`);
     } catch {}
     client.release();
     await pool.end();
