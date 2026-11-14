@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { getSessionCookie, deleteSessionCookie } from "./cookies";
+import { getSessionCookie } from "./cookies";
 import { validateSession, SafeUser } from "./session";
 
 export class AuthError extends Error {
@@ -19,7 +19,11 @@ export class AuthError extends Error {
  * the same request lifecycle (e.g. across nested layout, page, and server components)
  * execute at most one database query.
  *
- * @returns SafeUser without passwordHash, or null if unauthenticated
+ * In accordance with Next.js 16 Server Component rules, this read-only DAL function
+ * does NOT attempt to modify or delete cookies. Cookie clearing happens strictly in
+ * Server Actions or Route Handlers upon logout or rejection.
+ *
+ * @returns SafeUser without passwordHash, or null if unauthenticated or expired
  */
 export const getCurrentUser = cache(async (): Promise<SafeUser | null> => {
   const token = await getSessionCookie();
@@ -29,8 +33,6 @@ export const getCurrentUser = cache(async (): Promise<SafeUser | null> => {
 
   const result = await validateSession(token);
   if (!result) {
-    // If the token is invalid or expired, clear the stale cookie
-    await deleteSessionCookie().catch(() => {});
     return null;
   }
 

@@ -4,11 +4,10 @@ import db from "@/lib/db";
 
 /**
  * Session Expiration Configuration:
- * - Sessions remain valid for 30 days of inactivity.
- * - Sliding window refresh occurs when remaining lifetime is under 15 days.
+ * - Fixed 30-day session lifetime from creation.
+ * - Cookie expiration matches database expiration exactly.
  */
 export const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-export const SESSION_REFRESH_THRESHOLD_MS = 15 * 24 * 60 * 60 * 1000; // 15 days
 export const SESSION_COOKIE_NAME = "harmoni_session";
 
 /**
@@ -94,7 +93,6 @@ export async function createSession(userId: string): Promise<{
 /**
  * Validates a raw bearer token against PostgreSQL sessions.
  * Checks for existence, user status, and expiration.
- * Refreshes expiration (sliding window) if nearing half-life.
  *
  * @param rawToken The raw token obtained from the HTTP-only session cookie
  * @returns The session and SafeUser, or null if invalid or expired
@@ -120,10 +118,10 @@ export async function validateSession(rawToken: string): Promise<{
     return null;
   }
 
-  const now = new Date();
+  const expiresAtTime = new Date(found.expiresAt).getTime();
 
   // Expired session handling: clean up and reject
-  if (found.expiresAt <= now) {
+  if (isNaN(expiresAtTime) || expiresAtTime <= Date.now()) {
     await db.session.delete({
       where: { id: found.id },
     }).catch(() => {
@@ -132,25 +130,12 @@ export async function validateSession(rawToken: string): Promise<{
     return null;
   }
 
-  // Sliding window refresh: if remaining lifetime is under 15 days, extend expiration
-  let currentExpiresAt = found.expiresAt;
-  const remainingMs = found.expiresAt.getTime() - now.getTime();
-  if (remainingMs < SESSION_REFRESH_THRESHOLD_MS) {
-    currentExpiresAt = new Date(now.getTime() + SESSION_MAX_AGE_MS);
-    await db.session.update({
-      where: { id: found.id },
-      data: { expiresAt: currentExpiresAt },
-    }).catch(() => {
-      // Non-fatal if update fails
-    });
-  }
-
   return {
     session: {
       id: found.id,
       userId: found.userId,
-      expiresAt: currentExpiresAt,
-      createdAt: found.createdAt,
+      expiresAt: new Date(found.expiresAt),
+      createdAt: new Date(found.createdAt),
     },
     user: toSafeUser(found.user),
   };

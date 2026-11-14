@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3A: Secure Authentication Backend & Administrator Bootstrap** (COMPLETED & VERIFIED)
+**Milestone 3A.1: Authentication Implementation Audit & Hardening** (COMPLETED & VERIFIED)
 
 ---
 
@@ -94,7 +94,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] Implemented database-backed session engine (`src/lib/auth/session.ts`):
   - 256-bit cryptographically secure raw token generation (`crypto.randomBytes(32)`).
   - SHA-256 token hashing before PostgreSQL storage (raw token never saved in database).
-  - 30-day session lifetime with 15-day sliding window refresh.
+  - 30-day session lifetime.
   - Session revocation on logout and multi-session revocation support.
 - [x] Implemented secure HTTP-only cookie utilities (`src/lib/auth/cookies.ts`):
   - `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` in production via Next.js 16 async `cookies()`.
@@ -106,13 +106,26 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Idempotent: checks for existing `ADMIN` and refuses duplicate creation.
   - Interactive masked password prompts with confirmation in terminal.
   - Strict input validation via Zod before Argon2id hashing.
-- [x] Created comprehensive authentication test suite (`tests/auth.test.mjs` / `pnpm test:auth`):
-  - Validates Argon2id format, correct/incorrect verification, salt uniqueness, and length rules.
-  - Validates 256-bit raw token entropy, SHA-256 hashing, database absence of raw tokens, session resolution, expiration, and revocation.
-  - Validates authorization boundaries (USER vs. ADMIN).
-  - Validates bootstrap duplicate refusal and role protection.
-  - Uses strictly isolated ID tracking for cleanup.
-- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 3A.1: Authentication Implementation Audit & Hardening
+- [x] Replaced duplicate test scripts with a direct source-importing Vitest TypeScript test suite (`tests/auth/password.test.ts`, `tests/auth/session.test.ts`, `tests/auth/dal.test.ts`, `tests/auth/bootstrap.test.ts`):
+  - Imported real application modules directly from `@/lib/auth/password`, `@/lib/auth/session`, `@/lib/auth/dal`, `@/lib/auth/cookies`, and `scripts/bootstrap-admin.mjs`.
+  - Removed obsolete `tests/auth.test.mjs` that duplicated logic instead of testing source code.
+  - Added `vitest.config.mts` configuring `@/*` aliases and test mock for `server-only`.
+- [x] Fixed session expiration semantics:
+  - Enforced a fixed 30-day session lifetime from creation.
+  - Removed incomplete sliding-window database mutations and unused constants (`SESSION_REFRESH_THRESHOLD_MS`).
+  - Guaranteed safe date parsing and comparison (`new Date(expiresAt).getTime() <= Date.now()`).
+- [x] Hardened DAL cookie handling for Next.js 16 Server Components:
+  - Removed cookie deletion from read-only `getCurrentUser()` in `src/lib/auth/dal.ts` (Next.js Server Components disallow mutating cookies during render).
+  - Cookie deletion is strictly reserved for Server Actions and Route Handlers on logout or rejection.
+- [x] Hardened Administrator Bootstrap CLI (`scripts/bootstrap-admin.mjs`):
+  - Added PostgreSQL session-level advisory locks (`SELECT pg_advisory_lock(847291048172901::bigint)`) with guaranteed cleanup via `finally { SELECT pg_advisory_unlock(...) }`.
+  - Guaranteed serialized execution across concurrent CLI invocations; verified via integration test that exactly one bootstrap succeeds and concurrent attempts are rejected with `ALREADY_EXISTS`.
+  - Rejected non-interactive execution immediately when `process.stdin.isTTY` is false (never accepts unmasked fallback).
+  - Ensured terminal raw mode is cleanly restored via `restoreRawMode()` on all exit paths, exceptions, and Ctrl+C.
+  - Guaranteed no real administrator account is created in tests or development (database confirmed at 0 users and 0 admins).
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (33 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ---
 
@@ -156,6 +169,8 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ## 6. Current Dependencies & Licensing
 - `next` (16.4.6) — MIT License
 - `react` / `react-dom` (19.3.0) — MIT License
+- `@node-rs/argon2` (2.2.2) — MIT License
+- `zod` (4.6.7) — MIT License
 - `@prisma/client` / `prisma` (7.10.1) — Apache-2.0 License
 - `@prisma/adapter-pg` (7.10.1) — Apache-2.0 License
 - `pg` (8.23.1) / `@types/pg` (8.23.1) — MIT License
@@ -167,6 +182,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - `class-variance-authority` (0.7.1) — Apache-2.0 License
 - `lucide-react` (1.72.0) — ISC License
 - `typescript` (5.9.3) — Apache-2.0 License
+- `vitest` (5.1.0) — MIT License
 - `eslint` (9.39.5) / `eslint-config-next` (16.4.6) — MIT License
 
 *Every dependency is strictly free, open-source, and compatible with AGPL-3.0.*
