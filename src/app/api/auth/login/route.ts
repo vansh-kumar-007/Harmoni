@@ -1,68 +1,41 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import db from "@/lib/db";
-import { verifyPassword } from "@/lib/auth/password";
+import { usernameSchema, passwordSchema, verifyPassword, DUMMY_PASSWORD_HASH } from "@/lib/auth/password";
 import { createSession, toSafeUser } from "@/lib/auth/session";
 import { setSessionCookie } from "@/lib/auth/cookies";
+import { parseJsonBody, jsonError, HttpError } from "@/lib/auth/http";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Reuses existing canonical Zod schemas from password.ts.
+ * Normalizes username to lowercase and validates bounds.
+ */
 const loginSchema = z.object({
-  username: z.string().trim().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: usernameSchema,
+  password: passwordSchema,
 });
 
 const GENERIC_AUTH_ERROR = "Invalid username or password";
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const contentType = request.headers.get("content-type");
-  if (!contentType || !contentType.toLowerCase().includes("application/json")) {
-    return NextResponse.json(
-      { error: "Unsupported Media Type: application/json is required" },
-      {
-        status: 415,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  const contentLength = request.headers.get("content-length");
-  if (contentLength && parseInt(contentLength, 10) > 65536) {
-    return NextResponse.json(
-      { error: "Payload too large: maximum size is 64 KiB" },
-      {
-        status: 413,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  let body: unknown;
+  let rawBody: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Malformed JSON payload" },
-      {
-        status: 400,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    rawBody = await parseJsonBody(request);
+  } catch (err: unknown) {
+    if (err instanceof HttpError) {
+      return jsonError(err.message, err.status);
+    }
+    return jsonError("Malformed JSON payload", 400);
   }
 
-  const parsed = loginSchema.safeParse(body);
+  const parsed = loginSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message || "Invalid credentials format" },
-      {
-        status: 400,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    return jsonError(parsed.error.issues[0]?.message || "Invalid credentials format", 400);
   }
 
-  const { username, password } = parsed.data;
-  const normalizedUsername = username.toLowerCase();
+  const { username: normalizedUsername, password } = parsed.data;
 
   try {
     const user = await db.user.findUnique({
@@ -70,25 +43,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     if (!user) {
-      // Prevent user enumeration: identical response
-      return NextResponse.json(
-        { error: GENERIC_AUTH_ERROR },
-        {
-          status: 401,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
+      // Execute dummy Argon2id verification with same parameters to eliminate timing side-channel
+      await verifyPassword(password, DUMMY_PASSWORD_HASH);
+      return jsonError(GENERIC_AUTH_ERROR, 401);
     }
 
     const isValidPassword = await verifyPassword(password, user.passwordHash);
     if (!isValidPassword) {
-      return NextResponse.json(
-        { error: GENERIC_AUTH_ERROR },
-        {
-          status: 401,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
+      return jsonError(GENERIC_AUTH_ERROR, 401);
     }
 
     // Create session in PostgreSQL
@@ -110,12 +72,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     );
   } catch {
-    return NextResponse.json(
-      { error: "An unexpected error occurred during authentication" },
-      {
-        status: 500,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    return jsonError("An unexpected error occurred during authentication", 500);
   }
 }

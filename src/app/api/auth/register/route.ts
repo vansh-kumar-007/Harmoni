@@ -1,57 +1,23 @@
 import { NextResponse } from "next/server";
 import { registerUser, RegistrationError, RegisterInput } from "@/lib/auth/register";
 import { setSessionCookie } from "@/lib/auth/cookies";
+import { parseJsonBody, jsonError, HttpError } from "@/lib/auth/http";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const contentType = request.headers.get("content-type");
-  if (!contentType || !contentType.toLowerCase().includes("application/json")) {
-    return NextResponse.json(
-      { error: "Unsupported Media Type: application/json is required" },
-      {
-        status: 415,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  const contentLength = request.headers.get("content-length");
-  if (contentLength && parseInt(contentLength, 10) > 65536) {
-    return NextResponse.json(
-      { error: "Payload too large: maximum size is 64 KiB" },
-      {
-        status: 413,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  let body: unknown;
+  let body: RegisterInput;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Malformed JSON payload" },
-      {
-        status: 400,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  if (!body || typeof body !== "object") {
-    return NextResponse.json(
-      { error: "Invalid request body: object expected" },
-      {
-        status: 400,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    body = await parseJsonBody<RegisterInput>(request);
+  } catch (err: unknown) {
+    if (err instanceof HttpError) {
+      return jsonError(err.message, err.status);
+    }
+    return jsonError("Malformed JSON payload", 400);
   }
 
   try {
-    const { user, session, rawToken } = await registerUser(body as RegisterInput);
+    const { user, session, rawToken } = await registerUser(body);
 
     // Issue HTTP-only session cookie
     await setSessionCookie(rawToken, session.expiresAt);
@@ -70,30 +36,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   } catch (err: unknown) {
     if (err instanceof RegistrationError) {
-      if (err.code === "USERNAME_TAKEN") {
-        return NextResponse.json(
-          { error: err.message },
-          {
-            status: 409,
-            headers: { "Cache-Control": "no-store" },
-          }
-        );
-      }
-      return NextResponse.json(
-        { error: err.message },
-        {
-          status: 400,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
+      const status = err.code === "USERNAME_TAKEN" ? 409 : 400;
+      return jsonError(err.message, status);
     }
 
-    return NextResponse.json(
-      { error: "An unexpected error occurred during registration" },
-      {
-        status: 500,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    return jsonError("An unexpected error occurred during registration", 500);
   }
 }

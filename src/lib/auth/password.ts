@@ -18,6 +18,14 @@ export const ARGON2ID_OPTIONS = {
 } as const;
 
 /**
+ * Precomputed, reusable Argon2id hash for anti-enumeration timing attack mitigation.
+ * Formatted with the exact same OWASP parameters (19 MiB memory, 2 iterations, 1 parallelism).
+ * Generated from an unguessable high-entropy secret, ensuring it can never match a real user password.
+ */
+export const DUMMY_PASSWORD_HASH =
+  "$argon2id$v=19$m=19456,t=2,p=1$hMif8IwUOBWaaRBDOydJGQ$mhwlEYmDwD/G5Ec4U6rVbEdfg0IsOhmELvM70Auss28";
+
+/**
  * Zod validation schema for usernames:
  * - 3 to 30 characters
  * - Lowercase alphanumeric, underscores, hyphens

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin, AuthError } from "@/lib/auth/dal";
 import { createInviteCode, createInviteSchema } from "@/lib/auth/invites";
+import { parseOptionalJsonBody, jsonError, HttpError } from "@/lib/auth/http";
 
 export const dynamic = "force-dynamic";
 
@@ -12,63 +13,31 @@ export async function POST(request: Request): Promise<NextResponse> {
   } catch (err: unknown) {
     if (err instanceof AuthError) {
       const status = err.code === "UNAUTHORIZED" ? 401 : 403;
-      return NextResponse.json(
-        { error: err.message },
-        {
-          status,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
+      return jsonError(err.message, status);
     }
-    return NextResponse.json(
-      { error: "Authorization error" },
-      {
-        status: 500,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    return jsonError("Authorization error", 500);
   }
 
-  // 2. Parse optional request body for custom expiration
-  let body: unknown = {};
-  const contentType = request.headers.get("content-type");
-  const contentLength = request.headers.get("content-length");
-
-  if (contentLength && parseInt(contentLength, 10) > 65536) {
-    return NextResponse.json(
-      { error: "Payload too large: maximum size is 64 KiB" },
-      {
-        status: 413,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
-  }
-
-  if (contentType && contentType.toLowerCase().includes("application/json")) {
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { error: "Malformed JSON payload" },
-        {
-          status: 400,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
+  // 2. Safely parse optional JSON body (defaulting to empty object if genuinely empty)
+  let body: Record<string, unknown>;
+  try {
+    body = await parseOptionalJsonBody(request, {});
+  } catch (err: unknown) {
+    if (err instanceof HttpError) {
+      return jsonError(err.message, err.status);
     }
+    return jsonError("Malformed JSON payload", 400);
   }
 
-  const parsed = createInviteSchema.safeParse(body ?? {});
+  const parsed = createInviteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message || "Invalid invitation parameters" },
-      {
-        status: 400,
-        headers: { "Cache-Control": "no-store" },
-      }
+    return jsonError(
+      parsed.error.issues[0]?.message || "Invalid invitation parameters",
+      400
     );
   }
 
+  // 3. Create invitation record and return raw code exactly once
   try {
     const { invite, rawCode } = await createInviteCode({
       createdById: adminUser.id,
@@ -93,13 +62,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     );
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to create invitation";
-    return NextResponse.json(
-      { error: message },
-      {
-        status: 500,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    // Log detailed failure server-side without exposing internal details to the client
+    console.error("[ERROR] Failed to create invitation:", err);
+    return jsonError("An unexpected error occurred while creating the invitation", 500);
   }
 }

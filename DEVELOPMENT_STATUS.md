@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3B: Invitation Registration & Session Authentication Endpoints** (COMPLETED & VERIFIED)
+**Milestone 3B.1: Authentication API Security Audit & Corrections** (COMPLETED & VERIFIED)
 
 ---
 
@@ -151,6 +151,34 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Tested transaction rollback, race condition concurrency on single-use invitations, role restrictions, and cookie issuance.
 - [x] Confirmed database cleanliness: 0 users, 0 admins, 0 invites, 0 sessions left in PostgreSQL after testing.
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (64 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 3B.1: Authentication API Security Audit & Corrections
+- [x] Implemented robust request-body size enforcement and stream cancellation (`src/lib/auth/http.ts`):
+  - Strictly enforced a 64 KiB payload limit (`MAX_REQUEST_BODY_BYTES`) on the actual bytes read from `request.body` stream.
+  - Early rejection using `Content-Length` header when present, while also enforcing the limit during stream reading even when `Content-Length` is absent.
+  - Immediately cancels the input stream via `reader.cancel()` as soon as the byte limit is exceeded to prevent server resource exhaustion.
+  - Safe malformed JSON parsing with generic error responses without leaking Node.js parser internals.
+- [x] Strict `Content-Type` media-type validation (`src/lib/auth/http.ts`):
+  - Replaced naive substring matching (`.includes("application/json")`) with RFC-compliant media-type parsing (`isContentType`).
+  - Correctly accepts valid parameters (e.g. `application/json; charset=utf-8`).
+  - Strictly rejects non-JSON formats (`application/jsonp`, `text/plain`, etc.).
+  - Enforced strict JSON validation for `/api/auth/register` and `/api/auth/login`.
+  - For `/api/admin/invites`, accepted genuinely empty body (0 bytes) with 7-day default expiration, but strictly enforced `application/json` whenever a body is provided (rejecting non-JSON payloads with 415).
+- [x] Login input validation and timing-attack protection (`src/lib/auth/password.ts`, `src/app/api/auth/login/route.ts`):
+  - Reused canonical Zod `usernameSchema` and `passwordSchema` from `src/lib/auth/password.ts`.
+  - Preserved identical generic 401 response for both unknown usernames and invalid passwords to prevent user enumeration.
+  - Eliminated timing discrepancies by executing a dummy Argon2id password verification against a precomputed dummy hash (`DUMMY_PASSWORD_HASH`) with matching production parameters (`m=19456, t=2, p=1, algorithm=2`) when the username does not exist.
+- [x] Safe administrator invitation error responses (`src/app/api/admin/invites/route.ts`):
+  - Caught unexpected errors and returned a safe generic 500 response (`"An unexpected error occurred while creating the invitation"`).
+  - Explicitly avoided exposing database error objects, table names, SQL details, or stack traces.
+  - Preserved `Cache-Control: no-store` header on all error responses.
+- [x] Expanded Vitest test suite (`tests/auth/http.test.ts`, `tests/auth/login.test.ts`, `tests/auth/invites.test.ts`, `tests/auth/register.test.ts`):
+  - Added `tests/auth/http.test.ts` (17 tests) covering all branches of `isContentType`, stream limits, early rejection, stream cancellation, and JSON parsing.
+  - Expanded `tests/auth/login.test.ts` (16 tests) to test dummy Argon2id timing protection, canonical Zod validation, `application/json; charset=utf-8`, `application/jsonp` rejection, and 64 KiB stream limit.
+  - Expanded `tests/auth/register.test.ts` (14 tests) to test strict media-type handling and stream size enforcement.
+  - Expanded `tests/auth/invites.test.ts` (13 tests) to test non-empty body with unsupported Content-Type (415), `application/jsonp` rejection, and safe generic 500 error handling without leakage.
+  - Full suite expanded to **8 test files, 93 tests passing**, with 0 database fixture leaks.
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (93 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ---
 

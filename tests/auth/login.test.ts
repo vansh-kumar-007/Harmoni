@@ -3,8 +3,10 @@ import crypto from "node:crypto";
 import pg from "pg";
 import { POST as loginRoute } from "@/app/api/auth/login/route";
 import { POST as logoutRoute } from "@/app/api/auth/logout/route";
-import { hashPassword } from "@/lib/auth/password";
+import * as passwordModule from "@/lib/auth/password";
 import { createSession, SESSION_COOKIE_NAME, hashSessionToken } from "@/lib/auth/session";
+
+const { hashPassword } = passwordModule;
 
 const { Pool } = pg;
 
@@ -239,6 +241,112 @@ describe("Authentication Login & Logout Endpoints", () => {
 
       const data = await res.json();
       expect(data.error).toBeDefined();
+    });
+
+    it("executes dummy Argon2id verification when username does not exist (timing attack protection)", async () => {
+      const spy = vi.spyOn(passwordModule, "verifyPassword");
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: `nonexistent_${runSlug}`,
+          password: "ValidPassword123!",
+        }),
+      });
+
+      const res = await loginRoute(req);
+      expect(res.status).toBe(401);
+
+      // Verify that verifyPassword was called with DUMMY_PASSWORD_HASH
+      expect(spy).toHaveBeenCalledWith("ValidPassword123!", passwordModule.DUMMY_PASSWORD_HASH);
+      spy.mockRestore();
+    });
+
+    it("returns strictly identical 401 error payloads for nonexistent user and incorrect password", async () => {
+      const reqWrongPass = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: testUsername, password: "WrongPassword_999!" }),
+      });
+      const resWrongPass = await loginRoute(reqWrongPass);
+
+      const reqGhostUser = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: `ghost_user_${runSlug}`, password: "WrongPassword_999!" }),
+      });
+      const resGhostUser = await loginRoute(reqGhostUser);
+
+      expect(resWrongPass.status).toBe(401);
+      expect(resGhostUser.status).toBe(401);
+
+      const bodyWrongPass = await resWrongPass.json();
+      const bodyGhostUser = await resGhostUser.json();
+
+      expect(bodyWrongPass).toEqual(bodyGhostUser);
+      expect(bodyWrongPass.error).toBe("Invalid username or password");
+    });
+
+    it("accepts valid application/json with charset=utf-8 parameter", async () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({ username: testUsername, password: testPassword }),
+      });
+
+      const res = await loginRoute(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+    });
+
+    it("rejects application/jsonp with 415 Unsupported Media Type", async () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/jsonp" },
+        body: JSON.stringify({ username: testUsername, password: testPassword }),
+      });
+
+      const res = await loginRoute(req);
+      expect(res.status).toBe(415);
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+    });
+
+    it("rejects stream exceeding 64 KiB without Content-Length header with 413", async () => {
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          controller.enqueue(new Uint8Array(35 * 1024));
+        },
+      });
+
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: stream,
+        duplex: "half",
+      } as RequestInit & { duplex: string });
+
+      const res = await loginRoute(req);
+      expect(res.status).toBe(413);
+      const data = await res.json();
+      expect(data.error).toContain("maximum size is 64 KiB");
+    });
+
+    it("rejects invalid username characters using canonical usernameSchema", async () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: "_invalid_start", // starts with symbol
+          password: testPassword,
+        }),
+      });
+
+      const res = await loginRoute(req);
+      expect(res.status).toBe(400);
+      const data = await res.json();
+      expect(data.error).toContain("cannot start or end with a symbol");
     });
   });
 

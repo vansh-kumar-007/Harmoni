@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionCookie, deleteSessionCookie } from "@/lib/auth/cookies";
 import { revokeSession } from "@/lib/auth/session";
+import { jsonError } from "@/lib/auth/http";
 
 export const dynamic = "force-dynamic";
 
@@ -30,12 +31,6 @@ export async function POST(): Promise<NextResponse> {
     // Ensure cookie is cleared even if database operation encounters an error
     await deleteSessionCookie().catch(() => {});
 
-    return NextResponse.json(
-      { error: "An unexpected error occurred during logout" },
-      {
-        status: 500,
-        headers: { "Cache-Control": "no-store" },
-      }
-    );
+    return jsonError("An unexpected error occurred during logout", 500);
   }
 }

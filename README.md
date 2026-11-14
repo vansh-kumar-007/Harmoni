@@ -95,16 +95,16 @@ Ensure you have the following installed on your machine:
 
 ---
 
-## Authentication & API Endpoints (Milestone 3B)
+## Authentication & API Endpoints (Milestones 3B & 3B.1)
 
-Harmoni implements a private, invitation-only authentication backend:
+Harmoni implements a hardened, invitation-only authentication backend with strict 64 KiB streaming request-body size enforcement, RFC-compliant media-type validation, and timing-attack protected endpoints:
 
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Public (Requires Invite) | Atomic user registration and conditional single-use invitation redemption. Issues session cookie. |
-| `POST` | `/api/auth/login` | Public | Username/password authentication with constant-time Argon2id verification and anti-enumeration. |
+| `POST` | `/api/auth/register` | Public (Requires Invite) | Atomic user registration and conditional single-use invitation redemption with strict payload validation. Issues session cookie. |
+| `POST` | `/api/auth/login` | Public | Username/password authentication with dummy Argon2id verification for anti-enumeration and timing protection. |
 | `POST` | `/api/auth/logout` | Authenticated | Idempotent session revocation in PostgreSQL and cookie clearance. |
-| `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. |
+| `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. Rejects unsupported payloads. |
 
 ---
 

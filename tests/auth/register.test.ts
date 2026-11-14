@@ -406,5 +406,66 @@ describe("Atomic Registration Service & Route Handler", () => {
       const data = await res.json();
       expect(data.error).toContain("Username is already taken");
     });
+
+    it("accepts valid application/json with charset=utf-8 parameter", async () => {
+      const { invite, rawCode } = await createInviteCode({ createdById: adminUserId });
+      createdInviteIds.push(invite.id);
+
+      const username = `charset_reg_${runSlug}`;
+      const req = new Request("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          inviteCode: rawCode,
+          username,
+          displayName: "Charset User",
+          password: "ValidPassword123!",
+        }),
+      });
+
+      const res = await registerRoute(req);
+      expect(res.status).toBe(201);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      createdUserIds.push(data.user.id);
+    });
+
+    it("rejects application/jsonp with 415 Unsupported Media Type", async () => {
+      const req = new Request("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/jsonp" },
+        body: JSON.stringify({
+          inviteCode: "abc123def456_fake_invite_code",
+          username: "someuser",
+          displayName: "Some User",
+          password: "ValidPassword123!",
+        }),
+      });
+
+      const res = await registerRoute(req);
+      expect(res.status).toBe(415);
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+    });
+
+    it("rejects stream exceeding 64 KiB without Content-Length header with 413", async () => {
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          controller.enqueue(new Uint8Array(35 * 1024));
+        },
+      });
+
+      const req = new Request("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: stream,
+        duplex: "half",
+      } as RequestInit & { duplex: string });
+
+      const res = await registerRoute(req);
+      expect(res.status).toBe(413);
+      const data = await res.json();
+      expect(data.error).toContain("maximum size is 64 KiB");
+    });
   });
 });

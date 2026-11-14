@@ -1,15 +1,17 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
 import crypto from "node:crypto";
 import pg from "pg";
-import {
+import * as invitesModule from "@/lib/auth/invites";
+import { POST as createInviteRoute } from "@/app/api/admin/invites/route";
+import { createSession, SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { hashPassword } from "@/lib/auth/password";
+
+const {
   hashInviteCode,
   generateInviteCode,
   createInviteCode,
   DEFAULT_INVITE_EXPIRATION_DAYS,
-} from "@/lib/auth/invites";
-import { POST as createInviteRoute } from "@/app/api/admin/invites/route";
-import { createSession, SESSION_COOKIE_NAME } from "@/lib/auth/session";
-import { hashPassword } from "@/lib/auth/password";
+} = invitesModule;
 
 const { Pool } = pg;
 
@@ -268,6 +270,62 @@ describe("Administrator Invitation Engine & API", () => {
 
       const data = await res.json();
       expect(data.error).toContain("Expiration cannot exceed 30 days");
+    });
+
+    it("rejects non-empty body with unsupported Content-Type (text/plain) with 415 and does not create an invite", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: "unsupported text body",
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(415);
+
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+    });
+
+    it("rejects non-empty body with application/jsonp with 415 and does not create an invite", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/jsonp" },
+        body: JSON.stringify({ expiresInDays: 7 }),
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(415);
+
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+    });
+
+    it("returns generic safe 500 error without leaking database or internal exception messages", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      // Mock internal database/service failure with a simulated sensitive message
+      const sensitiveLeak = "FATAL: connection to server on 127.0.0.1:5432 failed: password authentication failed for user 'harmoni_app'";
+      const spy = vi.spyOn(invitesModule, "createInviteCode").mockRejectedValueOnce(new Error(sensitiveLeak));
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(500);
+      expect(res.headers.get("Cache-Control")).toBe("no-store");
+
+      const data = await res.json();
+      // Crucial security invariant: the internal error must NOT leak to client
+      expect(data.error).toBe("An unexpected error occurred while creating the invitation");
+      expect(data.error).not.toContain("FATAL");
+      expect(data.error).not.toContain("harmoni_app");
+
+      spy.mockRestore();
     });
   });
 });
