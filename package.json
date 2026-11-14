@@ -13,9 +13,12 @@
     "db:generate": "prisma generate",
     "db:migrate:status": "prisma migrate status",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:test": "node scripts/verify-db.mjs"
+    "db:test": "node scripts/verify-db.mjs",
+    "auth:bootstrap-admin": "node scripts/bootstrap-admin.mjs",
+    "test:auth": "node tests/auth.test.mjs"
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "class-variance-authority": "^0.7.1",
@@ -27,7 +30,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.5",

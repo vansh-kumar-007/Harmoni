@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 2D: Safe Database Integration Test Cleanup** (COMPLETED & VERIFIED)
+**Milestone 3A: Secure Authentication Backend & Administrator Bootstrap** (COMPLETED & VERIFIED)
 
 ---
 
@@ -81,12 +81,47 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] Verified test repeatability across multiple runs with 0 leftover test fixtures.
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
+### Milestone 3A: Secure Authentication Backend & Administrator Bootstrap
+- [x] Evaluated authentication architectures (Better Auth, Auth.js, custom minimal Next.js DAL) and selected custom minimal DAL:
+  - Supports pure username + password without forcing synthetic email addresses.
+  - Matches existing Prisma schema perfectly with zero migration overhead.
+  - Uses native database-backed sessions with cryptographic SHA-256 token hashing.
+  - Aligns with Next.js 16 asynchronous cookie model and React `cache()`.
+- [x] Implemented password hashing security (`src/lib/auth/password.ts`) using `@node-rs/argon2`:
+  - OWASP Recommended Minimum Parameters: 19 MiB memory cost (19456 KiB), 2 iterations, 1 parallelism, 32-byte output, Argon2id.
+  - Zod schemas for username, display name, and password (min 8, max 1024, no arbitrary character rules).
+  - Benchmarked locally at ~13ms per hash.
+- [x] Implemented database-backed session engine (`src/lib/auth/session.ts`):
+  - 256-bit cryptographically secure raw token generation (`crypto.randomBytes(32)`).
+  - SHA-256 token hashing before PostgreSQL storage (raw token never saved in database).
+  - 30-day session lifetime with 15-day sliding window refresh.
+  - Session revocation on logout and multi-session revocation support.
+- [x] Implemented secure HTTP-only cookie utilities (`src/lib/auth/cookies.ts`):
+  - `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` in production via Next.js 16 async `cookies()`.
+- [x] Implemented Centralized Data Access Layer (`src/lib/auth/dal.ts`):
+  - Request-memoized `getCurrentUser()` via React `cache()`.
+  - `requireUser()` and `requireAdmin()` with strict role verification and typed `AuthError`.
+  - Sensitive field redaction via `SafeUser` DTO.
+- [x] Built interactive Administrator Bootstrap CLI (`scripts/bootstrap-admin.mjs` / `pnpm auth:bootstrap-admin`):
+  - Idempotent: checks for existing `ADMIN` and refuses duplicate creation.
+  - Interactive masked password prompts with confirmation in terminal.
+  - Strict input validation via Zod before Argon2id hashing.
+- [x] Created comprehensive authentication test suite (`tests/auth.test.mjs` / `pnpm test:auth`):
+  - Validates Argon2id format, correct/incorrect verification, salt uniqueness, and length rules.
+  - Validates 256-bit raw token entropy, SHA-256 hashing, database absence of raw tokens, session resolution, expiration, and revocation.
+  - Validates authorization boundaries (USER vs. ADMIN).
+  - Validates bootstrap duplicate refusal and role protection.
+  - Uses strictly isolated ID tracking for cleanup.
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3: Invitation-Based Authentication & User Profiles**
-  - **Atomic Registration Transaction:** Combine user record creation, Argon2id password hashing, and atomic conditional invitation consumption in one single database transaction. If the invitation redemption returns 0 rows (expired/already used/invalid), automatically roll back the transaction.
-  - Set up secure HTTP-only cookie session management and auth middleware.
+- **Milestone 3B: Invitation Registration & Session Authentication Endpoints**
+  - Implement single-transaction user registration with atomic conditional invitation consumption.
+  - Implement login and logout Server Actions / Route Handlers with secure cookie issuance.
+  - Validate session lifecycle end-to-end.
+- **Milestone 3C: User Profile Page & Avatar Presets**
   - Build public user profile page (`/@username`) with customizable preset SVG avatars.
 - **Milestone 4: Music Discovery Engine & Jamendo API Integration**
   - Implement server-side Jamendo API client keeping credentials secret.
