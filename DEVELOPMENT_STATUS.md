@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3A.1: Authentication Implementation Audit & Hardening** (COMPLETED & VERIFIED)
+**Milestone 3B: Invitation Registration & Session Authentication Endpoints** (COMPLETED & VERIFIED)
 
 ---
 
@@ -127,13 +127,34 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Guaranteed no real administrator account is created in tests or development (database confirmed at 0 users and 0 admins).
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (33 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
+### Milestone 3B: Invitation Registration & Session Authentication Endpoints
+- [x] Extended `createSession` in `src/lib/auth/session.ts` to be transaction-aware (`createSession(userId, tx?)`), enabling atomic registration + session creation within one transaction.
+- [x] Built invitation engine (`src/lib/auth/invites.ts`):
+  - `generateInviteCode()` generating 256 bits (32 bytes) of cryptographic entropy (64 hex characters).
+  - Deterministic SHA-256 code hashing via `hashInviteCode()`.
+  - `createInviteCode()` supporting bounded expiration periods (1 to 30 days, default 7 days) and persisting only the hash.
+- [x] Implemented atomic registration service (`src/lib/auth/register.ts`):
+  - Strict input validation using Zod schemas (`inviteCode`, `username`, `displayName`, `password`).
+  - Mandatory atomic invariant: user creation, conditional invitation redemption (`usedById IS NULL`, `expiresAt IS NULL OR expiresAt > NOW()`), and session creation run in a single `db.$transaction`.
+  - Verifies `inviteUpdate.count === 1`; aborts and rolls back the entire transaction if the invitation is invalid, expired, or already consumed, leaving 0 orphaned users.
+  - Safe error handling without leaking database internals (P2002 username collision mapping to `RegistrationError`).
+- [x] Implemented Next.js App Router Route Handlers:
+  - `POST /api/auth/register` ([`src/app/api/auth/register/route.ts`](file:///d:/Projects/Harmoni/src/app/api/auth/register/route.ts)): Validates JSON payload and size, invokes atomic registration, issues secure HTTP-only session cookie, returns sanitized `SafeUser` with status 201 Created and `Cache-Control: no-store`.
+  - `POST /api/auth/login` ([`src/app/api/auth/login/route.ts`](file:///d:/Projects/Harmoni/src/app/api/auth/login/route.ts)): Case-insensitive username lookup, constant-time Argon2id password verification, identical generic 401 response for unknown usernames and incorrect passwords (anti-enumeration), session creation, and secure cookie issuance.
+  - `POST /api/auth/logout` ([`src/app/api/auth/logout/route.ts`](file:///d:/Projects/Harmoni/src/app/api/auth/logout/route.ts)): Idempotently revokes active PostgreSQL session and clears session cookie.
+  - `POST /api/admin/invites` ([`src/app/api/admin/invites/route.ts`](file:///d:/Projects/Harmoni/src/app/api/admin/invites/route.ts)): Protected by `requireAdmin()`, rejects non-admins with 403 Forbidden, generates 256-bit secure invite, stores hash in DB, and returns raw code exactly once with `Cache-Control: no-store`.
+- [x] Implemented comprehensive Vitest test suites:
+  - `tests/auth/invites.test.ts` (10 tests)
+  - `tests/auth/register.test.ts` (11 tests)
+  - `tests/auth/login.test.ts` (10 tests)
+  - Full suite expanded to **7 test files, 64 tests passing** with `fileParallelism: false` to ensure test database isolation.
+  - Tested transaction rollback, race condition concurrency on single-use invitations, role restrictions, and cookie issuance.
+- [x] Confirmed database cleanliness: 0 users, 0 admins, 0 invites, 0 sessions left in PostgreSQL after testing.
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (64 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3B: Invitation Registration & Session Authentication Endpoints**
-  - Implement single-transaction user registration with atomic conditional invitation consumption.
-  - Implement login and logout Server Actions / Route Handlers with secure cookie issuance.
-  - Validate session lifecycle end-to-end.
 - **Milestone 3C: User Profile Page & Avatar Presets**
   - Build public user profile page (`/@username`) with customizable preset SVG avatars.
 - **Milestone 4: Music Discovery Engine & Jamendo API Integration**
@@ -163,6 +184,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
 2. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 3. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
+4. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
 
 ---
 

@@ -56,7 +56,22 @@ Ensure you have the following installed on your machine:
 
 ---
 
-## Quality & Build Commands
+## Quality, Test & Build Commands
+
+- **Run unit and integration test suite:**
+  ```bash
+  pnpm test:auth
+  ```
+
+- **Run database integrity verification:**
+  ```bash
+  pnpm db:test
+  ```
+
+- **Run all automated tests:**
+  ```bash
+  pnpm test
+  ```
 
 - **Run linter:**
   ```bash
@@ -77,6 +92,19 @@ Ensure you have the following installed on your machine:
   ```bash
   pnpm start
   ```
+
+---
+
+## Authentication & API Endpoints (Milestone 3B)
+
+Harmoni implements a private, invitation-only authentication backend:
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public (Requires Invite) | Atomic user registration and conditional single-use invitation redemption. Issues session cookie. |
+| `POST` | `/api/auth/login` | Public | Username/password authentication with constant-time Argon2id verification and anti-enumeration. |
+| `POST` | `/api/auth/logout` | Authenticated | Idempotent session revocation in PostgreSQL and cookie clearance. |
+| `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. |
 
 ---
 

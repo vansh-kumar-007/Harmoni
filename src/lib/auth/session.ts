@@ -58,22 +58,30 @@ export function hashSessionToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+export type TransactionClient = Parameters<Parameters<typeof db.$transaction>[0]>[0];
+
 /**
  * Creates a cryptographically secure random session in PostgreSQL.
+ * Supports running within an existing Prisma transaction client or the singleton db client.
  *
  * @param userId ID of the authenticated user
+ * @param tx Optional Prisma transaction client
  * @returns Object containing the created session metadata and the raw bearer token (to be sent via cookie)
  */
-export async function createSession(userId: string): Promise<{
+export async function createSession(
+  userId: string,
+  tx?: TransactionClient
+): Promise<{
   session: { id: string; userId: string; expiresAt: Date; createdAt: Date };
   rawToken: string;
 }> {
+  const client = tx ?? db;
   // Generate 256 bits (32 bytes) of cryptographically secure random entropy
   const rawToken = crypto.randomBytes(32).toString("hex");
   const sessionTokenHash = hashSessionToken(rawToken);
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_MS);
 
-  const session = await db.session.create({
+  const session = await client.session.create({
     data: {
       sessionTokenHash,
       userId,
