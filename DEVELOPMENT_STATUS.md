@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 2C: Invitation Redemption Integrity Test Correction** (COMPLETED & VERIFIED)
+**Milestone 2D: Safe Database Integration Test Cleanup** (COMPLETED & VERIFIED)
 
 ---
 
@@ -59,15 +59,27 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] Verified full pipeline: `pnpm db:validate`, `pnpm db:generate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ### Milestone 2C: Invitation Redemption Integrity Test Correction
-- [x] Corrected invitation redemption test suite in `scripts/verify-db.mjs` to rigorously test atomic conditional redemption semantics:
-  - **Test 5.1 (Unused Invitation):** Atomic conditional `UPDATE ... WHERE "codeHash" = $2 AND "usedById" IS NULL AND ("expiresAt" IS NULL OR "expiresAt" > NOW()) RETURNING "id"` updates exactly 1 row and associates `usedById`.
-  - **Test 5.2 (Sequential Re-Redemption):** Attempt by a second user to redeem an already-consumed invitation matches 0 rows (returns 0 rows), rejecting consumption while preserving the original redeemer.
-  - **Test 5.3 (Simultaneous Concurrent Redemption Race):** Genuine concurrency test using two independent PostgreSQL client connections via `Promise.all` confirms row-level locks serialize redemption: exactly 1 user succeeds (returns 1 row) and the other is atomically rejected (returns 0 rows).
-  - **Test 5.4 (Expired Invitation):** Attempt to redeem an invitation where `expiresAt < NOW()` matches 0 rows (returns 0 rows; `usedById` remains `NULL`).
-  - **Test 5.5 (Multi-Redemption Policy):** Attempt by a user who already redeemed an invitation to redeem another is blocked by PostgreSQL unique constraint on `usedById` (SQLSTATE 23505; second invite `usedById` remains `NULL`).
+- [x] Corrected invitation redemption test suite in `scripts/verify-db.mjs` to rigorously test atomic conditional redemption semantics (Tests 5.1–5.5).
 - [x] Documented mandatory architecture requirement for Milestone 3 authentication: user creation and invitation consumption MUST run within a single atomic database transaction with verification that exactly 1 row was updated.
 - [x] Confirmed database schema and existing migration remain safe and unchanged.
 - [x] Re-verified all checks: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 2D: Safe Database Integration Test Cleanup
+- [x] Refactored `scripts/verify-db.mjs` to eliminate all unsafe wildcard deletions (`LIKE 'test_%'`, `LIKE 'hash_%'`).
+- [x] Implemented dynamic test execution isolation using `crypto.randomUUID()`:
+  - Every temporary user, invitation, conversation, friendship, and message utilizes a unique execution slug (`runSlug`).
+  - Completely eliminated static identifier collisions (`test_u_dup`, `test_f_inv`, etc.).
+- [x] Implemented strictly targeted array tracking:
+  - Maintained `createdUserIds` and `createdInviteIds` populated immediately upon successful record creation.
+  - Performed all database cleanups using parameterized array queries (`WHERE "id" = ANY($1::text[])`).
+- [x] Implemented Sentinel Database Preservation Test:
+  - Inserted untracked sentinel user (`test_sentinel_user_<uuid>`) and sentinel invite (`hash_sentinel_<uuid>`) not included in cleanup arrays.
+  - Executed targeted cleanup on tracked IDs.
+  - Verified that all tracked test records were deleted, while the sentinel user and invitation were preserved completely unharmed.
+  - Explicitly cleaned up sentinel records by exact ID.
+- [x] Eliminated silent empty catch blocks; added explicit cleanup error reporting and failure handling.
+- [x] Verified test repeatability across multiple runs with 0 leftover test fixtures.
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ---
 
