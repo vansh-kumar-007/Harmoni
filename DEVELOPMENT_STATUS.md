@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3B.2: Final Optional Request-Body Validation Fix** (COMPLETED & VERIFIED)
+**Milestone 3C.0: Visual Foundation Research & Design Specification** (PROPOSED — AWAITING REVIEW & APPROVAL)
 
 ---
 
@@ -207,6 +207,24 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Expanded `tests/auth/invites.test.ts` to 17 tests with route-level DB count checks verifying 0 invitations are created upon failed requests.
   - Total test suite expanded to **8 test files, 103 tests passing**.
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (103 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 3C.0: Visual Foundation Research & Design Specification
+- [x] Conducted comprehensive architectural and legal audit of 5 open-source music player foundations:
+  - `rajput-hemant/infinitunes` (MIT with non-commercial README note; unofficial JioSaavn scraping).
+  - `sillyangel/mice` (No license file / All Rights Reserved default; Subsonic client).
+  - `shadcn-ui/ui` Music Example (MIT; official reference; Radix UI accessibility; static presentation).
+  - `antonioerdeljac/next13-spotify` (MIT; Zustand player store; tightly coupled to Supabase/Stripe).
+  - `jeffvli/feishin` (GPL-3.0; Mantine UI CSS Modules incompatible with Tailwind v4).
+- [x] Formulated 3 distinct visual directions with complete palettes, typography, surfaces, and component concepts:
+  - Direction 1: "Obsidian Studio" (Warm Analog / High-Fidelity Hi-Fi with Amber Tube Glow).
+  - Direction 2: "Nordic Aurora" (Ethereal Midnight Glass with Cyan/Emerald Gradient Bloom).
+  - Direction 3: "Editorial Vinyl" (Swiss International Typographic with Acid Lime / Electric Cobalt).
+- [x] Selected and justified **Direction 1 ("Obsidian Studio")** as Harmoni's core visual direction for its intimate social fit, battery/GPU efficiency, eye ergonomics, and native alignment with initialized shadcn/ui zinc tokens.
+- [x] Defined complete design token system mapped to Tailwind CSS v4 `@theme inline` and CSS variables.
+- [x] Specified application layout shell with non-remounting docked audio player for desktop (3-column) and mobile (bottom navigation + compact floating player bar).
+- [x] Authored rigorous specification for Milestone 3C Profile Page (`/@username`) with 8 SVG avatar presets, bio editing, friendship relational state machine, and clean boundary between existing Prisma schema and future milestones.
+- [x] Published proposal document: [`docs/design-foundation-proposal.md`](file:///d:/Projects/Harmoni/docs/design-foundation-proposal.md).
+- [ ] Awaiting user review and explicit approval before initiating frontend implementation.
 
 ---
 
