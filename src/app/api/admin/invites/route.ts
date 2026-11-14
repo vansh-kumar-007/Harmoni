@@ -61,9 +61,10 @@ export async function POST(request: Request): Promise<NextResponse> {
         },
       }
     );
-  } catch (err: unknown) {
-    // Log detailed failure server-side without exposing internal details to the client
-    console.error("[ERROR] Failed to create invitation:", err);
+  } catch {
+    // Log a safe generic error indicator without serializing raw error objects,
+    // credentials, database connection strings, raw codes, or request payloads.
+    console.error("[ERROR] Failed to create invitation: internal operation failed");
     return jsonError("An unexpected error occurred while creating the invitation", 500);
   }
 }

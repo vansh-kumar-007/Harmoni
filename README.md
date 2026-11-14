@@ -95,7 +95,7 @@ Ensure you have the following installed on your machine:
 
 ---
 
-## Authentication & API Endpoints (Milestones 3B & 3B.1)
+## Authentication & API Endpoints (Milestones 3B, 3B.1 & 3B.2)
 
 Harmoni implements a hardened, invitation-only authentication backend with strict 64 KiB streaming request-body size enforcement, RFC-compliant media-type validation, and timing-attack protected endpoints:
 

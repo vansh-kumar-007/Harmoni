@@ -13,15 +13,54 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
     it("accepts exact application/json", () => {
       expect(isContentType("application/json")).toBe(true);
       expect(isContentType("APPLICATION/JSON")).toBe(true);
+      expect(isContentType("  application/json  ")).toBe(true);
     });
 
-    it("accepts application/json with valid parameters (charset, etc.)", () => {
+    it("accepts application/json with valid parameters (charset, case-insensitive tokens, quoted strings)", () => {
       expect(isContentType("application/json; charset=utf-8")).toBe(true);
       expect(isContentType("application/json;charset=UTF-8")).toBe(true);
+      expect(isContentType("APPLICATION/JSON; CHARSET=utf-8")).toBe(true);
+      expect(isContentType("application/json; Charset=Utf-8")).toBe(true);
+      expect(isContentType('application/json; charset="utf-8"')).toBe(true);
+      expect(isContentType('application/json; charset="foo;bar"')).toBe(true);
+      expect(isContentType('application/json; charset="foo\\"bar"')).toBe(true);
       expect(isContentType("application/json; boundary=something; charset=utf-8")).toBe(true);
+      expect(isContentType("application/json; v=1; profile=standard")).toBe(true);
     });
 
-    it("rejects non-json and near-miss media types", () => {
+    it("rejects malformed parameter syntax and missing parameter components", () => {
+      // Trailing semicolon with no parameter
+      expect(isContentType("application/json;")).toBe(false);
+      expect(isContentType("application/json;  ")).toBe(false);
+
+      // Empty parameter / consecutive semicolons
+      expect(isContentType("application/json; ; charset=utf-8")).toBe(false);
+
+      // Missing equals sign / missing value
+      expect(isContentType("application/json; charset")).toBe(false);
+
+      // Missing parameter name
+      expect(isContentType("application/json; =utf-8")).toBe(false);
+
+      // Missing parameter value
+      expect(isContentType("application/json; charset=")).toBe(false);
+
+      // Unclosed quoted string
+      expect(isContentType('application/json; charset="utf-8')).toBe(false);
+
+      // Trailing garbage after quoted string
+      expect(isContentType('application/json; charset="utf-8"trailing')).toBe(false);
+
+      // Unquoted space inside parameter value token
+      expect(isContentType("application/json; charset=utf 8")).toBe(false);
+    });
+
+    it("rejects malformed media types and near-misses", () => {
+      expect(isContentType("application")).toBe(false);
+      expect(isContentType("application/")).toBe(false);
+      expect(isContentType("/json")).toBe(false);
+      expect(isContentType("application/json/extra")).toBe(false);
+      expect(isContentType("application/json, text/plain")).toBe(false);
       expect(isContentType("application/jsonp")).toBe(false);
       expect(isContentType("text/plain")).toBe(false);
       expect(isContentType("text/html")).toBe(false);
@@ -30,6 +69,7 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
       expect(isContentType("multipart/form-data")).toBe(false);
       expect(isContentType("")).toBe(false);
       expect(isContentType(null)).toBe(false);
+      expect(isContentType(undefined)).toBe(false);
     });
   });
 
@@ -48,6 +88,16 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
       });
       const text = await readRequestBodyText(req);
       expect(text).toBe(payload);
+    });
+
+    it("preserves whitespace-only body as a non-empty string", async () => {
+      const whitespacePayload = "   \n\t   ";
+      const req = new Request("http://localhost:3000/api/test", {
+        method: "POST",
+        body: whitespacePayload,
+      });
+      const text = await readRequestBodyText(req);
+      expect(text).toBe(whitespacePayload);
     });
 
     it("rejects early via Content-Length header when oversized", async () => {
@@ -165,6 +215,22 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
       }
     });
 
+    it("rejects whitespace-only application/json with 400 (malformed JSON)", async () => {
+      const req = new Request("http://localhost:3000/api/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "   \n\t  ",
+      });
+
+      try {
+        await parseJsonBody(req);
+        expect.unreachable();
+      } catch (err: unknown) {
+        expect((err as HttpError).status).toBe(400);
+        expect((err as HttpError).message).toBe("Malformed JSON payload");
+      }
+    });
+
     it("rejects JSON primitives and arrays with 400 (requires object)", async () => {
       const makeReq = (val: string) =>
         new Request("http://localhost:3000/api/test", {
@@ -193,19 +259,71 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
   });
 
   describe("parseOptionalJsonBody", () => {
-    it("returns default fallback when request body is genuinely empty", async () => {
+    it("returns default fallback when request body is genuinely empty (zero bytes)", async () => {
       const req = new Request("http://localhost:3000/api/test", { method: "POST" });
       const data = await parseOptionalJsonBody(req, { defaultKey: "val" });
       expect(data).toEqual({ defaultKey: "val" });
     });
 
-    it("returns default fallback when Content-Length is explicitly '0'", async () => {
+    it("returns default fallback when Content-Length is '0' and body is genuinely empty", async () => {
       const req = new Request("http://localhost:3000/api/test", {
         method: "POST",
         headers: { "Content-Length": "0" },
       });
       const data = await parseOptionalJsonBody(req, { fallback: true });
       expect(data).toEqual({ fallback: true });
+    });
+
+    it("rejects Content-Length: 0 bypass attempt when body is genuinely non-empty (text/plain) with 415", async () => {
+      const req = new Request("http://localhost:3000/api/test", {
+        method: "POST",
+        headers: {
+          "Content-Length": "0",
+          "Content-Type": "text/plain",
+        },
+        body: "non-empty body disguised by Content-Length 0",
+      });
+
+      try {
+        await parseOptionalJsonBody(req);
+        expect.unreachable();
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(HttpError);
+        expect((err as HttpError).status).toBe(415);
+      }
+    });
+
+    it("rejects whitespace-only text/plain with 415", async () => {
+      const req = new Request("http://localhost:3000/api/test", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: "   \n\t  ",
+      });
+
+      try {
+        await parseOptionalJsonBody(req);
+        expect.unreachable();
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(HttpError);
+        expect((err as HttpError).status).toBe(415);
+      }
+    });
+
+    it("rejects whitespace-only application/json with 400 (malformed JSON)", async () => {
+      const req = new Request("http://localhost:3000/api/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "   \n\t  ",
+      });
+
+      try {
+        await parseOptionalJsonBody(req);
+        expect.unreachable();
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(HttpError);
+        expect((err as HttpError).status).toBe(400);
+        expect((err as HttpError).message).toBe("Malformed JSON payload");
+      }
     });
 
     it("rejects non-empty body with unsupported Content-Type (e.g. text/plain) with 415", async () => {
@@ -215,10 +333,11 @@ describe("HTTP Request Body & Content-Type Utility (src/lib/auth/http.ts)", () =
         body: "some text",
       });
 
-      await expect(parseOptionalJsonBody(req)).rejects.toThrow(HttpError);
       try {
         await parseOptionalJsonBody(req);
+        expect.unreachable();
       } catch (err: unknown) {
+        expect(err).toBeInstanceOf(HttpError);
         expect((err as HttpError).status).toBe(415);
       }
     });

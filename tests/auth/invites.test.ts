@@ -272,6 +272,104 @@ describe("Administrator Invitation Engine & API", () => {
       expect(data.error).toContain("Expiration cannot exceed 30 days");
     });
 
+    it("rejects Content-Length: 0 bypass attempt when body is genuinely non-empty text/plain with 415 and creates no invite", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const countBefore = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: {
+          "Content-Length": "0",
+          "Content-Type": "text/plain",
+        },
+        body: "non-empty body that Content-Length 0 tried to disguise",
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(415);
+
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+
+      const countAfter = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it("rejects whitespace-only text/plain with 415 and creates no invite record", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const countBefore = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: "   \n\t  ",
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(415);
+
+      const data = await res.json();
+      expect(data.error).toContain("application/json is required");
+
+      const countAfter = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it("rejects whitespace-only application/json with 400 as malformed JSON and creates no invite record", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const countBefore = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "   \n\t  ",
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(400);
+
+      const data = await res.json();
+      expect(data.error).toContain("Malformed JSON payload");
+
+      const countAfter = (
+        await client.query(`SELECT COUNT(*)::int AS count FROM "InviteCode";`)
+      ).rows[0].count;
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it("accepts Content-Length: 0 with genuinely empty body and creates invite with 7-day default", async () => {
+      currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
+
+      const req = new Request("http://localhost:3000/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Length": "0" },
+      });
+
+      const res = await createInviteRoute(req);
+      expect(res.status).toBe(201);
+
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      createdInviteIds.push(data.invite.id);
+
+      const expiresTime = new Date(data.invite.expiresAt).getTime();
+      const expectedTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      expect(Math.abs(expiresTime - expectedTime)).toBeLessThan(5000);
+    });
+
     it("rejects non-empty body with unsupported Content-Type (text/plain) with 415 and does not create an invite", async () => {
       currentCookieJar[SESSION_COOKIE_NAME] = adminToken;
 

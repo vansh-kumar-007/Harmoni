@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3B.1: Authentication API Security Audit & Corrections** (COMPLETED & VERIFIED)
+**Milestone 3B.2: Final Optional Request-Body Validation Fix** (COMPLETED & VERIFIED)
 
 ---
 
@@ -179,6 +179,34 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Expanded `tests/auth/invites.test.ts` (13 tests) to test non-empty body with unsupported Content-Type (415), `application/jsonp` rejection, and safe generic 500 error handling without leakage.
   - Full suite expanded to **8 test files, 93 tests passing**, with 0 database fixture leaks.
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (93 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### Milestone 3B.2: Final Optional Request-Body Validation Fix
+- [x] Closed `Content-Length: 0` bypass vulnerability in optional request body parser (`src/lib/auth/http.ts`):
+  - Removed insecure shortcut trusting `Content-Length: 0`.
+  - Always determines whether the request body is genuinely empty by reading the actual stream subject to the 64 KiB ceiling.
+  - Returns fallback only when zero actual body bytes were received.
+  - Early rejection for oversized bodies when `Content-Length` indicates an oversized request is strictly preserved.
+  - Disguised requests with `Content-Length: 0` and non-empty `text/plain` are strictly rejected with HTTP 415.
+- [x] Distinguished whitespace from an actually empty body (`src/lib/auth/http.ts`):
+  - Updated `readRequestBodyText()` to return `null` strictly when zero actual bytes were received.
+  - Preserved whitespace-only request content as non-empty strings.
+  - Consequently: whitespace-only `text/plain` is rejected with 415; whitespace-only `application/json` is rejected with 400 as malformed JSON; a genuinely empty admin invitation request still receives the default 7-day expiration.
+  - Verified at the route level that rejected requests do not create invitation records in PostgreSQL.
+- [x] Tightened RFC 9110 media-type syntax validation without external dependencies (`src/lib/auth/http.ts`):
+  - Validates type and subtype tokens (`TOKEN_REGEX`).
+  - Supports valid parameters (`application/json; charset=utf-8`, case-insensitive tokens, quoted strings).
+  - Handles quoted strings with semicolons and escaped characters per RFC 9110 (`qdtext` / `quoted-pair`).
+  - Rejects malformed parameters (trailing semicolons, empty parameters, missing equals, missing names, missing values, unclosed quoted strings, trailing characters after quotes, unquoted spaces in tokens).
+  - Rejects malformed media types (`application`, `application/`, `/json`, `application/json/extra`, comma lists, etc.) and `application/jsonp`.
+- [x] Sanitized administrator invitation error logging (`src/app/api/admin/invites/route.ts`):
+  - Replaced logging of raw exception objects with sanitized generic message (`[ERROR] Failed to create invitation: internal operation failed`).
+  - Guaranteed that raw invitation codes, credentials, database connection strings, passwords, or request payloads are never serialized into hosted logs.
+  - Preserved generic client-facing 500 error response with `Cache-Control: no-store`.
+- [x] Expanded Vitest test suite (`tests/auth/http.test.ts`, `tests/auth/invites.test.ts`):
+  - Expanded `tests/auth/http.test.ts` to 23 tests covering all media-type syntax edge cases, whitespace preservation, and `Content-Length: 0` bypass rejection.
+  - Expanded `tests/auth/invites.test.ts` to 17 tests with route-level DB count checks verifying 0 invitations are created upon failed requests.
+  - Total test suite expanded to **8 test files, 103 tests passing**.
+- [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (103 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
 ---
 
