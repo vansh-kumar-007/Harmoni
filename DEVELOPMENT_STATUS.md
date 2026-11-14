@@ -10,29 +10,42 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 1: Project Foundation & GitHub Initialization** (COMPLETED & VERIFIED)
+**Milestone 2A: Database Architecture & Prisma Foundation** (COMPLETED & VERIFIED)
 
 ---
 
-## 3. Completed Work (Milestone 1)
+## 3. Completed Work
+
+### Milestone 1: Project Foundation & GitHub Initialization
 - [x] Initialized Git repository on `main` branch with remote configured to `origin`.
 - [x] Scaffolded Next.js 16.4.6 project using `pnpm` with App Router, React 19.3.0, and TypeScript strict mode.
 - [x] Integrated Tailwind CSS v4 using `@tailwindcss/postcss` and PostCSS.
-- [x] Initialized shadcn/ui configuration (`components.json`) and core utilities (`src/lib/utils.ts` with `clsx` and `tailwind-merge`).
-- [x] Implemented minimal placeholder home view demonstrating verified app initialization without committing to premature UI templates.
+- [x] Initialized shadcn/ui configuration (`components.json`) and core utilities (`src/lib/utils.ts`).
 - [x] Created strict `.gitignore` blocking node modules, build artifacts, environment files, local databases, and secrets.
-- [x] Configured template `.env.example` with zero credentials.
 - [x] Established `AGENTS.md`, `README.md`, `DEVELOPMENT_STATUS.md`, and `LICENSE` (AGPL-3.0).
-- [x] Verified TypeScript compilation (`pnpm typecheck`), ESLint (`pnpm lint`), production build (`pnpm build`), and dev server runtime HTTP response (HTTP 200).
+- [x] Verified build and runtime; pushed initial commit (`5597976`) to `origin/main`.
+
+### Milestone 2A: Database Architecture & Prisma Foundation
+- [x] Installed Prisma ORM `7.10.1`, `@prisma/client` `7.10.1`, `@prisma/adapter-pg` `7.10.1`, `pg` `8.23.1`, and `server-only`.
+- [x] Configured Prisma 7 central configuration file (`prisma.config.ts`) using `defineConfig` from `prisma/config`.
+- [x] Designed normalized, decoupled database schema (`prisma/schema.prisma`):
+  - **Identity & Sessions:** `User` (with `avatarKey`, `bio`, `role`), `Session` (stores `sessionTokenHash`), `InviteCode` (stores `codeHash`, single-use/maxUses, audit links).
+  - **Social Relationships:** `Friendship` with strict canonical pair uniqueness (`userAId < userBId`) and `initiatorId`.
+  - **Music Catalog:** `Track` (canonical metadata independent of audio streams) and `AudioSource` (pluggable providers, permanent provider IDs, transient stream URLs, CC license and attribution tracking).
+  - **Personal Library:** `LikedTrack`, `Playlist`, `PlaylistTrack` (ordered tracks).
+  - **Listening History:** `Scrobble` (genuine playback events at >= 50% duration or 30s).
+  - **Direct Messaging:** `Conversation` (canonical pair uniqueness `userAId < userBId`), `ConversationParticipant`, `Message` (with optional `sharedTrackId`).
+- [x] Created reusable server-side database client (`src/lib/db.ts`) with development singleton caching and PostgreSQL connection pooling (`pg.Pool` + `PrismaPg`).
+- [x] Ignored generated Prisma client directory (`/src/generated/`) in `.gitignore`.
+- [x] Configured package build hooks (`"postinstall": "prisma generate"`, `"build": "prisma generate && next build --webpack"`).
+- [x] Verified schema validation (`pnpm db:validate`), client generation (`pnpm db:generate`), typechecking (`pnpm typecheck`), linting (`pnpm lint`), and production build (`pnpm build`).
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 2: Database Layer & Decoupled Schema Setup**
-  - Configure Prisma ORM with PostgreSQL.
-  - Implement decoupled `Track` metadata and `AudioSource` models.
-  - Set up `User`, `InviteCode`, `Friendship`, `Playlist`, `Scrobble`, and `Conversation` models.
-  - Create database seed script with sample legal Creative Commons tracks.
+- **Milestone 2B: Local Migration Verification & Test Fixtures (When PostgreSQL Service is Started)**
+  - Apply initial database migration to local PostgreSQL (`harmoni` database).
+  - Verify tables, indexes, and foreign-key constraints directly in PostgreSQL.
 - **Milestone 3: Invitation-Based Authentication & User Profiles**
   - Implement invite code validation and Argon2id password hashing.
   - Set up secure HTTP-only cookie session management and auth middleware.
@@ -60,16 +73,21 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ---
 
-## 5. Known Technical Limitations
-1. **Turbopack IPC Loader on Windows:** Next.js 16 Turbopack build currently encounters IPC communication issues with child process webpack loaders on Windows. The project is configured to use the stable webpack bundler (`next build --webpack`, `next dev --webpack`), which builds and runs reliably.
-2. **Server Port Sandbox Isolation:** On Windows environments inside the development sandbox, local HTTP loopback connections to listening ports require elevated network access or explicit host binding.
-3. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of inactivity; the very first request after an idle period experiences a ~300–500ms cold start latency while compute auto-wakes.
+## 5. Known Technical Limitations & Status
+1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), but the service was stopped and requires Windows administrator elevation (`net start postgresql-x64-18`) to start. Consequently, live schema migration testing remains pending.
+2. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
+3. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 
 ---
 
 ## 6. Current Dependencies & Licensing
 - `next` (16.4.6) — MIT License
 - `react` / `react-dom` (19.3.0) — MIT License
+- `@prisma/client` / `prisma` (7.10.1) — Apache-2.0 License
+- `@prisma/adapter-pg` (7.10.1) — Apache-2.0 License
+- `pg` (8.23.1) / `@types/pg` (8.23.1) — MIT License
+- `server-only` (0.0.1) — MIT License
+- `dotenv` (18.0.10) — BSD-2-Clause License
 - `tailwindcss` (4.3.3) / `@tailwindcss/postcss` (4.3.5) — MIT License
 - `postcss` (8.5.32) — MIT License
 - `clsx` (2.1.1) / `tailwind-merge` (3.7.0) — MIT License
@@ -78,11 +96,11 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - `typescript` (5.9.3) — Apache-2.0 License
 - `eslint` (9.39.5) / `eslint-config-next` (16.4.6) — MIT License
 
-*Every dependency is strictly free and open-source with permissive licensing compatible with AGPL-3.0.*
+*Every dependency is strictly free, open-source, and compatible with AGPL-3.0.*
 
 ---
 
 ## 7. Budget & Cost Confirmation
 - **Total Expenditure to Date:** **₹0.00 INR**
 - **Permitted Future Expenditure:** **₹0.00 INR (Permanent)**
-- **Paid Services Allowed:** None. No billing-enabled services, subscriptions, or automatic upgrade mechanisms will ever be introduced.
+- **Paid Services Allowed:** None.

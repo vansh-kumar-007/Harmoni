@@ -46,6 +46,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Generated Prisma Client
+/src/generated/
+
 # Operating System & IDE Files
 .DS_Store
 Thumbs.db

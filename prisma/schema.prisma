@@ -1,0 +1,281 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum AudioProvider {
+  JAMENDO
+  INTERNET_ARCHIVE
+  CUSTOM_URL
+  LOCAL
+}
+
+// -------------------------------------------------------------
+// IDENTITY, ACCESS & SESSIONS
+// -------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  displayName  String
+  passwordHash String
+  avatarKey    String   @default("avatar_1")
+  bio          String?  @db.VarChar(250)
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Sessions
+  sessions     Session[]
+
+  // Invitations created and redeemed
+  createdInvites InviteCode[] @relation("CreatedInvites")
+  redeemedInvite InviteCode?  @relation("RedeemedInvite")
+
+  // Social Friendships (User A is always lexicographically smaller than User B)
+  friendshipsA         Friendship[] @relation("FriendshipUserA")
+  friendshipsB         Friendship[] @relation("FriendshipUserB")
+  initiatedFriendships Friendship[] @relation("FriendshipInitiator")
+
+  // Personal Library & History
+  likedTracks  LikedTrack[]
+  playlists    Playlist[]
+  scrobbles    Scrobble[]
+
+  // Direct Messaging
+  conversationsA            Conversation[]            @relation("ConversationUserA")
+  conversationsB            Conversation[]            @relation("ConversationUserB")
+  conversationParticipation ConversationParticipant[]
+  sentMessages              Message[]                 @relation("SentMessages")
+
+  @@index([username])
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  sessionTokenHash String   @unique
+  userId           String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionTokenHash])
+}
+
+model InviteCode {
+  id          String    @id @default(cuid())
+  codeHash    String    @unique
+  createdById String
+  usedById    String?   @unique
+  isUsed      Boolean   @default(false)
+  maxUses     Int       @default(1)
+  timesUsed   Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  createdBy   User      @relation("CreatedInvites", fields: [createdById], references: [id], onDelete: Cascade)
+  usedBy      User?     @relation("RedeemedInvite", fields: [usedById], references: [id], onDelete: SetNull)
+
+  @@index([codeHash])
+}
+
+// -------------------------------------------------------------
+// SOCIAL RELATIONSHIPS (STRICT PAIR UNIQUENESS)
+// -------------------------------------------------------------
+
+model Friendship {
+  id          String           @id @default(cuid())
+  userAId     String           // Canonical invariant: userAId < userBId
+  userBId     String
+  initiatorId String           // User ID who sent the request
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  userA       User             @relation("FriendshipUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB       User             @relation("FriendshipUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  initiator   User             @relation("FriendshipInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+
+  @@unique([userAId, userBId])
+  @@index([userAId, status])
+  @@index([userBId, status])
+  @@index([initiatorId])
+}
+
+// -------------------------------------------------------------
+// MUSIC CATALOG & DECOUPLED AUDIO SOURCES
+// -------------------------------------------------------------
+
+model Track {
+  id                 String   @id @default(cuid())
+  title              String
+  artistName         String
+  albumName          String?
+  durationMs         Int      @default(0)
+  coverUrl           String?
+  artworkProvider    String?  // e.g. "JAMENDO", "COVER_ART_ARCHIVE", "CUSTOM"
+  artworkLicense     String?  // e.g. "CC BY-SA 3.0", "Fair Use Thumbnail"
+  artworkAttribution String?  // Attribution requirement for the artwork
+  mbid               String?  // MusicBrainz Recording ID
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  audioSources       AudioSource[]
+  likedBy            LikedTrack[]
+  playlistItems      PlaylistTrack[]
+  scrobbles          Scrobble[]
+  sharedInMessages   Message[]
+
+  @@index([title, artistName])
+}
+
+model AudioSource {
+  id                 String        @id @default(cuid())
+  trackId            String
+  provider           AudioProvider @default(JAMENDO)
+  providerTrackId    String        // Permanent ID with provider (e.g., Jamendo track ID)
+  streamUrl          String?       // Ephemeral/transient resolved stream URL
+  streamUrlExpiresAt DateTime?     // Expiration timestamp of streamUrl
+  format             String?       @default("mp3") // mp3, ogg, flac
+  bitrate            Int?          @default(128)   // kbps
+  isAvailable        Boolean       @default(true)  // Availability flag
+  licenseType        String?       // e.g. "CC BY-NC-SA 3.0", "Public Domain"
+  licenseUrl         String?       // Link to legal license text
+  attributionText    String?       // Mandatory artist attribution string
+  lastVerifiedAt     DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  track              Track         @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  scrobbles          Scrobble[]
+
+  @@unique([provider, providerTrackId])
+  @@index([trackId, isAvailable])
+}
+
+// -------------------------------------------------------------
+// PERSONAL LIBRARY & LISTENING HISTORY
+// -------------------------------------------------------------
+
+model LikedTrack {
+  userId    String
+  trackId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@id([userId, trackId])
+}
+
+model Playlist {
+  id          String          @id @default(cuid())
+  userId      String
+  title       String          @db.VarChar(100)
+  description String?         @db.VarChar(300)
+  coverUrl    String?
+  isPublic    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks      PlaylistTrack[]
+
+  @@index([userId])
+}
+
+model PlaylistTrack {
+  id         String   @id @default(cuid())
+  playlistId String
+  trackId    String
+  position   Int
+  addedAt    DateTime @default(now())
+
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([playlistId, position])
+  @@index([trackId])
+}
+
+model Scrobble {
+  id                 String       @id @default(cuid())
+  userId             String
+  trackId            String
+  audioSourceId      String?
+  listenedAt         DateTime     @default(now())
+  durationListenedMs Int
+  isCompleted        Boolean      @default(true) // Recorded on genuine playback >= 50% or 30s
+
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track              Track        @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  audioSource        AudioSource? @relation(fields: [audioSourceId], references: [id], onDelete: SetNull)
+
+  @@index([userId, listenedAt])
+  @@index([trackId])
+}
+
+// -------------------------------------------------------------
+// PRIVATE CONVERSATIONS (PAIR UNIQUENESS) & TRACK SHARING
+// -------------------------------------------------------------
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  userAId      String                    // Canonical invariant: userAId < userBId
+  userBId      String
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  userA        User                      @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB        User                      @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages     Message[]
+  participants ConversationParticipant[]
+
+  @@unique([userAId, userBId])
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  joinedAt       DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String?      @db.VarChar(2000)
+  sharedTrackId  String?      // Embedded interactive track card
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  sharedTrack    Track?       @relation(fields: [sharedTrackId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
