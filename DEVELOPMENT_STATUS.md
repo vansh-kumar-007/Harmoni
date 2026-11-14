@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 2A: Database Architecture & Prisma Foundation** (COMPLETED & VERIFIED)
+**Milestone 2B: PostgreSQL Migration, Schema Audit & Database Verification** (COMPLETED & VERIFIED)
 
 ---
 
@@ -29,23 +29,48 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] Installed Prisma ORM `7.10.1`, `@prisma/client` `7.10.1`, `@prisma/adapter-pg` `7.10.1`, `pg` `8.23.1`, and `server-only`.
 - [x] Configured Prisma 7 central configuration file (`prisma.config.ts`) using `defineConfig` from `prisma/config`.
 - [x] Designed normalized, decoupled database schema (`prisma/schema.prisma`):
-  - **Identity & Sessions:** `User` (with `avatarKey`, `bio`, `role`), `Session` (stores `sessionTokenHash`), `InviteCode` (stores `codeHash`, single-use/maxUses, audit links).
+  - **Identity & Sessions:** `User` (with `avatarKey`, `bio`, `role`), `Session` (stores `sessionTokenHash`), `InviteCode` (stores `codeHash`, audit links).
   - **Social Relationships:** `Friendship` with strict canonical pair uniqueness (`userAId < userBId`) and `initiatorId`.
   - **Music Catalog:** `Track` (canonical metadata independent of audio streams) and `AudioSource` (pluggable providers, permanent provider IDs, transient stream URLs, CC license and attribution tracking).
   - **Personal Library:** `LikedTrack`, `Playlist`, `PlaylistTrack` (ordered tracks).
   - **Listening History:** `Scrobble` (genuine playback events at >= 50% duration or 30s).
-  - **Direct Messaging:** `Conversation` (canonical pair uniqueness `userAId < userBId`), `ConversationParticipant`, `Message` (with optional `sharedTrackId`).
+  - **Direct Messaging:** `Conversation` (canonical pair uniqueness `userAId < userBId`), `Message` (with optional `sharedTrackId`).
 - [x] Created reusable server-side database client (`src/lib/db.ts`) with development singleton caching and PostgreSQL connection pooling (`pg.Pool` + `PrismaPg`).
 - [x] Ignored generated Prisma client directory (`/src/generated/`) in `.gitignore`.
 - [x] Configured package build hooks (`"postinstall": "prisma generate"`, `"build": "prisma generate && next build --webpack"`).
 - [x] Verified schema validation (`pnpm db:validate`), client generation (`pnpm db:generate`), typechecking (`pnpm typecheck`), linting (`pnpm lint`), and production build (`pnpm build`).
 
+### Milestone 2B: PostgreSQL Migration, Schema Audit & Database Verification
+- [x] Audited and refactored Prisma schema:
+  - Simplified `InviteCode` to strictly single-use redemption derived from `@unique usedById` (removed `maxUses`, `timesUsed`, and `isUsed`).
+  - Streamlined `Conversation` to canonical pair (`userAId < userBId`) with `userALastReadAt` and `userBLastReadAt` read receipts; removed redundant `ConversationParticipant` join table.
+  - Verified relational integrity, unique indexes, and cascade delete rules across all models.
+- [x] Generated initial migration (`20261115021000_init/migration.sql`) and created `prisma/migrations/migration_lock.toml` for PostgreSQL.
+- [x] Embedded custom PostgreSQL CHECK constraints directly in migration SQL:
+  - `friendship_canonical_ordering_check` (`"userAId" < "userBId"`)
+  - `friendship_no_self_check` (`"userAId" <> "userBId"`)
+  - `friendship_initiator_check` (`"initiatorId" = "userAId" OR "initiatorId" = "userBId"`)
+  - `conversation_canonical_ordering_check` (`"userAId" < "userBId"`)
+  - `conversation_no_self_check` (`"userAId" <> "userBId"`)
+- [x] Applied migration to local PostgreSQL 18.4 database (`harmoni`) using `prisma migrate deploy` under dedicated role `harmoni_app`.
+- [x] Created automated database integration test suite (`scripts/verify-db.mjs`, executable via `pnpm db:test`) verifying:
+  - Active connection and metadata without exposing credentials.
+  - All 13 tables in `public` schema.
+  - Presence and definitions of all custom CHECK constraints.
+  - User creation and unique username constraint enforcement (SQLSTATE 23505).
+  - Single-use invite code issuance, redemption, and reuse prevention (SQLSTATE 23505).
+  - Canonical friendship ordering and rejection of inverted pairs, self-friendships, and outsider initiators.
+  - Canonical conversation ordering and rejection of inverted pairs and self-conversations.
+  - Message creation linked to conversation and sender.
+  - Cascading deletion across Conversations, Messages, Friendships, and InviteCodes upon user deletion.
+  - 100% database cleanliness post-run (0 leftover test fixtures).
+- [x] Added `db:migrate:status`, `db:migrate:deploy`, and `db:test` scripts to `package.json`.
+- [x] Confirmed `.env` is properly gitignored and credentials remain secret.
+- [x] Verified full pipeline: `pnpm db:validate`, `pnpm db:generate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 2B: Local Migration Verification & Test Fixtures (When PostgreSQL Service is Started)**
-  - Apply initial database migration to local PostgreSQL (`harmoni` database).
-  - Verify tables, indexes, and foreign-key constraints directly in PostgreSQL.
 - **Milestone 3: Invitation-Based Authentication & User Profiles**
   - Implement invite code validation and Argon2id password hashing.
   - Set up secure HTTP-only cookie session management and auth middleware.
@@ -74,7 +99,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 5. Known Technical Limitations & Status
-1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), but the service was stopped and requires Windows administrator elevation (`net start postgresql-x64-18`) to start. Consequently, live schema migration testing remains pending.
+1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
 2. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 3. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 

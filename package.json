@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "db:validate": "prisma validate",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "db:migrate:status": "prisma migrate status",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:test": "node scripts/verify-db.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",

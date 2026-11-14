@@ -44,7 +44,7 @@ model User {
   // Sessions
   sessions     Session[]
 
-  // Invitations created and redeemed
+  // Strictly single-use invitations created and redeemed
   createdInvites InviteCode[] @relation("CreatedInvites")
   redeemedInvite InviteCode?  @relation("RedeemedInvite")
 
@@ -58,11 +58,10 @@ model User {
   playlists    Playlist[]
   scrobbles    Scrobble[]
 
-  // Direct Messaging
-  conversationsA            Conversation[]            @relation("ConversationUserA")
-  conversationsB            Conversation[]            @relation("ConversationUserB")
-  conversationParticipation ConversationParticipant[]
-  sentMessages              Message[]                 @relation("SentMessages")
+  // Direct 1-on-1 Messaging
+  conversationsA Conversation[] @relation("ConversationUserA")
+  conversationsB Conversation[] @relation("ConversationUserB")
+  sentMessages   Message[]      @relation("SentMessages")
 
   @@index([username])
 }
@@ -85,9 +84,6 @@ model InviteCode {
   codeHash    String    @unique
   createdById String
   usedById    String?   @unique
-  isUsed      Boolean   @default(false)
-  maxUses     Int       @default(1)
-  timesUsed   Int       @default(0)
   expiresAt   DateTime?
   createdAt   DateTime  @default(now())
 
@@ -234,34 +230,25 @@ model Scrobble {
 }
 
 // -------------------------------------------------------------
-// PRIVATE CONVERSATIONS (PAIR UNIQUENESS) & TRACK SHARING
+// DIRECT 1-ON-1 CONVERSATIONS (PAIR UNIQUENESS) & TRACK SHARING
 // -------------------------------------------------------------
 
 model Conversation {
-  id           String                    @id @default(cuid())
-  userAId      String                    // Canonical invariant: userAId < userBId
-  userBId      String
-  createdAt    DateTime                  @default(now())
-  updatedAt    DateTime                  @updatedAt
+  id             String    @id @default(cuid())
+  userAId        String    // Canonical invariant: userAId < userBId
+  userBId        String
+  userALastReadAt DateTime?
+  userBLastReadAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  userA        User                      @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
-  userB        User                      @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
-  messages     Message[]
-  participants ConversationParticipant[]
+  userA          User      @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB          User      @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages       Message[]
 
   @@unique([userAId, userBId])
-}
-
-model ConversationParticipant {
-  conversationId String
-  userId         String
-  lastReadAt     DateTime?
-  joinedAt       DateTime @default(now())
-
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([conversationId, userId])
+  @@index([userAId])
+  @@index([userBId])
 }
 
 model Message {
