@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.0.4: Theme System Accuracy & Design Specification Audit** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 3C.1)
+**Milestone 3C.1: Multi-Theme Engine & Per-User Theme Preference Persistence** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 3C.2)
 
 ---
 
@@ -290,17 +290,62 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Split frontend roadmap into two distinct sequential milestones:
     1. **Milestone 3C.1: Multi-Theme Engine & User Preference Persistence**
     2. **Milestone 3C.2: User Profiles & Avatar Presets**
-- [ ] Awaiting user review and explicit approval before initiating Milestone 3C.1.
+### Milestone 3C.1: Multi-Theme Engine & Per-User Theme Preference Persistence (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Centralized Five-Theme Registry (`src/lib/theme/constants.ts`):**
+  - Single source of truth defining `THEME_REGISTRY` (`obsidian-studio`, `nordic-aurora`, `editorial-vinyl`, `crimson-vigil`, `cobalt-web`).
+  - Strongly-typed `ThemeKey` and `DEFAULT_THEME` (`obsidian-studio`).
+  - Complete metadata registry `THEMES_META` with names, subtitles, aesthetic descriptions, 4-chip swatches, and contrast metrics.
+  - Type guard `isThemeKey()` and safe fallback helper `getValidThemeKey()` returning `obsidian-studio` for null, undefined, or unknown values.
+  - 100% original visual styling with zero Marvel logos, character artwork, copyrighted promo images, or masks.
+- [x] **Database Schema & Migration (`20261115070000_add_user_theme_key`):**
+  - Extended `User` model in `prisma/schema.prisma` with `themeKey String @default("obsidian-studio") @db.VarChar(50)`.
+  - Preserved all existing fields, relations, and the `Role` enum.
+  - Deployed migration to local PostgreSQL (`harmoni` database) using Prisma 7 migration deploy workflow.
+  - Verified `themeKey` column properties in PostgreSQL: `VARCHAR(50)`, `NOT NULL`, `DEFAULT 'obsidian-studio'`.
+  - Intentionally did not add an index on `themeKey` (lookups occur by primary key `id` or unique `username`).
+- [x] **SafeUser Interface & Authentication Propagation:**
+  - Extended `SafeUser` in `src/lib/auth/session.ts` with non-sensitive `themeKey: string`.
+  - Updated `toSafeUser()` to pass `themeKey` through with safe fallback.
+  - Verified zero exposure of sensitive authentication credentials or tokens.
+- [x] **Centralized CSS Theme System (`src/app/globals.css`):**
+  - Root-level `html[data-theme="..."]` token mapping for all five themes.
+  - Seamless integration with Tailwind CSS v4 `@theme inline` and shadcn/ui semantic variables (`--background`, `--foreground`, `--card`, `--primary`, `--secondary`, `--accent`, `--ring`, etc.).
+  - Preserved exact contrast fixes (Cobalt Web primary button `#dc2626` at 4.83:1 WCAG AA).
+- [x] **Zero-FOUC Server-Side Theme Loading (`src/app/layout.tsx`):**
+  - Converted RootLayout to asynchronous Server Component.
+  - Fetches current authenticated user via React 19 memoized `getCurrentUser()` DAL.
+  - Resolves theme via `getValidThemeKey()` and injects `<html lang="en" data-theme={themeKey}>` directly into initial HTML response.
+  - Defaults safely to `obsidian-studio` for unauthenticated visitors.
+- [x] **Authenticated Theme Preference Endpoint (`PATCH /api/users/me/theme`):**
+  - Enforces user authentication via `requireUser()` DAL (returns 401 if unauthenticated).
+  - Validates request body with strict 64 KiB size limit and `application/json` Content-Type via `parseJsonBody()`.
+  - Validates payload against `THEME_REGISTRY` with Zod (returns 400 for unknown/missing keys).
+  - Mutates `themeKey` strictly for the authenticated user (`db.user.update({ where: { id: currentUser.id } })`).
+  - Returns sanitized response `{ success: true, themeKey }` with `Cache-Control: no-store`.
+- [x] **Appearance Settings Page (`/settings/appearance`):**
+  - Standalone, authenticated settings page at `src/app/settings/appearance/page.tsx`.
+  - Interactive two-stage client component `src/app/settings/appearance/appearance-form.tsx`:
+    1. Instant live preview on `document.documentElement.setAttribute('data-theme', ...)` upon selecting any theme card.
+    2. Persistent database update on clicking "Save Theme Preference".
+    3. "Reset to Obsidian Studio" and "Revert Preview" controls.
+    4. Real-time visual feedback for unsaved changes, saving spinners, success toasts, and error alerts.
+    5. Reverts DOM preview back to persisted theme if API call fails.
+  - Full keyboard accessibility with `role="radiogroup"`, `role="radio"`, roving `tabIndex`, and arrow key navigation (`ArrowRight`, `ArrowLeft`, `ArrowDown`, `ArrowUp`).
+  - Clear unauthenticated gate when accessed without an active session.
+- [x] **Comprehensive Automated Test Coverage:**
+  - Added `tests/theme/constants.test.ts` (7 tests).
+  - Added `tests/theme/route.test.ts` (9 tests).
+  - Added `tests/theme/db-theme.test.ts` (3 tests).
+  - Full Vitest suite passes: **11 test files, 122 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` creates all 8 static and dynamic routes.
+- [ ] Awaiting user review and explicit approval before initiating Milestone 3C.2.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3C.1: Multi-Theme Engine & User Preference Persistence (Next Pending Milestone)**
-  - Apply Prisma migration adding `themeKey String @default("obsidian-studio") @db.VarChar(50)` to `User`.
-  - Implement zero-FOUC server-rendered `RootLayout` reading `getCurrentUser()` and applying `data-theme` to `<html>`.
-  - Implement `PATCH /api/users/me/theme` with strict Zod validation against `THEME_REGISTRY` and 64 KiB body limits.
-  - Build accessible Appearance Settings modal / page component with the 5 interactive cards.
-- **Milestone 3C.2: User Profiles & Avatar Presets (Subsequent Milestone)**
+- **Milestone 3C.2: User Profiles & Avatar Presets (Next Pending Milestone)**
   - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
   - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 bundled SVG avatar presets (`avatar_1` to `avatar_8`).
   - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
@@ -330,7 +375,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`), while pure unit tests pass (33 tests). When unsandboxed, all 103 tests pass cleanly.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`), while pure unit tests pass (40 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`). When unsandboxed, all 11 test files and **all 122 tests pass cleanly with 0 errors in ~5.5s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.

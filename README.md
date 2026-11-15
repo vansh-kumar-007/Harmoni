@@ -105,6 +105,20 @@ Harmoni implements a hardened, invitation-only authentication backend with stric
 | `POST` | `/api/auth/login` | Public | Username/password authentication with dummy Argon2id verification for anti-enumeration and timing protection. |
 | `POST` | `/api/auth/logout` | Authenticated | Idempotent session revocation in PostgreSQL and cookie clearance. |
 | `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. Rejects unsupported payloads. |
+| `PATCH` | `/api/users/me/theme` | Authenticated | Updates personal visual theme preference (`obsidian-studio`, `nordic-aurora`, `editorial-vinyl`, `crimson-vigil`, `cobalt-web`). |
+
+---
+
+## Appearance Settings & Multi-Theme Engine (Milestone 3C.1)
+
+Harmoni provides five distinct selectable visual themes with independent, per-user persistent storage:
+1. **Obsidian Studio (Default):** Warm Analog Hi-Fi (Brushed slate, warm charcoal, amber glow).
+2. **Nordic Aurora:** Atmospheric Midnight Glass (Midnight ink glass, bioluminescent cyan and mint emerald).
+3. **Editorial Vinyl:** Swiss Typographic Record Club (Matte vinyl black, Swiss grid typography, acid-lime).
+4. **Crimson Vigil:** Daredevil-inspired Shadow Noir (Deep shadow black, dark oxblood leather, blind-justice crimson).
+5. **Cobalt Web:** Spider-Man-inspired Midnight Navy (Midnight navy, royal cobalt, kinetic red-600, sky cyan pips).
+
+Users can preview and save preferences at `/settings/appearance`. The theme is rendered server-side via Next.js 16 App Router for zero-FOUC (Flash of Unstyled Content).
 
 ---
 

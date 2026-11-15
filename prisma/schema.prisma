@@ -38,6 +38,7 @@ model User {
   avatarKey    String   @default("avatar_1")
   bio          String?  @db.VarChar(250)
   role         Role     @default(USER)
+  themeKey     String   @default("obsidian-studio") @db.VarChar(50)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

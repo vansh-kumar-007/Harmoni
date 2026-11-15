@@ -21,6 +21,7 @@ export interface SafeUser {
   avatarKey: string;
   bio: string | null;
   role: "USER" | "ADMIN";
+  themeKey: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +36,7 @@ export function toSafeUser(user: {
   avatarKey: string;
   bio: string | null;
   role: "USER" | "ADMIN";
+  themeKey?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): SafeUser {
@@ -45,6 +47,7 @@ export function toSafeUser(user: {
     avatarKey: user.avatarKey,
     bio: user.bio,
     role: user.role,
+    themeKey: user.themeKey || "obsidian-studio",
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
