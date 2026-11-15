@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harmoni — Visual Design Exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Obsidian Studio (Recommended) */
+      --obsidian-bg: #0b0c10;
+      --obsidian-surface: #14161f;
+      --obsidian-card: #181b26;
+      --obsidian-border: #252937;
+      --obsidian-amber: #f59e0b;
+      --obsidian-amber-glow: #fbbf24;
+      --obsidian-brass: #d97706;
+      --obsidian-text: #f3f4f6;
+      --obsidian-muted: #9ca3af;
+
+      /* Nordic Aurora */
+      --aurora-bg: #08090d;
+      --aurora-surface: #111420;
+      --aurora-card: #161b2a;
+      --aurora-border: #22293d;
+      --aurora-cyan: #06b6d4;
+      --aurora-emerald: #10b981;
+      --aurora-indigo: #6366f1;
+      --aurora-text: #f8fafc;
+      --aurora-muted: #8b949e;
+
+      /* Editorial Vinyl */
+      --editorial-bg: #0d0e11;
+      --editorial-surface: #15171e;
+      --editorial-card: #1b1e27;
+      --editorial-border: #2d313f;
+      --editorial-lime: #ccff00;
+      --editorial-cobalt: #3b82f6;
+      --editorial-text: #ffffff;
+      --editorial-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #06070a;
+      color: #f3f4f6;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Top Global Switcher Bar */
+    .prototype-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 12, 16, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #252937;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #0b0c10;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+    }
+
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      color: #f3f4f6;
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: #1c202c;
+      color: #f59e0b;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      border: 1px solid #252937;
+    }
+
+    .view-tabs {
+      display: flex;
+      background: #11131a;
+      border: 1px solid #252937;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .view-btn {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .view-btn:hover {
+      color: #f3f4f6;
+    }
+
+    .view-btn.active {
+      background: #252937;
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    .figma-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Container */
+    .stage-container {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      color: #9ca3af;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* Direction Comparison Cards Grid */
+    .directions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 1024px) {
+      .directions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .direction-card {
+      border-radius: 14px;
+      border: 1px solid;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .direction-card.obsidian {
+      background: var(--obsidian-surface);
+      border-color: var(--obsidian-border);
+    }
+
+    .direction-card.aurora {
+      background: var(--aurora-surface);
+      border-color: var(--aurora-border);
+    }
+
+    .direction-card.editorial {
+      background: var(--editorial-surface);
+      border-color: var(--editorial-border);
+    }
+
+    .dir-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .obsidian .dir-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .aurora .dir-badge {
+      background: rgba(6, 182, 212, 0.15);
+      color: #06b6d4;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .editorial .dir-badge {
+      background: rgba(204, 255, 0, 0.15);
+      color: #ccff00;
+      border: 1px solid rgba(204, 255, 0, 0.3);
+    }
+
+    .dir-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .obsidian .dir-title { font-family: 'Plus Jakarta Sans', sans-serif; color: #f3f4f6; }
+    .aurora .dir-title { font-family: 'Space Grotesk', sans-serif; color: #f8fafc; }
+    .editorial .dir-title { font-family: 'Syne', sans-serif; color: #ffffff; }
+
+    .dir-desc {
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 8px;
+    }
+
+    .swatch {
+      flex: 1;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* Miniature UI Component Preview inside Direction Cards */
+    .mini-player-preview {
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid;
+    }
+
+    .obsidian .mini-player-preview {
+      background: #0b0c10;
+      border-color: #252937;
+    }
+
+    .aurora .mini-player-preview {
+      background: rgba(8, 9, 13, 0.7);
+      border-color: rgba(6, 182, 212, 0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    .editorial .mini-player-preview {
+      background: #0d0e11;
+      border-color: #2d313f;
+    }
+
+    .mini-artwork {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .obsidian .mini-artwork {
+      background: linear-gradient(135deg, #252937, #14161f);
+      border: 1px solid #f59e0b;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+    }
+
+    .aurora .mini-artwork {
+      background: linear-gradient(135deg, #06b6d4, #6366f1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .editorial .mini-artwork {
+      background: #21242e;
+      border: 1px solid #ccff00;
+    }
+
+    .mini-track-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mini-track-title {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-track-artist {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .mini-play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .obsidian .mini-play-btn {
+      background: #f59e0b;
+      color: #0b0c10;
+    }
+
+    .aurora .mini-play-btn {
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      color: #08090d;
+    }
+
+    .editorial .mini-play-btn {
+      background: #ccff00;
+      color: #0d0e11;
+      border-radius: 4px;
+    }
+
+    /* Screen Frames */
+    .screen-stage {
+      background: #090a0f;
+      border: 1px solid #252937;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      margin-bottom: 48px;
+    }
+
+    .screen-stage-bar {
+      background: #11131a;
+      border-bottom: 1px solid #252937;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 6px;
+    }
+
+    .traffic-light {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Desktop Viewport (1440x900 simulated) */
+    .desktop-frame {
+      width: 100%;
+      min-height: 860px;
+      display: flex;
+      position: relative;
+      background: #0b0c10;
+    }
+
+    /* Left Sidebar */
+    .desktop-sidebar {
+      width: 240px;
+      background: #11131a;
+      border-right: 1px solid #252937;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-section {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-heading {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 10px;
+      padding-left: 10px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #9ca3af;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-link:hover {
+      background: #181b26;
+      color: #f3f4f6;
+    }
+
+    .sidebar-link.active {
+      background: #1c202c;
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    .sidebar-link-icon {
+      font-size: 16px;
+      width: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* User Profile Card in Sidebar */
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #14161f;
+      border: 1px solid #252937;
+    }
+
+    .sidebar-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #252937;
+      border: 1px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .sidebar-user-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-username {
+      font-size: 12px;
+      font-weight: 600;
+      color: #f3f4f6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-userhandle {
+      font-size: 11px;
+      color: #6b7280;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Desktop Main Content Area */
+    .desktop-main {
+      flex: 1;
+      padding: 32px 40px 120px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    /* Top Discover Hero */
+    .hero-banner {
+      border-radius: 14px;
+      background: linear-gradient(135deg, #181b26 0%, #11131a 100%);
+      border: 1px solid #252937;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .hero-desc {
+      color: #9ca3af;
+      font-size: 14px;
+      max-width: 480px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f59e0b;
+      color: #0b0c10;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .hero-cta:hover {
+      background: #fbbf24;
+      transform: translateY(-1px);
+    }
+
+    .hero-vinyl {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: repeating-radial-gradient(circle, #1a1d26, #1a1d26 4px, #11131a 5px, #11131a 8px);
+      border: 3px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      animation: spin 16s linear infinite;
+    }
+
+    .hero-vinyl-center {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #0b0c10;
+      font-weight: 800;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Track Listing Table */
+    .track-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .track-table th {
+      text-align: left;
+      padding: 10px 14px;
+      color: #6b7280;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #1c202c;
+    }
+
+    .track-row {
+      border-bottom: 1px solid #141720;
+      transition: background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .track-row:hover {
+      background: #141722;
+    }
+
+    .track-row.playing {
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .track-row td {
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+
+    .track-cell-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .track-art {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: #1e222d;
+      border: 1px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .track-name {
+      font-weight: 600;
+      color: #f3f4f6;
+    }
+
+    .track-row.playing .track-name {
+      color: #f59e0b;
+    }
+
+    .track-artist {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .track-license-badge {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      background: #181b26;
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .equalizer-anim {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      width: 14px;
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: #f59e0b;
+      border-radius: 1px;
+      animation: eqBounce 1s ease-in-out infinite alternate;
+    }
+
+    .eq-bar:nth-child(1) { height: 60%; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 100%; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+
+    @keyframes eqBounce {
+      0% { height: 20%; }
+      100% { height: 100%; }
+    }
+
+    /* Docked Bottom Audio Player */
+    .docked-player {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: #11131a;
+      border-top: 1px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      gap: 24px;
+      z-index: 50;
+    }
+
+    .player-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 280px;
+    }
+
+    .player-art {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: #1e222d;
+      border: 1px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .player-center {
+      flex: 1;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-player {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease;
+    }
+
+    .btn-player:hover { color: #f3f4f6; }
+
+    .btn-player-primary {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f59e0b;
+      color: #0b0c10;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .btn-player-primary:hover {
+      background: #fbbf24;
+      color: #0b0c10;
+    }
+
+    .scrubber-bar-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #6b7280;
+    }
+
+    .scrubber-track {
+      flex: 1;
+      height: 4px;
+      background: #1e222e;
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .scrubber-progress {
+      width: 45%;
+      height: 100%;
+      background: #f59e0b;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .scrubber-head {
+      position: absolute;
+      right: -4px;
+      top: -4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+    }
+
+    .player-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 240px;
+      justify-content: flex-end;
+    }
+
+    .scrobble-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Mobile Frame (390x844 simulated) */
+    .mobile-frame-container {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .mobile-device {
+      width: 390px;
+      height: 844px;
+      background: #0b0c10;
+      border-radius: 40px;
+      border: 8px solid #252937;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .mobile-notch {
+      height: 28px;
+      background: #11131a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .mobile-header {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1c202c;
+    }
+
+    .mobile-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 140px;
+    }
+
+    .mobile-docked-player {
+      position: absolute;
+      bottom: 56px;
+      left: 10px;
+      right: 10px;
+      height: 52px;
+      background: #141722;
+      border: 1px solid #252937;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      z-index: 40;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .mobile-nav-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #11131a;
+      border-top: 1px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 50;
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: #6b7280;
+      text-decoration: none;
+    }
+
+    .mobile-nav-item.active {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    /* Profile Specific Layouts */
+    .profile-hero {
+      background: linear-gradient(180deg, #161924 0%, #0b0c10 100%);
+      border-radius: 14px;
+      border: 1px solid #252937;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+
+    .profile-avatar-large {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: #181b26;
+      border: 3px solid #d97706;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-names {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .profile-display-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .role-badge {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .profile-meta {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .profile-bio {
+      font-size: 14px;
+      color: #d1d5db;
+      line-height: 1.5;
+      max-width: 600px;
+      margin-bottom: 16px;
+    }
+
+    .btn-edit-profile {
+      background: #1e222e;
+      color: #f3f4f6;
+      border: 1px solid #252937;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-edit-profile:hover {
+      background: #252937;
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    /* Preset Avatars Showcase */
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .avatar-preset-card {
+      background: #14161f;
+      border: 1px solid #252937;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-preset-preview {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #1a1d28;
+      border: 2px solid #252937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      transition: border-color 0.15s ease;
+    }
+
+    .avatar-preset-card:hover .avatar-preset-preview {
+      border-color: #f59e0b;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+
+    .avatar-preset-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #f3f4f6;
+    }
+
+    .avatar-preset-key {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="prototype-header">
+    <div class="brand-group">
+      <div class="brand-logo">H</div>
+      <div>
+        <div class="brand-title">Harmoni Design Exploration</div>
+        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.1 Visual Specification</div>
+      </div>
+      <span class="brand-badge">STUDIO HI-FI PROTOTYPE</span>
+    </div>
+
+    <!-- View Switcher -->
+    <div class="view-tabs">
+      <button class="view-btn active" onclick="switchView('directions')">1. Visual Directions</button>
+      <button class="view-btn" onclick="switchView('desktop-discover')">2. Desktop Discover</button>
+      <button class="view-btn" onclick="switchView('desktop-profile')">3. Desktop Profile</button>
+      <button class="view-btn" onclick="switchView('mobile')">4. Mobile Screens</button>
+      <button class="view-btn" onclick="switchView('tokens')">5. Design Tokens & Avatars</button>
+    </div>
+
+    <div class="figma-status">
+      <span class="status-dot"></span>
+      <span>Figma Student File Linked</span>
+    </div>
+  </header>
+
+  <main class="stage-container">
+
+    <!-- VIEW 1: THREE VISUAL DIRECTIONS COMPARISON -->
+    <section id="view-directions">
+      <div class="section-title">
+        <span>Three Visual Directions for Harmoni</span>
+      </div>
+      <p class="section-desc">Comparing three tailored aesthetic directions built for an intimate circle of 5–15 friends at ₹0 lifetime cost.</p>
+
+      <div class="directions-grid">
+        <!-- Direction 1: Obsidian Studio (Recommended) -->
+        <div class="direction-card obsidian">
+          <span class="dir-badge">★ RECOMMENDED DIRECTION</span>
+          <h3 class="dir-title">1. Obsidian Studio</h3>
+          <p class="dir-desc">Warm analog audio preamps, vinyl listening rooms, and the cozy amber tube glow of a late-night private music session with friends.</p>
+          
+          <div class="color-swatches">
+            <div class="swatch" style="background: #0b0c10;">#0b0c10</div>
+            <div class="swatch" style="background: #14161f;">#14161f</div>
+            <div class="swatch" style="background: #f59e0b; color: #000;">#f59e0b</div>
+            <div class="swatch" style="background: #d97706;">#d97706</div>
+          </div>
+
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
+            Typography: Plus Jakarta Sans + Inter + JetBrains Mono
+          </div>
+
+          <!-- Component preview -->
+          <div class="mini-player-preview">
+            <div class="mini-artwork">📻</div>
+            <div class="mini-track-info">
+              <div class="mini-track-title">Solar Drift</div>
+              <div class="mini-track-artist">Tycho · CC BY-NC-SA 4.0</div>
+            </div>
+            <button class="mini-play-btn">▶</button>
+          </div>
+        </div>
+
+        <!-- Direction 2: Nordic Aurora -->
+        <div class="direction-card aurora">
+          <span class="dir-badge">ETHEREAL MINIMALISM</span>
+          <h3 class="dir-title">2. Nordic Aurora</h3>
+          <p class="dir-desc">Scandinavian atmospheric minimalism, dark midnight glass, and bioluminescent aurora cyan/emerald gradients reflecting artwork.</p>
+          
+          <div class="color-swatches">
+            <div class="swatch" style="background: #08090d;">#08090d</div>
+            <div class="swatch" style="background: #111420;">#111420</div>
+            <div class="swatch" style="background: #06b6d4; color: #000;">#06b6d4</div>
+            <div class="swatch" style="background: #10b981; color: #000;">#10b981</div>
+          </div>
+
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
+            Typography: Space Grotesk + Inter + Space Mono
+          </div>
+
+          <!-- Component preview -->
+          <div class="mini-player-preview">
+            <div class="mini-artwork">🌌</div>
+            <div class="mini-track-info">
+              <div class="mini-track-title">Solar Drift</div>
+              <div class="mini-track-artist">Tycho · Ambient Wash</div>
+            </div>
+            <button class="mini-play-btn">▶</button>
+          </div>
+        </div>
+
+        <!-- Direction 3: Editorial Vinyl -->
+        <div class="direction-card editorial">
+          <span class="dir-badge">SWISS RECORD CLUB</span>
+          <h3 class="dir-title">3. Editorial Vinyl</h3>
+          <p class="dir-desc">Swiss graphic design, indie record catalog typography, bold structural lines, and monochrome matte surfaces with electric acid lime.</p>
+          
+          <div class="color-swatches">
+            <div class="swatch" style="background: #0d0e11;">#0d0e11</div>
+            <div class="swatch" style="background: #15171e;">#15171e</div>
+            <div class="swatch" style="background: #ccff00; color: #000;">#ccff00</div>
+            <div class="swatch" style="background: #3b82f6;">#3b82f6</div>
+          </div>
+
+          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
+            Typography: Syne + DM Sans + JetBrains Mono Upper
+          </div>
+
+          <!-- Component preview -->
+          <div class="mini-player-preview">
+            <div class="mini-artwork">🎛️</div>
+            <div class="mini-track-info">
+              <div class="mini-track-title">SOLAR DRIFT // 01</div>
+              <div class="mini-track-artist">TYCHO // 320 KBPS</div>
+            </div>
+            <button class="mini-play-btn">▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: HIGH-FIDELITY DESKTOP DISCOVER SCREEN (1440x900) -->
+    <section id="view-desktop-discover" style="display: none;">
+      <div class="section-title">
+        <span>Desktop Discover Screen (1440 × 900 · Obsidian Studio)</span>
+      </div>
+      <p class="section-desc">Uncluttered 2-column layout with fixed navigation sidebar, spacious listening viewport, and docked bottom Hi-Fi preamp player.</p>
+
+      <div class="screen-stage">
+        <div class="screen-stage-bar">
+          <div class="traffic-lights">
+            <div class="traffic-light" style="background: #ef4444;"></div>
+            <div class="traffic-light" style="background: #f59e0b;"></div>
+            <div class="traffic-light" style="background: #10b981;"></div>
+          </div>
+          <span>Harmoni Desktop — 1440 × 900 — Obsidian Hi-Fi</span>
+          <span>https://harmoni.local/discover</span>
+        </div>
+
+        <div class="desktop-frame">
+          <!-- Left Sidebar -->
+          <aside class="desktop-sidebar">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
+                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;">H</div>
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
+              </div>
+
+              <div class="sidebar-nav-section">
+                <div class="sidebar-heading">// Explore</div>
+                <a href="#discover" class="sidebar-link active">
+                  <span class="sidebar-link-icon">🧭</span>
+                  <span>Discover</span>
+                </a>
+                <a href="#search" class="sidebar-link">
+                  <span class="sidebar-link-icon">🔍</span>
+                  <span>Search</span>
+                </a>
+              </div>
+
+              <div class="sidebar-nav-section">
+                <div class="sidebar-heading">// Library</div>
+                <a href="#liked" class="sidebar-link">
+                  <span class="sidebar-link-icon">❤️</span>
+                  <span>Liked Tracks</span>
+                </a>
+                <a href="#playlists" class="sidebar-link">
+                  <span class="sidebar-link-icon">📑</span>
+                  <span>Playlists</span>
+                </a>
+                <a href="#history" class="sidebar-link">
+                  <span class="sidebar-link-icon">⏳</span>
+                  <span>Scrobble History</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Authenticated User Profile Pill -->
+            <div class="sidebar-user">
+              <div class="sidebar-avatar">🎧</div>
+              <div class="sidebar-user-text">
+                <div class="sidebar-username">Elena Vance</div>
+                <div class="sidebar-userhandle">@elena</div>
+              </div>
+              <span class="role-badge">ADMIN</span>
+            </div>
+          </aside>
+
+          <!-- Main Viewport -->
+          <main class="desktop-main">
+            <!-- Hero Featured Banner -->
+            <div class="hero-banner">
+              <div>
+                <span class="hero-tag">FEATURED CC RELEASE</span>
+                <h1 class="hero-title">Solar Drift — Single Cut</h1>
+                <p class="hero-desc">Atmospheric analog synthesizers and organic percussion recorded in California. Licensed under Creative Commons Attribution-NonCommercial-ShareAlike.</p>
+                <button class="hero-cta">▶ Listen Now</button>
+              </div>
+
+              <div class="hero-vinyl">
+                <div class="hero-vinyl-center">TYCHO</div>
+              </div>
+            </div>
+
+            <!-- Fresh Discoveries Track Table -->
+            <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700;">Curated Vinyl Feed</h2>
+              <span style="font-size: 12px; color: #9ca3af; font-family: 'JetBrains Mono', monospace;">5 Tracks Loaded · CC Verified</span>
+            </div>
+
+            <table class="track-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>Title & Artist</th>
+                  <th>Album</th>
+                  <th>License</th>
+                  <th style="text-align: right; width: 80px;">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="track-row playing">
+                  <td>
+                    <div class="equalizer-anim">
+                      <div class="eq-bar"></div>
+                      <div class="eq-bar"></div>
+                      <div class="eq-bar"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="track-cell-title">
+                      <div class="track-art">☀️</div>
+                      <div>
+                        <div class="track-name">Solar Drift</div>
+                        <div class="track-artist">Tycho</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color: #9ca3af;">Simulate EP</td>
+                  <td><span class="track-license-badge">CC BY-NC-SA</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #f59e0b;">03:42</td>
+                </tr>
+                <tr class="track-row">
+                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">02</td>
+                  <td>
+                    <div class="track-cell-title">
+                      <div class="track-art">🌊</div>
+                      <div>
+                        <div class="track-name">Coastal Grooves</div>
+                        <div class="track-artist">Bonobo</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color: #9ca3af;">Migration Cuts</td>
+                  <td><span class="track-license-badge">CC BY-SA</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">04:18</td>
+                </tr>
+                <tr class="track-row">
+                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">03</td>
+                  <td>
+                    <div class="track-cell-title">
+                      <div class="track-art">🌙</div>
+                      <div>
+                        <div class="track-name">Midnight Frequency</div>
+                        <div class="track-artist">Kiasmos</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color: #9ca3af;">Looped Sessions</td>
+                  <td><span class="track-license-badge">CC BY-NC</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">05:02</td>
+                </tr>
+                <tr class="track-row">
+                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">04</td>
+                  <td>
+                    <div class="track-cell-title">
+                      <div class="track-art">🌲</div>
+                      <div>
+                        <div class="track-name">Pinecone Reverberation</div>
+                        <div class="track-artist">Emancipator</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color: #9ca3af;">Soon It Will Be Cold</td>
+                  <td><span class="track-license-badge">CC BY 4.0</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">03:55</td>
+                </tr>
+              </tbody>
+            </table>
+          </main>
+
+          <!-- Docked Audio Player (Fixed Bottom 80px) -->
+          <div class="docked-player">
+            <div class="player-left">
+              <div class="player-art">☀️</div>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
+                <div style="font-size: 11px; color: #9ca3af;">Tycho · Jamendo CC</div>
+              </div>
+            </div>
+
+            <div class="player-center">
+              <div class="player-controls">
+                <button class="btn-player">⏮</button>
+                <button class="btn-player btn-player-primary">⏸</button>
+                <button class="btn-player">⏭</button>
+              </div>
+
+              <div class="scrubber-bar-container">
+                <span>01:40</span>
+                <div class="scrubber-track">
+                  <div class="scrubber-progress">
+                    <div class="scrubber-head"></div>
+                  </div>
+                </div>
+                <span>03:42</span>
+              </div>
+            </div>
+
+            <div class="player-right">
+              <div class="scrobble-badge">
+                <span>✓</span>
+                <span>SCROBBLE ARMED (45%)</span>
+              </div>
+              <button class="btn-player">🔊</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: HIGH-FIDELITY DESKTOP USER PROFILE (/@username) -->
+    <section id="view-desktop-profile" style="display: none;">
+      <div class="section-title">
+        <span>Desktop User Profile Screen (`/@username`)</span>
+      </div>
+      <p class="section-desc">Grounded strictly in Harmoni's existing PostgreSQL Prisma schema. Features the 8 SVG avatar presets, bio editing, and public playlists.</p>
+
+      <div class="screen-stage">
+        <div class="screen-stage-bar">
+          <div class="traffic-lights">
+            <div class="traffic-light" style="background: #ef4444;"></div>
+            <div class="traffic-light" style="background: #f59e0b;"></div>
+            <div class="traffic-light" style="background: #10b981;"></div>
+          </div>
+          <span>Harmoni Profile — Desktop Viewport</span>
+          <span>https://harmoni.local/@elena (Mapped via next.config.ts rewrite to /users/elena)</span>
+        </div>
+
+        <div class="desktop-frame">
+          <!-- Left Sidebar -->
+          <aside class="desktop-sidebar">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
+                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;">H</div>
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
+              </div>
+
+              <div class="sidebar-nav-section">
+                <div class="sidebar-heading">// Explore</div>
+                <a href="#discover" class="sidebar-link">
+                  <span class="sidebar-link-icon">🧭</span>
+                  <span>Discover</span>
+                </a>
+                <a href="#search" class="sidebar-link">
+                  <span class="sidebar-link-icon">🔍</span>
+                  <span>Search</span>
+                </a>
+              </div>
+
+              <div class="sidebar-nav-section">
+                <div class="sidebar-heading">// Library</div>
+                <a href="#liked" class="sidebar-link">
+                  <span class="sidebar-link-icon">❤️</span>
+                  <span>Liked Tracks</span>
+                </a>
+                <a href="#playlists" class="sidebar-link">
+                  <span class="sidebar-link-icon">📑</span>
+                  <span>Playlists</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="sidebar-user">
+              <div class="sidebar-avatar">🎧</div>
+              <div class="sidebar-user-text">
+                <div class="sidebar-username">Elena Vance</div>
+                <div class="sidebar-userhandle">@elena</div>
+              </div>
+              <span class="role-badge">ADMIN</span>
+            </div>
+          </aside>
+
+          <!-- Profile Main Content -->
+          <main class="desktop-main">
+            <!-- Profile Hero -->
+            <div class="profile-hero">
+              <div class="profile-avatar-large">📻</div>
+              <div class="profile-info">
+                <div class="profile-names">
+                  <h1 class="profile-display-name">Elena Vance</h1>
+                  <span class="role-badge">ADMINISTRATOR</span>
+                </div>
+                <div class="profile-meta">
+                  <span>@elena</span> · <span>Member since November 2026</span>
+                </div>
+                <p class="profile-bio">
+                  Curating warm analog synth waves, ambient jazz, and late-night vinyl sessions with close friends. Building personal listening archives at ₹0 cost.
+                </p>
+                <div>
+                  <!-- Milestone 3C Boundary: Profile editing action for authenticated user -->
+                  <button class="btn-edit-profile">✏️ Edit Avatar & Biography</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Content Tabs -->
+            <div style="display: flex; gap: 24px; border-bottom: 1px solid #252937; margin-bottom: 24px; padding-bottom: 10px;">
+              <span style="color: #f59e0b; font-weight: 600; font-size: 14px; border-bottom: 2px solid #f59e0b; padding-bottom: 10px;">Public Playlists (3)</span>
+              <span style="color: #6b7280; font-size: 14px; cursor: pointer;">Liked Tracks (42)</span>
+              <span style="color: #6b7280; font-size: 14px; cursor: pointer;">Scrobble History</span>
+            </div>
+
+            <!-- Public Playlists Cards Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: linear-gradient(135deg, #252937, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">☕</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Late Night Ambient</div>
+                <div style="font-size: 12px; color: #9ca3af;">18 tracks · Public Playlist</div>
+              </div>
+
+              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: linear-gradient(135deg, #2c2518, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">🎷</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Tokyo Coffeehouse Jazz</div>
+                <div style="font-size: 12px; color: #9ca3af;">24 tracks · Public Playlist</div>
+              </div>
+
+              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: linear-gradient(135deg, #182524, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">🌲</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Pacific Northwest Drift</div>
+                <div style="font-size: 12px; color: #9ca3af;">12 tracks · Public Playlist</div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: MOBILE SCREENS (390x844) -->
+    <section id="view-mobile" style="display: none;">
+      <div class="section-title">
+        <span>Mobile Screen Designs (390 × 844 · Obsidian Studio)</span>
+      </div>
+      <p class="section-desc">Mobile viewport layouts with comfortable 48px+ touch targets, compact floating mini-player bar, and bottom navigation.</p>
+
+      <div class="mobile-frame-container">
+        <!-- Mobile Discover Screen -->
+        <div class="mobile-device">
+          <div class="mobile-notch">9:41 · Harmoni Discover</div>
+
+          <div class="mobile-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="brand-logo" style="width: 26px; height: 26px; font-size: 13px;">H</div>
+              <span style="font-weight: 700; font-size: 15px;">Harmoni</span>
+            </div>
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: #1c202c; border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 12px;">🎧</div>
+          </div>
+
+          <div class="mobile-content">
+            <div style="background: linear-gradient(135deg, #181b26, #11131a); border: 1px solid #252937; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+              <span class="hero-tag" style="margin-bottom: 6px;">FEATURED SINGLE</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Solar Drift</h3>
+              <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">Tycho · Ambient Synthesizers</p>
+              <button class="hero-cta" style="padding: 8px 16px; font-size: 12px;">▶ Play Single</button>
+            </div>
+
+            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #f3f4f6;">Today's Feed</h4>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="track-art" style="width: 38px; height: 38px;">☀️</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #f59e0b;">Solar Drift</div>
+                    <div style="font-size: 11px; color: #6b7280;">Tycho</div>
+                  </div>
+                </div>
+                <div class="equalizer-anim">
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="track-art" style="width: 38px; height: 38px;">🌊</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600;">Coastal Grooves</div>
+                    <div style="font-size: 11px; color: #6b7280;">Bonobo</div>
+                  </div>
+                </div>
+                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280;">04:18</span>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="track-art" style="width: 38px; height: 38px;">🌙</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600;">Midnight Frequency</div>
+                    <div style="font-size: 11px; color: #6b7280;">Kiasmos</div>
+                  </div>
+                </div>
+                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280;">05:02</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Compact Player -->
+          <div class="mobile-docked-player">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+              <div style="width: 32px; height: 32px; border-radius: 6px; background: #252937; display: flex; align-items: center; justify-content: center; font-size: 14px;">☀️</div>
+              <div style="min-width: 0;">
+                <div style="font-size: 12px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
+                <div style="font-size: 10px; color: #9ca3af;">Tycho</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button class="btn-player" style="font-size: 12px;">⏸</button>
+              <button class="btn-player" style="font-size: 12px;">⏭</button>
+            </div>
+          </div>
+
+          <!-- Mobile Bottom Navigation Bar -->
+          <nav class="mobile-nav-bar">
+            <a href="#home" class="mobile-nav-item active">
+              <span style="font-size: 16px;">🏠</span>
+              <span>Home</span>
+            </a>
+            <a href="#search" class="mobile-nav-item">
+              <span style="font-size: 16px;">🔍</span>
+              <span>Search</span>
+            </a>
+            <a href="#library" class="mobile-nav-item">
+              <span style="font-size: 16px;">📚</span>
+              <span>Library</span>
+            </a>
+            <a href="#profile" class="mobile-nav-item">
+              <span style="font-size: 16px;">👤</span>
+              <span>Profile</span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Mobile Profile Screen -->
+        <div class="mobile-device">
+          <div class="mobile-notch">9:41 · Profile /@elena</div>
+
+          <div class="mobile-header">
+            <span style="font-size: 14px; font-weight: 600;">/@elena</span>
+            <span class="role-badge">ADMIN</span>
+          </div>
+
+          <div class="mobile-content">
+            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
+              <div class="profile-avatar-large" style="width: 80px; height: 80px; font-size: 32px; margin-bottom: 12px;">📻</div>
+              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Elena Vance</h2>
+              <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280; margin-bottom: 8px;">@elena · Nov 2026</div>
+              <p style="font-size: 12px; color: #9ca3af; line-height: 1.4; margin-bottom: 14px;">
+                Curating analog synth waves, ambient jazz, and late-night vinyl sessions with friends.
+              </p>
+              <button class="btn-edit-profile" style="padding: 6px 14px; font-size: 11px;">Edit Profile & Avatar</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-around; border-bottom: 1px solid #1c202c; padding-bottom: 8px; margin-bottom: 16px; font-size: 12px;">
+              <span style="color: #f59e0b; font-weight: 600;">Playlists (3)</span>
+              <span style="color: #6b7280;">Liked (42)</span>
+              <span style="color: #6b7280;">History</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center; font-size: 20px;">☕</div>
+                <div>
+                  <div style="font-size: 13px; font-weight: 600;">Late Night Ambient</div>
+                  <div style="font-size: 11px; color: #6b7280;">18 tracks · Public</div>
+                </div>
+              </div>
+
+              <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎷</div>
+                <div>
+                  <div style="font-size: 13px; font-weight: 600;">Tokyo Coffeehouse Jazz</div>
+                  <div style="font-size: 11px; color: #6b7280;">24 tracks · Public</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Mobile Navigation Bar -->
+          <nav class="mobile-nav-bar">
+            <a href="#home" class="mobile-nav-item">
+              <span style="font-size: 16px;">🏠</span>
+              <span>Home</span>
+            </a>
+            <a href="#search" class="mobile-nav-item">
+              <span style="font-size: 16px;">🔍</span>
+              <span>Search</span>
+            </a>
+            <a href="#library" class="mobile-nav-item">
+              <span style="font-size: 16px;">📚</span>
+              <span>Library</span>
+            </a>
+            <a href="#profile" class="mobile-nav-item active">
+              <span style="font-size: 16px;">👤</span>
+              <span>Profile</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: DESIGN TOKENS & AVATAR PRESETS -->
+    <section id="view-tokens" style="display: none;">
+      <div class="section-title">
+        <span>Design Tokens & Eight SVG Avatar Presets</span>
+      </div>
+      <p class="section-desc">To maintain the absolute ₹0 INR lifetime budget constraint, Harmoni provides 8 built-in SVG presets avoiding costly S3/Cloudinary upload dependencies.</p>
+
+      <div class="avatar-grid">
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">📻</div>
+          <div class="avatar-preset-name">Studio Turntable</div>
+          <div class="avatar-preset-key">avatar_1 (Default)</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">🎛️</div>
+          <div class="avatar-preset-name">Tube Preamp</div>
+          <div class="avatar-preset-key">avatar_2</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">〰️</div>
+          <div class="avatar-preset-name">Obsidian Waveform</div>
+          <div class="avatar-preset-key">avatar_3</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">💿</div>
+          <div class="avatar-preset-name">Vinyl Groove Disc</div>
+          <div class="avatar-preset-key">avatar_4</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">💎</div>
+          <div class="avatar-preset-name">Aurora Prism</div>
+          <div class="avatar-preset-key">avatar_5</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">📼</div>
+          <div class="avatar-preset-name">Classic Cassette</div>
+          <div class="avatar-preset-key">avatar_6</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">📊</div>
+          <div class="avatar-preset-name">Audio Equalizer</div>
+          <div class="avatar-preset-key">avatar_7</div>
+        </div>
+
+        <div class="avatar-preset-card">
+          <div class="avatar-preset-preview">🔔</div>
+          <div class="avatar-preset-name">Acoustic Bell</div>
+          <div class="avatar-preset-key">avatar_8</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function switchView(viewId) {
+      // Hide all views
+      document.getElementById('view-directions').style.display = 'none';
+      document.getElementById('view-desktop-discover').style.display = 'none';
+      document.getElementById('view-desktop-profile').style.display = 'none';
+      document.getElementById('view-mobile').style.display = 'none';
+      document.getElementById('view-tokens').style.display = 'none';
+
+      // Show selected view
+      document.getElementById('view-' + viewId).style.display = 'block';
+
+      // Update tab active state
+      const buttons = document.querySelectorAll('.view-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
