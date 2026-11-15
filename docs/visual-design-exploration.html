@@ -3,45 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harmoni — Visual Design Exploration</title>
+  <title>Harmoni — Multi-Theme Visual Design Exploration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      /* Obsidian Studio (Recommended) */
-      --obsidian-bg: #0b0c10;
-      --obsidian-surface: #14161f;
-      --obsidian-card: #181b26;
-      --obsidian-border: #252937;
-      --obsidian-amber: #f59e0b;
-      --obsidian-amber-glow: #fbbf24;
-      --obsidian-brass: #d97706;
-      --obsidian-text: #f3f4f6;
-      --obsidian-muted: #9ca3af;
+    /* =========================================================================
+       HARMONI MULTI-THEME CSS VARIABLE DESIGN SYSTEM
+       Theme 1: Obsidian Studio (Default)
+       Theme 2: Nordic Aurora
+       Theme 3: Editorial Vinyl
+       Theme 4: Crimson Vigil (Daredevil-inspired)
+       Theme 5: Cobalt Web (Spider-Man-inspired)
+       ========================================================================= */
 
-      /* Nordic Aurora */
-      --aurora-bg: #08090d;
-      --aurora-surface: #111420;
-      --aurora-card: #161b2a;
-      --aurora-border: #22293d;
-      --aurora-cyan: #06b6d4;
-      --aurora-emerald: #10b981;
-      --aurora-indigo: #6366f1;
-      --aurora-text: #f8fafc;
-      --aurora-muted: #8b949e;
-
-      /* Editorial Vinyl */
-      --editorial-bg: #0d0e11;
-      --editorial-surface: #15171e;
-      --editorial-card: #1b1e27;
-      --editorial-border: #2d313f;
-      --editorial-lime: #ccff00;
-      --editorial-cobalt: #3b82f6;
-      --editorial-text: #ffffff;
-      --editorial-muted: #94a3b8;
+    :root, body, [data-theme="obsidian-studio"] {
+      --theme-name: "Obsidian Studio";
+      --theme-key: "obsidian-studio";
+      --bg-canvas: #0b0c10;
+      --bg-surface: #11131a;
+      --bg-card: #14161f;
+      --bg-card-hover: #1c202c;
+      --border-hairline: #252936;
+      --accent-primary: #f59e0b;
+      --accent-glow: #fbbf24;
+      --accent-secondary: #d97706;
+      --text-primary: #f3f4f6;
+      --text-muted: #9ca3af;
+      --status-success: #10b981;
+      --badge-bg: rgba(245, 158, 11, 0.15);
+      --badge-border: rgba(245, 158, 11, 0.3);
+      --badge-text: #f59e0b;
+      --player-bg: #0e1017;
+      --hero-gradient: linear-gradient(135deg, #181b26 0%, #11131a 100%);
+      --hero-glow: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+      --button-primary-text: #0b0c10;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
     }
 
+    [data-theme="nordic-aurora"] {
+      --theme-name: "Nordic Aurora";
+      --theme-key: "nordic-aurora";
+      --bg-canvas: #08090d;
+      --bg-surface: #10131d;
+      --bg-card: #141926;
+      --bg-card-hover: #1c2438;
+      --border-hairline: #222d42;
+      --accent-primary: #06b6d4;
+      --accent-glow: #38bdf8;
+      --accent-secondary: #10b981;
+      --text-primary: #f8fafc;
+      --text-muted: #8b949e;
+      --status-success: #10b981;
+      --badge-bg: rgba(6, 182, 212, 0.15);
+      --badge-border: rgba(6, 182, 212, 0.3);
+      --badge-text: #06b6d4;
+      --player-bg: #0c0e15;
+      --hero-gradient: linear-gradient(135deg, #121829 0%, #0c101c 100%);
+      --hero-glow: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      --button-primary-text: #08090d;
+      --font-display: 'Space Grotesk', sans-serif;
+    }
+
+    [data-theme="editorial-vinyl"] {
+      --theme-name: "Editorial Vinyl";
+      --theme-key: "editorial-vinyl";
+      --bg-canvas: #0d0e11;
+      --bg-surface: #14161d;
+      --bg-card: #191c24;
+      --bg-card-hover: #222632;
+      --border-hairline: #2d313f;
+      --accent-primary: #ccff00;
+      --accent-glow: #d9ff33;
+      --accent-secondary: #3b82f6;
+      --text-primary: #ffffff;
+      --text-muted: #94a3b8;
+      --status-success: #ccff00;
+      --badge-bg: rgba(204, 255, 0, 0.15);
+      --badge-border: rgba(204, 255, 0, 0.3);
+      --badge-text: #ccff00;
+      --player-bg: #101217;
+      --hero-gradient: linear-gradient(135deg, #1b1e28 0%, #13151c 100%);
+      --hero-glow: radial-gradient(circle, rgba(204, 255, 0, 0.12) 0%, transparent 70%);
+      --button-primary-text: #0d0e11;
+      --font-display: 'Syne', sans-serif;
+    }
+
+    [data-theme="crimson-vigil"] {
+      --theme-name: "Crimson Vigil";
+      --theme-key: "crimson-vigil";
+      --bg-canvas: #09070a;
+      --bg-surface: #130c11;
+      --bg-card: #1a0f16;
+      --bg-card-hover: #261420;
+      --border-hairline: #331725;
+      --accent-primary: #e11d48;
+      --accent-glow: #f43f5e;
+      --accent-secondary: #be123c;
+      --text-primary: #f1f1f4;
+      --text-muted: #9da1ad;
+      --status-success: #10b981;
+      --badge-bg: rgba(225, 29, 72, 0.15);
+      --badge-border: rgba(225, 29, 72, 0.3);
+      --badge-text: #f43f5e;
+      --player-bg: #0e090d;
+      --hero-gradient: linear-gradient(135deg, #22101b 0%, #12090e 100%);
+      --hero-glow: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+      --button-primary-text: #ffffff;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    [data-theme="cobalt-web"] {
+      --theme-name: "Cobalt Web";
+      --theme-key: "cobalt-web";
+      --bg-canvas: #070b14;
+      --bg-surface: #0c1322;
+      --bg-card: #111a2e;
+      --bg-card-hover: #182542;
+      --border-hairline: #1e2e4f;
+      --accent-primary: #ef4444;
+      --accent-glow: #f87171;
+      --accent-secondary: #2563eb;
+      --text-primary: #f8fafc;
+      --text-muted: #94a3b8;
+      --status-success: #06b6d4;
+      --badge-bg: rgba(239, 68, 68, 0.15);
+      --badge-border: rgba(239, 68, 68, 0.3);
+      --badge-text: #f87171;
+      --player-bg: #090e1b;
+      --hero-gradient: linear-gradient(135deg, #141f38 0%, #0a101f 100%);
+      --hero-glow: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
+      --button-primary-text: #ffffff;
+      --font-display: 'Inter', sans-serif;
+    }
+
+    /* Base Elements */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -49,11 +145,12 @@
     }
 
     body {
-      background-color: #06070a;
-      color: #f3f4f6;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
       line-height: 1.5;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     /* Top Global Switcher Bar */
@@ -63,12 +160,13 @@
       z-index: 100;
       background: rgba(11, 12, 16, 0.95);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid #252937;
+      border-bottom: 1px solid var(--border-hairline);
       padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      flex-wrap: wrap;
     }
 
     .brand-group {
@@ -81,16 +179,17 @@
       width: 32px;
       height: 32px;
       border-radius: 8px;
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
       font-size: 16px;
-      color: #0b0c10;
+      color: var(--button-primary-text);
       font-family: 'Plus Jakarta Sans', sans-serif;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
       flex-shrink: 0;
+      transition: all 0.25s ease;
     }
 
     .brand-title {
@@ -105,27 +204,29 @@
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
       background: #1c202c;
-      color: #f59e0b;
+      color: var(--accent-primary);
       padding: 3px 8px;
       border-radius: 9999px;
-      border: 1px solid #252937;
+      border: 1px solid var(--border-hairline);
       white-space: nowrap;
+      transition: color 0.25s ease;
     }
 
     .view-tabs {
       display: flex;
       background: #11131a;
-      border: 1px solid #252937;
+      border: 1px solid #252936;
       border-radius: 8px;
       padding: 3px;
       gap: 2px;
+      overflow-x: auto;
     }
 
     .view-btn {
       background: transparent;
       border: none;
       color: #9ca3af;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 500;
@@ -140,33 +241,42 @@
     }
 
     .view-btn:focus-visible {
-      outline: 2px solid #f59e0b;
+      outline: 2px solid var(--accent-primary);
       outline-offset: 1px;
     }
 
     .view-btn.active {
       background: #252937;
-      color: #f59e0b;
+      color: var(--accent-primary);
       font-weight: 600;
     }
 
-    .figma-status {
+    /* Active Theme Quick Selector in Header */
+    .header-theme-selector {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      color: #9ca3af;
+      font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      white-space: nowrap;
+      color: #9ca3af;
     }
 
-    .status-dot-shell {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #eab308;
-      box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
-      flex-shrink: 0;
+    .theme-select-dropdown {
+      background: #14161f;
+      color: var(--accent-primary);
+      border: 1px solid var(--border-hairline);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .theme-select-dropdown:focus {
+      border-color: var(--accent-primary);
     }
 
     /* Container */
@@ -176,11 +286,11 @@
       padding: 28px 24px 80px;
     }
 
-    /* Prototype Notice Banner */
+    /* Prototype Scope & Limitation Banner */
     .prototype-notice-banner {
-      background: #11131a;
-      border: 1px solid #252937;
-      border-left: 4px solid #f59e0b;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-left: 4px solid var(--accent-primary);
       border-radius: 10px;
       padding: 16px 20px;
       margin-bottom: 32px;
@@ -188,20 +298,21 @@
       flex-direction: column;
       gap: 8px;
       font-size: 13px;
-      color: #9ca3af;
+      color: var(--text-muted);
       line-height: 1.5;
+      transition: all 0.25s ease;
     }
 
     .notice-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
-      color: #f59e0b;
+      color: var(--accent-primary);
       letter-spacing: 0.05em;
     }
 
     .notice-content strong {
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .notice-meta {
@@ -212,11 +323,11 @@
       gap: 16px;
       flex-wrap: wrap;
       padding-top: 6px;
-      border-top: 1px solid #1c202c;
+      border-top: 1px solid var(--border-hairline);
     }
 
     .section-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-display);
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -224,227 +335,133 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      color: var(--text-primary);
     }
 
     .section-desc {
-      color: #9ca3af;
+      color: var(--text-muted);
       font-size: 14px;
       margin-bottom: 24px;
     }
 
-    /* Direction Comparison Cards Grid */
-    .directions-grid {
+    /* Grid for 5 Visual Directions Comparison */
+    .directions-grid-5 {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
       margin-bottom: 48px;
     }
 
-    @media (max-width: 1024px) {
-      .directions-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .direction-card {
+    .direction-card-5 {
       border-radius: 14px;
-      border: 1px solid;
-      padding: 24px;
+      border: 1px solid #252936;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      position: relative;
-      overflow: hidden;
+      gap: 16px;
+      background: #14161f;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .direction-card.obsidian {
-      background: var(--obsidian-surface);
-      border-color: var(--obsidian-border);
+    .direction-card-5:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
     }
 
-    .direction-card.aurora {
-      background: var(--aurora-surface);
-      border-color: var(--aurora-border);
-    }
-
-    .direction-card.editorial {
-      background: var(--editorial-surface);
-      border-color: var(--editorial-border);
-    }
-
-    .dir-badge {
+    .dir-badge-chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      width: fit-content;
-    }
-
-    .obsidian .dir-badge {
-      background: rgba(245, 158, 11, 0.15);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .aurora .dir-badge {
-      background: rgba(6, 182, 212, 0.15);
-      color: #06b6d4;
-      border: 1px solid rgba(6, 182, 212, 0.3);
-    }
-
-    .editorial .dir-badge {
-      background: rgba(204, 255, 0, 0.15);
-      color: #ccff00;
-      border: 1px solid rgba(204, 255, 0, 0.3);
-    }
-
-    .dir-title {
-      font-size: 20px;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      width: fit-content;
+      text-transform: uppercase;
     }
 
-    .obsidian .dir-title { font-family: 'Plus Jakarta Sans', sans-serif; color: #f3f4f6; }
-    .aurora .dir-title { font-family: 'Space Grotesk', sans-serif; color: #f8fafc; }
-    .editorial .dir-title { font-family: 'Syne', sans-serif; color: #ffffff; }
+    .dir-title-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
 
-    .dir-desc {
-      font-size: 13px;
+    .dir-desc-text {
+      font-size: 12px;
       color: #9ca3af;
-      line-height: 1.5;
+      line-height: 1.45;
+      min-height: 52px;
     }
 
-    .color-swatches {
+    .palette-swatches-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .swatch {
+    .swatch-chip {
       flex: 1;
-      height: 36px;
+      height: 32px;
       border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 9px;
       font-family: 'JetBrains Mono', monospace;
       color: #fff;
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
 
-    /* Miniature UI Component Preview inside Direction Cards */
-    .mini-player-preview {
-      border-radius: 10px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      border: 1px solid;
-    }
-
-    .obsidian .mini-player-preview {
-      background: #0b0c10;
-      border-color: #252937;
-    }
-
-    .aurora .mini-player-preview {
-      background: rgba(8, 9, 13, 0.7);
-      border-color: rgba(6, 182, 212, 0.25);
-      backdrop-filter: blur(8px);
-    }
-
-    .editorial .mini-player-preview {
-      background: #0d0e11;
-      border-color: #2d313f;
-    }
-
-    .mini-artwork {
-      width: 40px;
-      height: 40px;
+    .btn-apply-theme-chip {
+      background: #1c202c;
+      color: #f3f4f6;
+      border: 1px solid #252936;
+      padding: 7px 12px;
       border-radius: 6px;
-      background: #1f2330;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .mini-track-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .mini-track-title {
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .mini-track-artist {
       font-size: 11px;
-      color: #9ca3af;
-      font-family: 'JetBrains Mono', monospace;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .mini-play-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-size: 12px;
-      flex-shrink: 0;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: inherit;
     }
 
-    .obsidian .mini-play-btn {
-      background: #f59e0b;
-      color: #0b0c10;
+    .btn-apply-theme-chip:hover {
+      background: #252937;
+      color: #f59e0b;
     }
 
-    .aurora .mini-play-btn {
-      background: #06b6d4;
-      color: #08090d;
-    }
-
-    .editorial .mini-play-btn {
-      background: #ccff00;
-      color: #0d0e11;
+    .btn-apply-theme-chip.active-theme {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border-color: var(--badge-border);
+      font-weight: 700;
     }
 
     /* Screen Stage Frame (Desktop 1440x900 simulated) */
     .screen-stage {
-      background: #0b0c10;
-      border: 1px solid #252937;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
       margin-bottom: 40px;
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .screen-stage-bar {
-      background: #11131a;
-      border-bottom: 1px solid #252937;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
       padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -468,13 +485,14 @@
     /* Desktop Sidebar (240px fixed) */
     .desktop-sidebar {
       width: 240px;
-      background: #11131a;
-      border-right: 1px solid #252937;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-hairline);
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       flex-shrink: 0;
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .sidebar-nav-section {
@@ -486,7 +504,7 @@
       font-family: 'JetBrains Mono', monospace;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #6b7280;
+      color: var(--text-muted);
       padding: 0 10px 8px;
     }
 
@@ -496,7 +514,7 @@
       gap: 12px;
       padding: 8px 10px;
       border-radius: 8px;
-      color: #9ca3af;
+      color: var(--text-muted);
       text-decoration: none;
       font-size: 13px;
       font-weight: 500;
@@ -505,13 +523,13 @@
     }
 
     .sidebar-link:hover {
-      background: #161922;
-      color: #f3f4f6;
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
     }
 
     .sidebar-link.active {
-      background: #1c202c;
-      color: #f59e0b;
+      background: var(--bg-card);
+      color: var(--accent-primary);
       font-weight: 600;
     }
 
@@ -528,17 +546,17 @@
       align-items: center;
       gap: 10px;
       padding: 10px;
-      background: #14161f;
+      background: var(--bg-card);
       border-radius: 10px;
-      border: 1px solid #252937;
+      border: 1px solid var(--border-hairline);
     }
 
     .sidebar-avatar {
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: #14161f;
-      border: 1px solid #f59e0b;
+      background: var(--bg-surface);
+      border: 1px solid var(--accent-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -560,7 +578,7 @@
     .sidebar-username {
       font-size: 12px;
       font-weight: 600;
-      color: #f3f4f6;
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -568,7 +586,7 @@
 
     .sidebar-userhandle {
       font-size: 11px;
-      color: #6b7280;
+      color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -578,13 +596,15 @@
       padding: 32px 40px 120px;
       overflow-y: auto;
       min-width: 0;
+      background: var(--bg-canvas);
+      transition: background 0.25s ease;
     }
 
     /* Top Discover Hero */
     .hero-banner {
       border-radius: 14px;
-      background: linear-gradient(135deg, #181b26 0%, #11131a 100%);
-      border: 1px solid #252937;
+      background: var(--hero-gradient);
+      border: 1px solid var(--border-hairline);
       padding: 32px;
       display: flex;
       align-items: center;
@@ -593,6 +613,7 @@
       margin-bottom: 36px;
       position: relative;
       overflow: hidden;
+      transition: all 0.25s ease;
     }
 
     .hero-banner::after {
@@ -602,16 +623,16 @@
       right: -10%;
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+      background: var(--hero-glow);
       pointer-events: none;
     }
 
     .hero-tag {
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-primary);
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
       padding: 3px 10px;
       border-radius: 9999px;
       display: inline-block;
@@ -619,15 +640,16 @@
     }
 
     .hero-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-display);
       font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
+      color: var(--text-primary);
     }
 
     .hero-desc {
-      color: #9ca3af;
+      color: var(--text-muted);
       font-size: 14px;
       max-width: 480px;
       margin-bottom: 20px;
@@ -638,20 +660,20 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #f59e0b;
-      color: #0b0c10;
+      background: var(--accent-primary);
+      color: var(--button-primary-text);
       font-weight: 600;
       font-size: 13px;
       padding: 10px 20px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
       transition: all 0.15s ease;
     }
 
     .hero-cta:hover {
-      background: #fbbf24;
+      background: var(--accent-glow);
       transform: translateY(-1px);
     }
 
@@ -659,8 +681,8 @@
       width: 140px;
       height: 140px;
       border-radius: 50%;
-      background: repeating-radial-gradient(circle, #1a1d26, #1a1d26 4px, #11131a 5px, #11131a 8px);
-      border: 3px solid #252937;
+      background: repeating-radial-gradient(circle, var(--bg-card), var(--bg-card) 4px, var(--bg-surface) 5px, var(--bg-surface) 8px);
+      border: 3px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -673,12 +695,12 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: #f59e0b;
+      background: var(--accent-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 11px;
-      color: #0b0c10;
+      color: var(--button-primary-text);
       font-weight: 800;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -697,26 +719,26 @@
     .track-table th {
       text-align: left;
       padding: 10px 14px;
-      color: #6b7280;
+      color: var(--text-muted);
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      border-bottom: 1px solid #1c202c;
+      border-bottom: 1px solid var(--border-hairline);
     }
 
     .track-row {
-      border-bottom: 1px solid #141720;
+      border-bottom: 1px solid var(--border-hairline);
       transition: background 0.15s ease;
       cursor: pointer;
     }
 
     .track-row:hover {
-      background: #141722;
+      background: var(--bg-card-hover);
     }
 
     .track-row.playing {
-      background: rgba(245, 158, 11, 0.08);
+      background: var(--badge-bg);
     }
 
     .track-row td {
@@ -734,8 +756,8 @@
       width: 36px;
       height: 36px;
       border-radius: 6px;
-      background: #1e222d;
-      border: 1px solid #252937;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -751,24 +773,24 @@
 
     .track-name {
       font-weight: 600;
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .track-row.playing .track-name {
-      color: #f59e0b;
+      color: var(--accent-primary);
     }
 
     .track-artist {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .track-license-badge {
       font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-      background: #181b26;
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: var(--bg-card);
+      color: var(--status-success);
+      border: 1px solid var(--border-hairline);
       padding: 2px 6px;
       border-radius: 4px;
     }
@@ -783,7 +805,7 @@
 
     .eq-bar {
       width: 3px;
-      background: #f59e0b;
+      background: var(--accent-primary);
       border-radius: 1px;
       animation: eqBounce 1s ease-in-out infinite alternate;
     }
@@ -804,14 +826,15 @@
       left: 0;
       right: 0;
       height: 80px;
-      background: #0e1017;
-      border-top: 1px solid #252937;
+      background: var(--player-bg);
+      border-top: 1px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
       z-index: 50;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .docked-player::before {
@@ -821,8 +844,8 @@
       left: 0;
       width: 45%;
       height: 2px;
-      background: #f59e0b;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+      background: var(--accent-primary);
+      box-shadow: 0 0 8px var(--accent-glow);
     }
 
     .player-left {
@@ -836,8 +859,8 @@
       width: 48px;
       height: 48px;
       border-radius: 8px;
-      background: #1c202c;
-      border: 1px solid #252937;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -854,12 +877,12 @@
     .player-track-title {
       font-size: 13px;
       font-weight: 600;
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .player-track-artist {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .player-center {
@@ -880,7 +903,7 @@
     .btn-player {
       background: transparent;
       border: none;
-      color: #9ca3af;
+      color: var(--text-muted);
       cursor: pointer;
       font-size: 16px;
       display: flex;
@@ -889,21 +912,21 @@
       transition: color 0.15s ease;
     }
 
-    .btn-player:hover { color: #f3f4f6; }
+    .btn-player:hover { color: var(--text-primary); }
 
     .btn-player-primary {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: #f59e0b;
-      color: #0b0c10;
+      background: var(--accent-primary);
+      color: var(--button-primary-text);
       font-size: 14px;
       font-weight: 700;
+      transition: background 0.15s ease;
     }
 
     .btn-player-primary:hover {
-      background: #fbbf24;
-      color: #0b0c10;
+      background: var(--accent-glow);
     }
 
     .scrubber-bar-container {
@@ -913,13 +936,13 @@
       gap: 10px;
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #6b7280;
+      color: var(--text-muted);
     }
 
     .scrubber-track {
       flex: 1;
       height: 4px;
-      background: #1e222e;
+      background: var(--bg-card);
       border-radius: 2px;
       position: relative;
       cursor: pointer;
@@ -928,7 +951,7 @@
     .scrubber-progress {
       width: 45%;
       height: 100%;
-      background: #f59e0b;
+      background: var(--accent-primary);
       border-radius: 2px;
       position: relative;
     }
@@ -940,8 +963,8 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #fbbf24;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+      background: var(--accent-glow);
+      box-shadow: 0 0 8px var(--accent-glow);
     }
 
     .player-right {
@@ -958,11 +981,11 @@
       gap: 6px;
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      background: rgba(16, 185, 129, 0.12);
-      color: #10b981;
+      background: var(--badge-bg);
+      color: var(--status-success);
       padding: 4px 8px;
       border-radius: 6px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid var(--badge-border);
     }
 
     /* Mobile Frame (390x844 simulated) */
@@ -976,24 +999,25 @@
     .mobile-device {
       width: 390px;
       height: 844px;
-      background: #0b0c10;
+      background: var(--bg-canvas);
       border-radius: 40px;
-      border: 8px solid #252937;
+      border: 8px solid var(--border-hairline);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       position: relative;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .mobile-notch {
       height: 28px;
-      background: #11131a;
+      background: var(--bg-surface);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -1002,13 +1026,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #1c202c;
+      border-bottom: 1px solid var(--border-hairline);
+      background: var(--bg-surface);
     }
 
     .mobile-content {
       flex: 1;
       overflow-y: auto;
       padding: 16px 16px 140px;
+      background: var(--bg-canvas);
     }
 
     .mobile-docked-player {
@@ -1017,8 +1043,8 @@
       left: 10px;
       right: 10px;
       height: 52px;
-      background: #141722;
-      border: 1px solid #252937;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -1034,8 +1060,8 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: #11131a;
-      border-top: 1px solid #252937;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: space-around;
@@ -1048,7 +1074,7 @@
       align-items: center;
       gap: 2px;
       font-size: 10px;
-      color: #6b7280;
+      color: var(--text-muted);
       text-decoration: none;
       min-width: 48px;
       min-height: 48px;
@@ -1056,15 +1082,15 @@
     }
 
     .mobile-nav-item.active {
-      color: #f59e0b;
+      color: var(--accent-primary);
       font-weight: 600;
     }
 
     /* Profile Specific Layouts */
     .profile-hero {
-      background: linear-gradient(180deg, #161924 0%, #0b0c10 100%);
+      background: var(--hero-gradient);
       border-radius: 14px;
-      border: 1px solid #252937;
+      border: 1px solid var(--border-hairline);
       padding: 32px;
       display: flex;
       align-items: center;
@@ -1076,13 +1102,13 @@
       width: 104px;
       height: 104px;
       border-radius: 50%;
-      background: #181b26;
-      border: 3px solid #d97706;
+      background: var(--bg-card);
+      border: 3px solid var(--accent-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
       flex-shrink: 0;
     }
 
@@ -1104,40 +1130,41 @@
     }
 
     .profile-display-name {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-display);
       font-size: 26px;
       font-weight: 700;
+      color: var(--text-primary);
     }
 
     .role-badge {
       font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-      background: rgba(245, 158, 11, 0.15);
-      color: #f59e0b;
+      background: var(--badge-bg);
+      color: var(--badge-text);
       padding: 2px 8px;
       border-radius: 9999px;
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border: 1px solid var(--badge-border);
     }
 
     .profile-meta {
       font-size: 13px;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-bottom: 12px;
       font-family: 'JetBrains Mono', monospace;
     }
 
     .profile-bio {
       font-size: 14px;
-      color: #d1d5db;
+      color: var(--text-primary);
       line-height: 1.5;
       max-width: 600px;
       margin-bottom: 16px;
     }
 
     .btn-edit-profile {
-      background: #1e222e;
-      color: #f3f4f6;
-      border: 1px solid #252937;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-hairline);
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 13px;
@@ -1150,9 +1177,9 @@
     }
 
     .btn-edit-profile:hover {
-      background: #252937;
-      border-color: #f59e0b;
-      color: #f59e0b;
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
     }
 
     /* Preset Avatars Showcase */
@@ -1171,8 +1198,8 @@
     }
 
     .avatar-preset-card {
-      background: #14161f;
-      border: 1px solid #252937;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
       border-radius: 12px;
       padding: 20px 16px;
       text-align: center;
@@ -1184,7 +1211,7 @@
     }
 
     .avatar-preset-card:hover {
-      border-color: #f59e0b;
+      border-color: var(--accent-primary);
       transform: translateY(-2px);
     }
 
@@ -1192,8 +1219,8 @@
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: #14161f;
-      border: 2px solid #252937;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1209,196 +1236,491 @@
     }
 
     .avatar-preset-card:hover .avatar-preset-preview {
-      border-color: #f59e0b;
+      border-color: var(--accent-primary);
       box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
     }
 
     .avatar-preset-name {
       font-size: 13px;
       font-weight: 600;
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .avatar-preset-key {
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-primary);
+      background: var(--badge-bg);
       padding: 2px 8px;
       border-radius: 4px;
-      border: 1px solid rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--badge-border);
     }
 
     .avatar-preset-desc {
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-muted);
       line-height: 1.4;
+    }
+
+    /* Appearance Settings Page Styles */
+    .appearance-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+
+    .theme-cards-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+      margin-bottom: 32px;
+    }
+
+    .theme-option-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-hairline);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .theme-option-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .theme-option-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .theme-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .theme-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .theme-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .theme-tagline {
+      font-size: 11px;
+      color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .theme-selected-indicator {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #374151;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: transparent;
+      transition: all 0.15s ease;
+    }
+
+    .theme-option-card.selected .theme-selected-indicator {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--button-primary-text);
+      font-weight: 800;
+    }
+
+    .theme-palette-preview {
+      display: flex;
+      gap: 6px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .palette-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .theme-description-text {
+      font-size: 12px;
+      color: #9ca3af;
+      line-height: 1.45;
+    }
+
+    .theme-contrast-badge {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .theme-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-hairline);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .btn-save-theme {
+      background: var(--accent-primary);
+      color: var(--button-primary-text);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-save-theme:hover {
+      background: var(--accent-glow);
+    }
+
+    .btn-reset-theme {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-hairline);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-reset-theme:hover {
+      color: var(--text-primary);
+      border-color: var(--text-primary);
     }
   </style>
 </head>
-<body>
+<body data-theme="obsidian-studio">
 
   <!-- Top Sticky Navigation Bar -->
   <header class="prototype-header">
     <div class="brand-group">
       <div class="brand-logo" aria-hidden="true">H</div>
       <div>
-        <div class="brand-title">Harmoni Design Exploration</div>
-        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.2 Visual Prototype</div>
+        <div class="brand-title">Harmoni Multi-Theme System</div>
+        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.3 Architecture Exploration</div>
       </div>
-      <span class="brand-badge">STUDIO HI-FI PROTOTYPE</span>
+      <span class="brand-badge">FIVE THEMES AVAILABLE</span>
     </div>
 
     <!-- View Switcher (WAI-ARIA Tablist Pattern with Keyboard Navigation) -->
     <nav class="view-tabs" role="tablist" aria-label="Prototype View Navigation">
-      <button type="button" class="view-btn active" role="tab" aria-selected="true" aria-controls="view-directions" id="tab-directions" data-view="directions" tabindex="0">1. Visual Directions</button>
-      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-discover" id="tab-desktop-discover" data-view="desktop-discover" tabindex="-1">2. Desktop Discover</button>
-      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-profile" id="tab-desktop-profile" data-view="desktop-profile" tabindex="-1">3. Desktop Profile</button>
-      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-mobile" id="tab-mobile" data-view="mobile" tabindex="-1">4. Mobile Screens</button>
-      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-tokens" id="tab-tokens" data-view="tokens" tabindex="-1">5. Design Tokens & Avatars</button>
+      <button type="button" class="view-btn active" role="tab" aria-selected="true" aria-controls="view-directions" id="tab-directions" data-view="directions" tabindex="0">1. Theme Catalog</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-appearance" id="tab-appearance" data-view="appearance" tabindex="-1">2. Appearance Settings</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-discover" id="tab-desktop-discover" data-view="desktop-discover" tabindex="-1">3. Live Desktop</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-profile" id="tab-desktop-profile" data-view="desktop-profile" tabindex="-1">4. Live Profile</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-mobile" id="tab-mobile" data-view="mobile" tabindex="-1">5. Mobile Screens</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-tokens" id="tab-tokens" data-view="tokens" tabindex="-1">6. SVG Avatars</button>
     </nav>
 
-    <div class="figma-status">
-      <span class="status-dot-shell" aria-hidden="true"></span>
-      <span>Figma Shell Linked (Empty Document)</span>
+    <!-- Global Quick Theme Selector for Live Testing -->
+    <div class="header-theme-selector">
+      <span>ACTIVE THEME:</span>
+      <select id="quickThemeSelector" class="theme-select-dropdown" aria-label="Quick Theme Switcher">
+        <option value="obsidian-studio" selected>1. Obsidian Studio</option>
+        <option value="nordic-aurora">2. Nordic Aurora</option>
+        <option value="editorial-vinyl">3. Editorial Vinyl</option>
+        <option value="crimson-vigil">4. Crimson Vigil (Daredevil-inspired)</option>
+        <option value="cobalt-web">5. Cobalt Web (Spider-Man-inspired)</option>
+      </select>
     </div>
   </header>
 
   <main class="stage-container">
 
-    <!-- Prototype Capability & Limitation Notice -->
+    <!-- Prototype Scope & Limitation Banner -->
     <div class="prototype-notice-banner" role="region" aria-label="Prototype Scope and Limitations">
-      <div class="notice-badge">// PROTOTYPE SCOPE &amp; BOUNDARY NOTICE</div>
+      <div class="notice-badge">// MULTI-THEME PLATFORM ARCHITECTURE SPECIFICATION</div>
       <div class="notice-content">
-        <p><strong>Interactive Features in this Document:</strong> Accessible view switcher tabs (keyboard navigation with Arrow keys/Home/End), visual direction comparison cards, simulated 1440&times;900 desktop and 390&times;844 mobile frames, design token palette, and eight handcrafted inline SVG avatar illustrations.</p>
-        <p><strong>Design-Only Mockups (Non-Functional Placeholders):</strong> Audio scrubber, equalizer animations, volume sliders, and play/pause controls are decorative visual demonstrations and do not stream audio; track titles, albums, and duration metrics are illustrative placeholders without Jamendo API streaming; user profiles and listening counters are fictional mock data with zero live database queries or authentication sessions.</p>
+        <p><strong>Interactive Multi-Theme Architecture:</strong> Harmoni has evolved into a multi-theme music platform. Every signed-in user chooses their preferred theme independently. Use the <strong>Theme Selector</strong> in the header or in View 2 to switch between all five themes in real-time. Notice how the sidebar, hero cards, vinyl artwork, track listings, and docked music player immediately transform their surfaces, accents, and contrast.</p>
+        <p><strong>Prototype State vs. Production Storage:</strong> In this HTML exploration, theme selection is held dynamically in client-side memory. In production, every user's selection will be securely persisted to PostgreSQL on the <code>User.themeKey</code> column and server-rendered onto <code>&lt;html data-theme="..."&gt;</code> in Next.js 16 to completely eliminate any theme flash (FOUC).</p>
       </div>
       <div class="notice-meta">
-        <span>Figma Shell: <a href="https://www.figma.com/design/tde7tKDtxqTwhqJQko989H" target="_blank" rel="noreferrer" style="color: #f59e0b; text-decoration: underline;">tde7tKDtxqTwhqJQko989H</a> (Verified Empty Canvas Shell)</span>
-        <span>Canonical Deliverable: This HTML Prototype Document</span>
+        <span>Figma Shell: <a href="https://www.figma.com/design/tde7tKDtxqTwhqJQko989H" target="_blank" rel="noreferrer" style="color: var(--accent-primary); text-decoration: underline;">tde7tKDtxqTwhqJQko989H</a> (Verified Empty Document Shell)</span>
+        <span>Canonical Exploration: This HTML Prototype</span>
         <span>Budget Constraint: &yen;0 INR</span>
       </div>
     </div>
 
-    <!-- VIEW 1: THREE VISUAL DIRECTIONS COMPARISON -->
+    <!-- VIEW 1: THEME CATALOG & DIRECTION COMPARISON (5 THEMES) -->
     <section id="view-directions" role="tabpanel" aria-labelledby="tab-directions">
       <div class="section-title">
-        <span>Three Visual Directions for Harmoni</span>
+        <span>The Five Initial Harmoni Themes</span>
       </div>
-      <p class="section-desc">Comparing three tailored aesthetic directions built for an intimate circle of 5&ndash;15 friends at &yen;0 lifetime cost.</p>
+      <p class="section-desc">Each theme has a distinct aesthetic personality, carefully calibrated for low-light listening, contrast, and &yen;0 cost performance.</p>
 
-      <div class="directions-grid">
-        <!-- Direction 1: Obsidian Studio (Recommended) -->
-        <div class="direction-card obsidian">
-          <span class="dir-badge">&starf; RECOMMENDED DIRECTION</span>
-          <h3 class="dir-title">1. Obsidian Studio</h3>
-          <p class="dir-desc">Warm analog audio preamps, vinyl listening rooms, and the cozy amber tube glow of a late-night private music session with friends.</p>
+      <div class="directions-grid-5">
+        <!-- Theme 1: Obsidian Studio -->
+        <div class="direction-card-5">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="dir-badge-chip" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">&starf; DEFAULT THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 18:1</span>
+          </div>
+          <h3 class="dir-title-text" style="font-family: 'Plus Jakarta Sans', sans-serif;">1. Obsidian Studio</h3>
+          <p class="dir-desc-text">Warm analog audio preamps, brushed slate listening desks, and the amber tube glow of a cozy late-night listening session.</p>
           
-          <div class="color-swatches">
-            <div class="swatch" style="background: #0b0c10;">#0b0c10</div>
-            <div class="swatch" style="background: #14161f;">#14161f</div>
-            <div class="swatch" style="background: #f59e0b; color: #000;">#f59e0b</div>
-            <div class="swatch" style="background: #d97706;">#d97706</div>
+          <div class="palette-swatches-row">
+            <div class="swatch-chip" style="background: #0b0c10;">#0b0c10</div>
+            <div class="swatch-chip" style="background: #14161f;">#14161f</div>
+            <div class="swatch-chip" style="background: #f59e0b; color: #000;">#f59e0b</div>
+            <div class="swatch-chip" style="background: #d97706;">#d97706</div>
           </div>
 
-          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
-            Typography: Plus Jakarta Sans + Inter + JetBrains Mono
+          <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('obsidian-studio')">
+            <span>Apply Obsidian Studio</span>
+          </button>
+        </div>
+
+        <!-- Theme 2: Nordic Aurora -->
+        <div class="direction-card-5">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="dir-badge-chip" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">AURORA GLASS</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 19:1</span>
+          </div>
+          <h3 class="dir-title-text" style="font-family: 'Space Grotesk', sans-serif;">2. Nordic Aurora</h3>
+          <p class="dir-desc-text">Scandinavian atmospheric minimalism, midnight dark canvas, and bioluminescent aurora cyan and emerald accents.</p>
+          
+          <div class="palette-swatches-row">
+            <div class="swatch-chip" style="background: #08090d;">#08090d</div>
+            <div class="swatch-chip" style="background: #10131d;">#10131d</div>
+            <div class="swatch-chip" style="background: #06b6d4; color: #000;">#06b6d4</div>
+            <div class="swatch-chip" style="background: #10b981; color: #000;">#10b981</div>
           </div>
 
-          <!-- Component preview with SVG avatar -->
-          <div class="mini-player-preview">
-            <div class="mini-artwork">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Studio Turntable" style="width: 28px; height: 28px;">
-                <circle cx="28" cy="32" r="16" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
-                <circle cx="28" cy="32" r="6" fill="#f59e0b"/>
-                <circle cx="28" cy="32" r="2" fill="#0b0c10"/>
-                <path d="M48 18L44 32L38 34" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
-              </svg>
+          <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('nordic-aurora')">
+            <span>Apply Nordic Aurora</span>
+          </button>
+        </div>
+
+        <!-- Theme 3: Editorial Vinyl -->
+        <div class="direction-card-5">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="dir-badge-chip" style="background: rgba(204, 255, 0, 0.15); color: #ccff00; border: 1px solid rgba(204, 255, 0, 0.3);">SWISS CATALOG</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 19:1</span>
+          </div>
+          <h3 class="dir-title-text" style="font-family: 'Syne', sans-serif;">3. Editorial Vinyl</h3>
+          <p class="dir-desc-text">Swiss typography, independent record label catalog styling, structured micro-borders, and electric acid-lime accents.</p>
+          
+          <div class="palette-swatches-row">
+            <div class="swatch-chip" style="background: #0d0e11;">#0d0e11</div>
+            <div class="swatch-chip" style="background: #14161d;">#14161d</div>
+            <div class="swatch-chip" style="background: #ccff00; color: #000;">#ccff00</div>
+            <div class="swatch-chip" style="background: #3b82f6;">#3b82f6</div>
+          </div>
+
+          <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('editorial-vinyl')">
+            <span>Apply Editorial Vinyl</span>
+          </button>
+        </div>
+
+        <!-- Theme 4: Crimson Vigil (Daredevil-inspired) -->
+        <div class="direction-card-5">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="dir-badge-chip" style="background: rgba(225, 29, 72, 0.15); color: #f43f5e; border: 1px solid rgba(225, 29, 72, 0.3);">INSPIRED THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AA 4.6:1</span>
+          </div>
+          <h3 class="dir-title-text" style="font-family: 'Plus Jakarta Sans', sans-serif;">4. Crimson Vigil</h3>
+          <p class="dir-desc-text">Atmospheric Daredevil and Hell's Kitchen inspiration: deep shadow backgrounds, dark oxblood surfaces, and serious crimson accents.</p>
+          
+          <div class="palette-swatches-row">
+            <div class="swatch-chip" style="background: #09070a;">#09070a</div>
+            <div class="swatch-chip" style="background: #1a0f16;">#1a0f16</div>
+            <div class="swatch-chip" style="background: #e11d48;">#e11d48</div>
+            <div class="swatch-chip" style="background: #be123c;">#be123c</div>
+          </div>
+
+          <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('crimson-vigil')">
+            <span>Apply Crimson Vigil</span>
+          </button>
+        </div>
+
+        <!-- Theme 5: Cobalt Web (Spider-Man-inspired) -->
+        <div class="direction-card-5">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="dir-badge-chip" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">INSPIRED THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AA 4.9:1</span>
+          </div>
+          <h3 class="dir-title-text" style="font-family: 'Inter', sans-serif;">5. Cobalt Web</h3>
+          <p class="dir-desc-text">Spider-Man color inspiration: deep midnight navy canvas, royal blue secondary chassis, dynamic vermilion red accents, and crisp white type.</p>
+          
+          <div class="palette-swatches-row">
+            <div class="swatch-chip" style="background: #070b14;">#070b14</div>
+            <div class="swatch-chip" style="background: #111a2e;">#111a2e</div>
+            <div class="swatch-chip" style="background: #ef4444;">#ef4444</div>
+            <div class="swatch-chip" style="background: #2563eb;">#2563eb</div>
+          </div>
+
+          <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('cobalt-web')">
+            <span>Apply Cobalt Web</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: APPEARANCE & THEME SELECTOR SETTINGS VIEW -->
+    <section id="view-appearance" role="tabpanel" aria-labelledby="tab-appearance" style="display: none;">
+      <div class="appearance-container">
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">Appearance &amp; Theme Settings</h2>
+          <p style="color: var(--text-muted); font-size: 14px;">Select your preferred visual identity. Your theme is private to your user account and does not change what your friends see.</p>
+        </div>
+
+        <!-- Theme Selection Cards Grid -->
+        <div class="theme-cards-gallery">
+          <!-- Card 1 -->
+          <div class="theme-option-card selected" id="opt-obsidian-studio" onclick="applyTheme('obsidian-studio')">
+            <div class="theme-card-header">
+              <div class="theme-title-group">
+                <span class="theme-title">Obsidian Studio</span>
+                <span class="theme-tagline">DEFAULT &middot; ANALOG HI-FI</span>
+              </div>
+              <div class="theme-selected-indicator">&check;</div>
             </div>
-            <div class="mini-track-info">
-              <div class="mini-track-title">Solar Drift</div>
-              <div class="mini-track-artist">Tycho &middot; CC BY-NC-SA 4.0</div>
+            <div class="theme-palette-preview">
+              <div class="palette-box" style="background: #0b0c10;">#0b0c10</div>
+              <div class="palette-box" style="background: #14161f;">#14161f</div>
+              <div class="palette-box" style="background: #f59e0b; color: #000;">#f59e0b</div>
+              <div class="palette-box" style="background: #d97706;">#d97706</div>
             </div>
-            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
+            <p class="theme-description-text">Warm obsidian charcoal, brushed slate surfaces, and glowing amber tube filaments for cozy studio listening.</p>
+            <div class="theme-contrast-badge">&check; WCAG AAA Verified (18:1 contrast ratio)</div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="theme-option-card" id="opt-nordic-aurora" onclick="applyTheme('nordic-aurora')">
+            <div class="theme-card-header">
+              <div class="theme-title-group">
+                <span class="theme-title">Nordic Aurora</span>
+                <span class="theme-tagline">ETHEREAL SCANDINAVIAN GLASS</span>
+              </div>
+              <div class="theme-selected-indicator">&check;</div>
+            </div>
+            <div class="theme-palette-preview">
+              <div class="palette-box" style="background: #08090d;">#08090d</div>
+              <div class="palette-box" style="background: #10131d;">#10131d</div>
+              <div class="palette-box" style="background: #06b6d4; color: #000;">#06b6d4</div>
+              <div class="palette-box" style="background: #10b981; color: #000;">#10b981</div>
+            </div>
+            <p class="theme-description-text">Midnight ink canvas, subtle glass borders, and luminous cyan and emerald aurora reflections.</p>
+            <div class="theme-contrast-badge">&check; WCAG AAA Verified (19:1 contrast ratio)</div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="theme-option-card" id="opt-editorial-vinyl" onclick="applyTheme('editorial-vinyl')">
+            <div class="theme-card-header">
+              <div class="theme-title-group">
+                <span class="theme-title">Editorial Vinyl</span>
+                <span class="theme-tagline">SWISS RECORD CLUB</span>
+              </div>
+              <div class="theme-selected-indicator">&check;</div>
+            </div>
+            <div class="theme-palette-preview">
+              <div class="palette-box" style="background: #0d0e11;">#0d0e11</div>
+              <div class="palette-box" style="background: #14161d;">#14161d</div>
+              <div class="palette-box" style="background: #ccff00; color: #000;">#ccff00</div>
+              <div class="palette-box" style="background: #3b82f6;">#3b82f6</div>
+            </div>
+            <p class="theme-description-text">High-contrast matte graphite, structured monospace metadata, and bold pops of electric acid-lime.</p>
+            <div class="theme-contrast-badge">&check; WCAG AAA Verified (19:1 contrast ratio)</div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="theme-option-card" id="opt-crimson-vigil" onclick="applyTheme('crimson-vigil')">
+            <div class="theme-card-header">
+              <div class="theme-title-group">
+                <span class="theme-title">Crimson Vigil</span>
+                <span class="theme-tagline">DAREDEVIL-INSPIRED NOIR</span>
+              </div>
+              <div class="theme-selected-indicator">&check;</div>
+            </div>
+            <div class="theme-palette-preview">
+              <div class="palette-box" style="background: #09070a;">#09070a</div>
+              <div class="palette-box" style="background: #1a0f16;">#1a0f16</div>
+              <div class="palette-box" style="background: #e11d48;">#e11d48</div>
+              <div class="palette-box" style="background: #be123c;">#be123c</div>
+            </div>
+            <p class="theme-description-text">Deep shadow canvas, dark oxblood chassis, and restrained vigilante crimson for serious late-night sessions.</p>
+            <div class="theme-contrast-badge">&check; WCAG AA Verified (4.6:1 contrast ratio)</div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="theme-option-card" id="opt-cobalt-web" onclick="applyTheme('cobalt-web')">
+            <div class="theme-card-header">
+              <div class="theme-title-group">
+                <span class="theme-title">Cobalt Web</span>
+                <span class="theme-tagline">SPIDER-MAN-INSPIRED COBALT</span>
+              </div>
+              <div class="theme-selected-indicator">&check;</div>
+            </div>
+            <div class="theme-palette-preview">
+              <div class="palette-box" style="background: #070b14;">#070b14</div>
+              <div class="palette-box" style="background: #111a2e;">#111a2e</div>
+              <div class="palette-box" style="background: #ef4444;">#ef4444</div>
+              <div class="palette-box" style="background: #2563eb;">#2563eb</div>
+            </div>
+            <p class="theme-description-text">Midnight navy backgrounds, royal blue surfaces, and dynamic vermilion red accents for an energetic modern feel.</p>
+            <div class="theme-contrast-badge">&check; WCAG AA Verified (4.9:1 contrast ratio)</div>
           </div>
         </div>
 
-        <!-- Direction 2: Nordic Aurora -->
-        <div class="direction-card aurora">
-          <span class="dir-badge">ETHEREAL MINIMALISM</span>
-          <h3 class="dir-title">2. Nordic Aurora</h3>
-          <p class="dir-desc">Scandinavian atmospheric minimalism, dark midnight glass, and bioluminescent aurora cyan/emerald gradients reflecting artwork.</p>
-          
-          <div class="color-swatches">
-            <div class="swatch" style="background: #08090d;">#08090d</div>
-            <div class="swatch" style="background: #111420;">#111420</div>
-            <div class="swatch" style="background: #06b6d4; color: #000;">#06b6d4</div>
-            <div class="swatch" style="background: #10b981; color: #000;">#10b981</div>
+        <div class="theme-actions-bar">
+          <div style="font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+            Active Session Theme: <strong id="currentThemeDisplay" style="color: var(--accent-primary);">Obsidian Studio</strong>
           </div>
-
-          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
-            Typography: Space Grotesk + Inter + Space Mono
-          </div>
-
-          <!-- Component preview -->
-          <div class="mini-player-preview">
-            <div class="mini-artwork">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aurora Prism" style="width: 28px; height: 28px;">
-                <polygon points="32,14 18,46 46,46" fill="#111420" stroke="#06b6d4" stroke-width="1.5"/>
-                <path d="M36 30L52 20" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M36 34L52 42" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="mini-track-info">
-              <div class="mini-track-title">Solar Drift</div>
-              <div class="mini-track-artist">Tycho &middot; Ambient Wash</div>
-            </div>
-            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
-          </div>
-        </div>
-
-        <!-- Direction 3: Editorial Vinyl -->
-        <div class="direction-card editorial">
-          <span class="dir-badge">SWISS RECORD CLUB</span>
-          <h3 class="dir-title">3. Editorial Vinyl</h3>
-          <p class="dir-desc">Swiss graphic design, indie record catalog typography, bold structural lines, and monochrome matte surfaces with electric acid lime.</p>
-          
-          <div class="color-swatches">
-            <div class="swatch" style="background: #0d0e11;">#0d0e11</div>
-            <div class="swatch" style="background: #15171e;">#15171e</div>
-            <div class="swatch" style="background: #ccff00; color: #000;">#ccff00</div>
-            <div class="swatch" style="background: #3b82f6;">#3b82f6</div>
-          </div>
-
-          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">
-            Typography: Syne + DM Sans + JetBrains Mono Upper
-          </div>
-
-          <!-- Component preview -->
-          <div class="mini-player-preview">
-            <div class="mini-artwork">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Editorial Disc" style="width: 28px; height: 28px;">
-                <circle cx="32" cy="32" r="22" stroke="#ccff00" stroke-width="1.5"/>
-                <circle cx="32" cy="32" r="6" fill="#ccff00"/>
-                <circle cx="32" cy="32" r="2" fill="#0d0e11"/>
-              </svg>
-            </div>
-            <div class="mini-track-info">
-              <div class="mini-track-title">SOLAR DRIFT // 01</div>
-              <div class="mini-track-artist">TYCHO // 320 KBPS</div>
-            </div>
-            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
+          <div style="display: flex; gap: 12px;">
+            <button type="button" class="btn-reset-theme" onclick="applyTheme('obsidian-studio')">Reset to Default</button>
+            <button type="button" class="btn-save-theme" onclick="alert('Theme selection confirmed for this session! In production, this saves to User.themeKey via PATCH /api/users/me/theme.')">
+              <span>Save Theme Preference</span>
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 2: HIGH-FIDELITY DESKTOP DISCOVER SCREEN (1440x900) -->
+    <!-- VIEW 3: LIVE DESKTOP DISCOVER SCREEN (1440x900) -->
     <section id="view-desktop-discover" role="tabpanel" aria-labelledby="tab-desktop-discover" style="display: none;">
       <div class="section-title">
-        <span>Desktop Discover Screen (1440 &times; 900 &middot; Obsidian Studio)</span>
+        <span>Desktop Discover Screen (1440 &times; 900)</span>
       </div>
-      <p class="section-desc">Spacious 2-column studio layout with fixed navigation sidebar, fluid listening viewport, and docked persistent preamp player.</p>
+      <p class="section-desc">Notice how this entire view transforms dynamically to reflect your currently selected theme.</p>
 
       <div class="screen-stage">
         <div class="screen-stage-bar">
@@ -1407,7 +1729,7 @@
             <div class="traffic-light" style="background: #f59e0b;"></div>
             <div class="traffic-light" style="background: #10b981;"></div>
           </div>
-          <span>Harmoni Desktop &mdash; 1440 &times; 900 &mdash; Obsidian Hi-Fi</span>
+          <span>Harmoni Desktop &mdash; 1440 &times; 900 &mdash; Live Themed View</span>
           <span>https://harmoni.local/discover</span>
         </div>
 
@@ -1417,7 +1739,7 @@
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
                 <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;" aria-hidden="true">H</div>
-                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
+                <div style="font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--text-primary);">Harmoni</div>
               </div>
 
               <div class="sidebar-nav-section">
@@ -1452,16 +1774,11 @@
             <!-- Authenticated User Profile Pill with SVG Avatar -->
             <div class="sidebar-user">
               <div class="sidebar-avatar">
-                <!-- Avatar 1 SVG Inline -->
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar: Amber Studio Turntable">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar">
                   <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
                   <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
-                  <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
-                  <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
                   <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
-                  <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
-                  <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
-                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="sidebar-user-text">
@@ -1490,8 +1807,8 @@
 
             <!-- Fresh Discoveries Track Table -->
             <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700;">Curated Vinyl Feed</h2>
-              <span style="font-size: 12px; color: #9ca3af; font-family: 'JetBrains Mono', monospace;">5 Tracks Loaded &middot; CC Verified</span>
+              <h2 style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary);">Curated Vinyl Feed</h2>
+              <span style="font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">5 Tracks Loaded &middot; CC Verified</span>
             </div>
 
             <table class="track-table">
@@ -1518,7 +1835,7 @@
                       <div class="track-art">
                         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
                           <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
-                          <circle cx="32" cy="32" r="10" fill="#f59e0b"/>
+                          <circle cx="32" cy="32" r="10" fill="var(--accent-primary)"/>
                           <circle cx="32" cy="32" r="3" fill="#0b0c10"/>
                         </svg>
                       </div>
@@ -1528,19 +1845,19 @@
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Simulated Single</td>
+                  <td style="color: var(--text-muted);">Simulated Single</td>
                   <td><span class="track-license-badge">CC BY-NC-SA 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #f59e0b;">03:42</td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--accent-primary);">03:42</td>
                 </tr>
 
                 <tr class="track-row">
-                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">02</td>
+                  <td style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">02</td>
                   <td>
                     <div class="track-cell-title">
                       <div class="track-art">
                         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
                           <rect x="12" y="12" width="40" height="40" rx="6" fill="#141722" stroke="#252937" stroke-width="2"/>
-                          <path d="M18 36L28 24L38 34L46 26" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M18 36L28 24L38 34L46 26" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                       </div>
                       <div>
@@ -1549,19 +1866,19 @@
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Migration Sessions</td>
+                  <td style="color: var(--text-muted);">Migration Sessions</td>
                   <td><span class="track-license-badge">CC BY-SA 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">04:18</td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">04:18</td>
                 </tr>
 
                 <tr class="track-row">
-                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">03</td>
+                  <td style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">03</td>
                   <td>
                     <div class="track-cell-title">
                       <div class="track-art">
                         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
                           <circle cx="32" cy="32" r="26" fill="#111420" stroke="#22293d" stroke-width="2"/>
-                          <polygon points="32,18 20,44 44,44" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="1.5"/>
+                          <polygon points="32,18 20,44 44,44" fill="var(--accent-primary)" fill-opacity="0.2" stroke="var(--accent-primary)" stroke-width="1.5"/>
                         </svg>
                       </div>
                       <div>
@@ -1570,52 +1887,9 @@
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Looped Horizon</td>
+                  <td style="color: var(--text-muted);">Looped Horizon</td>
                   <td><span class="track-license-badge">CC BY 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">05:02</td>
-                </tr>
-
-                <tr class="track-row">
-                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">04</td>
-                  <td>
-                    <div class="track-cell-title">
-                      <div class="track-art">
-                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
-                          <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
-                          <path d="M16 32C22 20 28 44 34 32C40 20 44 44 48 32" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <div class="track-name">Analog Reverie</div>
-                        <div class="track-artist">Nils Frahm</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style="color: #9ca3af;">Solo Works Vol. 1</td>
-                  <td><span class="track-license-badge">CC BY-NC 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">06:14</td>
-                </tr>
-
-                <tr class="track-row">
-                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">05</td>
-                  <td>
-                    <div class="track-cell-title">
-                      <div class="track-art">
-                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
-                          <rect x="12" y="16" width="40" height="32" rx="4" fill="#181b26" stroke="#252937" stroke-width="1.5"/>
-                          <circle cx="26" cy="32" r="4" stroke="#f59e0b" stroke-width="1.5"/>
-                          <circle cx="38" cy="32" r="4" stroke="#f59e0b" stroke-width="1.5"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <div class="track-name">Tokyo Substation</div>
-                        <div class="track-artist">Four Tet</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style="color: #9ca3af;">Parallel Cuts</td>
-                  <td><span class="track-license-badge">CC BY-SA 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">04:45</td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">05:02</td>
                 </tr>
               </tbody>
             </table>
@@ -1627,7 +1901,7 @@
               <div class="player-cover">
                 <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Current Track Artwork">
                   <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
-                  <circle cx="32" cy="32" r="10" fill="#f59e0b"/>
+                  <circle cx="32" cy="32" r="10" fill="var(--accent-primary)"/>
                   <circle cx="32" cy="32" r="3" fill="#0b0c10"/>
                 </svg>
               </div>
@@ -1666,12 +1940,12 @@
       </div>
     </section>
 
-    <!-- VIEW 3: DESKTOP PROFILE SCREEN (1440x900) -->
+    <!-- VIEW 4: LIVE PROFILE SCREEN (1440x900) -->
     <section id="view-desktop-profile" role="tabpanel" aria-labelledby="tab-desktop-profile" style="display: none;">
       <div class="section-title">
         <span>Desktop Profile Screen (1440 &times; 900 &middot; /@elena)</span>
       </div>
-      <p class="section-desc">Profile identity view with 104px SVG avatar preset, bio editor trigger, and zero deceptive friend buttons (Milestone 3C boundary).</p>
+      <p class="section-desc">Profile identity view with 104px SVG avatar preset and theme-coherent surface styling.</p>
 
       <div class="screen-stage">
         <div class="screen-stage-bar">
@@ -1689,7 +1963,7 @@
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
                 <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;" aria-hidden="true">H</div>
-                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
+                <div style="font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--text-primary);">Harmoni</div>
               </div>
 
               <div class="sidebar-nav-section">
@@ -1739,8 +2013,7 @@
             <!-- Profile Hero -->
             <div class="profile-hero">
               <div class="profile-avatar-large">
-                <!-- Large 104px SVG Avatar Preset (Amber Studio Turntable) -->
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Elena Vance's avatar: Amber Studio Turntable">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Elena Vance avatar: Amber Studio Turntable">
                   <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
                   <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
                   <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
@@ -1765,7 +2038,6 @@
                   Curating warm analog synth waves, ambient jazz, and late-night vinyl sessions with close friends. Building personal listening archives at &yen;0 cost.
                 </p>
                 <div>
-                  <!-- Milestone 3C Boundary: Profile editing action for authenticated user -->
                   <button type="button" class="btn-edit-profile">
                     <span aria-hidden="true">&#9998;</span>
                     <span>Edit Avatar &amp; Biography</span>
@@ -1775,49 +2047,43 @@
             </div>
 
             <!-- Profile Content Tabs -->
-            <div style="display: flex; gap: 24px; border-bottom: 1px solid #252937; margin-bottom: 24px; padding-bottom: 10px;">
-              <span style="color: #f59e0b; font-weight: 600; font-size: 14px; border-bottom: 2px solid #f59e0b; padding-bottom: 10px;">Public Playlists (3)</span>
-              <span style="color: #6b7280; font-size: 14px; cursor: pointer;">Liked Tracks (42)</span>
-              <span style="color: #6b7280; font-size: 14px; cursor: pointer;">Scrobble History</span>
+            <div style="display: flex; gap: 24px; border-bottom: 1px solid var(--border-hairline); margin-bottom: 24px; padding-bottom: 10px;">
+              <span style="color: var(--accent-primary); font-weight: 600; font-size: 14px; border-bottom: 2px solid var(--accent-primary); padding-bottom: 10px;">Public Playlists (3)</span>
+              <span style="color: var(--text-muted); font-size: 14px; cursor: pointer;">Liked Tracks (42)</span>
+              <span style="color: var(--text-muted); font-size: 14px; cursor: pointer;">Scrobble History</span>
             </div>
 
             <!-- Public Playlists Cards Grid -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #252937, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coffee cup icon" style="width: 44px; height: 44px;">
-                    <path d="M16 22H42V36C42 41 38 45 32 45H26C20 45 16 41 16 36V22Z" fill="#252937" stroke="#f59e0b" stroke-width="2"/>
-                    <path d="M42 26H46C49 26 51 28 51 31C51 34 49 36 46 36H42" stroke="#f59e0b" stroke-width="2"/>
-                    <path d="M22 15C22 13 24 13 24 11" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M30 15C30 13 32 13 32 11" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: var(--bg-surface); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coffee icon" style="width: 44px; height: 44px;">
+                    <path d="M16 22H42V36C42 41 38 45 32 45H26C20 45 16 41 16 36V22Z" fill="var(--bg-card)" stroke="var(--accent-primary)" stroke-width="2"/>
+                    <path d="M42 26H46C49 26 51 28 51 31C51 34 49 36 46 36H42" stroke="var(--accent-primary)" stroke-width="2"/>
                   </svg>
                 </div>
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Late Night Ambient</div>
-                <div style="font-size: 12px; color: #9ca3af;">18 tracks &middot; Public Playlist</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">Late Night Ambient</div>
+                <div style="font-size: 12px; color: var(--text-muted);">18 tracks &middot; Public Playlist</div>
               </div>
 
-              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #2c2518, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Saxophone/Jazz icon" style="width: 44px; height: 44px;">
-                    <path d="M20 16L32 16L32 38C32 44 26 48 20 48C14 48 10 44 10 38C10 32 15 28 20 28" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-                    <circle cx="36" cy="20" r="3" fill="#fbbf24"/>
-                    <circle cx="42" cy="26" r="3" fill="#fbbf24"/>
-                    <circle cx="46" cy="34" r="4" fill="#d97706"/>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: var(--bg-surface); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jazz icon" style="width: 44px; height: 44px;">
+                    <path d="M20 16L32 16L32 38C32 44 26 48 20 48C14 48 10 44 10 38C10 32 15 28 20 28" stroke="var(--accent-primary)" stroke-width="2"/>
                   </svg>
                 </div>
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Tokyo Coffeehouse Jazz</div>
-                <div style="font-size: 12px; color: #9ca3af;">24 tracks &middot; Public Playlist</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">Tokyo Coffeehouse Jazz</div>
+                <div style="font-size: 12px; color: var(--text-muted);">24 tracks &middot; Public Playlist</div>
               </div>
 
-              <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #182524, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pine tree icon" style="width: 44px; height: 44px;">
-                    <polygon points="32,14 20,28 26,28 16,42 48,42 38,28 44,28" fill="#182524" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/>
-                    <rect x="29" y="42" width="6" height="8" fill="#78350f"/>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 16px;">
+                <div style="height: 120px; background: var(--bg-surface); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pine icon" style="width: 44px; height: 44px;">
+                    <polygon points="32,14 20,28 26,28 16,42 48,42 38,28 44,28" fill="var(--bg-card)" stroke="var(--status-success)" stroke-width="2"/>
                   </svg>
                 </div>
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Pacific Northwest Drift</div>
-                <div style="font-size: 12px; color: #9ca3af;">12 tracks &middot; Public Playlist</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">Pacific Northwest Drift</div>
+                <div style="font-size: 12px; color: var(--text-muted);">12 tracks &middot; Public Playlist</div>
               </div>
             </div>
           </main>
@@ -1825,12 +2091,12 @@
       </div>
     </section>
 
-    <!-- VIEW 4: MOBILE SCREENS (390x844) -->
+    <!-- VIEW 5: MOBILE SCREENS (390x844) -->
     <section id="view-mobile" role="tabpanel" aria-labelledby="tab-mobile" style="display: none;">
       <div class="section-title">
-        <span>Mobile Screen Designs (390 &times; 844 &middot; Obsidian Studio)</span>
+        <span>Mobile Screen Designs (390 &times; 844)</span>
       </div>
-      <p class="section-desc">Mobile viewport layouts with comfortable 48px+ touch targets, compact floating mini-player bar, and bottom navigation.</p>
+      <p class="section-desc">Mobile layouts with 48px+ touch targets and theme-aware surfaces.</p>
 
       <div class="mobile-frame-container">
         <!-- Mobile Discover Screen -->
@@ -1840,41 +2106,39 @@
           <div class="mobile-header">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="brand-logo" style="width: 26px; height: 26px; font-size: 13px;" aria-hidden="true">H</div>
-              <span style="font-weight: 700; font-size: 15px;">Harmoni</span>
+              <span style="font-weight: 700; font-size: 15px; color: var(--text-primary);">Harmoni</span>
             </div>
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: #1c202c; border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-              <!-- Mini SVG Avatar -->
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--accent-primary); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mini avatar">
                 <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
                 <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
                 <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
-                <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </div>
           </div>
 
           <div class="mobile-content">
-            <div style="background: linear-gradient(135deg, #181b26, #11131a); border: 1px solid #252937; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+            <div style="background: var(--hero-gradient); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
               <span class="hero-tag" style="margin-bottom: 6px;">FEATURED SINGLE</span>
-              <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Solar Drift</h3>
-              <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">Tycho &middot; Ambient Synthesizers</p>
+              <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary);">Solar Drift</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Tycho &middot; Ambient Synthesizers</p>
               <button type="button" class="hero-cta" style="padding: 8px 16px; font-size: 12px;">&blacktriangleright; Play Single</button>
             </div>
 
-            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #f3f4f6;">Today's Feed</h4>
+            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Today's Feed</h4>
             
             <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-hairline);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <div class="track-art" style="width: 38px; height: 38px;">
                     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
-                      <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
-                      <circle cx="32" cy="32" r="8" fill="#f59e0b"/>
+                      <circle cx="32" cy="32" r="26" fill="var(--bg-card)" stroke="var(--border-hairline)" stroke-width="2"/>
+                      <circle cx="32" cy="32" r="8" fill="var(--accent-primary)"/>
                     </svg>
                   </div>
                   <div>
-                    <div style="font-size: 13px; font-weight: 600; color: #f59e0b;">Solar Drift</div>
-                    <div style="font-size: 11px; color: #6b7280;">Tycho</div>
+                    <div style="font-size: 13px; font-weight: 600; color: var(--accent-primary);">Solar Drift</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tycho</div>
                   </div>
                 </div>
                 <div class="equalizer-anim">
@@ -1884,36 +2148,20 @@
                 </div>
               </div>
 
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-hairline);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <div class="track-art" style="width: 38px; height: 38px;">
                     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
-                      <rect x="12" y="12" width="40" height="40" rx="6" fill="#141722" stroke="#252937" stroke-width="2"/>
-                      <path d="M18 36L28 24L38 34L46 26" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                      <rect x="12" y="12" width="40" height="40" rx="6" fill="var(--bg-card)" stroke="var(--border-hairline)" stroke-width="2"/>
+                      <path d="M18 36L28 24L38 34L46 26" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                   </div>
                   <div>
-                    <div style="font-size: 13px; font-weight: 600;">Coastal Grooves</div>
-                    <div style="font-size: 11px; color: #6b7280;">Bonobo</div>
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Coastal Grooves</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Bonobo</div>
                   </div>
                 </div>
-                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280;">04:18</span>
-              </div>
-
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="track-art" style="width: 38px; height: 38px;">
-                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
-                      <circle cx="32" cy="32" r="26" fill="#111420" stroke="#22293d" stroke-width="2"/>
-                      <polygon points="32,18 20,44 44,44" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="1.5"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div style="font-size: 13px; font-weight: 600;">Midnight Frequency</div>
-                    <div style="font-size: 11px; color: #6b7280;">Kiasmos</div>
-                  </div>
-                </div>
-                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280;">05:02</span>
+                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">04:18</span>
               </div>
             </div>
           </div>
@@ -1921,15 +2169,15 @@
           <!-- Floating Compact Player (56px) -->
           <div class="mobile-docked-player">
             <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-              <div style="width: 32px; height: 32px; border-radius: 6px; background: #252937; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--bg-surface); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
                 <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mini cover" style="width: 22px; height: 22px;">
-                  <circle cx="32" cy="32" r="24" fill="#f59e0b"/>
-                  <circle cx="32" cy="32" r="8" fill="#0b0c10"/>
+                  <circle cx="32" cy="32" r="24" fill="var(--accent-primary)"/>
+                  <circle cx="32" cy="32" r="8" fill="var(--bg-canvas)"/>
                 </svg>
               </div>
               <div style="min-width: 0;">
-                <div style="font-size: 12px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
-                <div style="font-size: 10px; color: #9ca3af;">Tycho</div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
+                <div style="font-size: 10px; color: var(--text-muted);">Tycho</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -1959,74 +2207,66 @@
           </nav>
         </div>
 
-        <!-- Mobile Profile Screen -->
+        <!-- Mobile Appearance Screen -->
         <div class="mobile-device">
-          <div class="mobile-notch">9:41 &middot; Profile /@elena</div>
+          <div class="mobile-notch">9:41 &middot; Appearance Settings</div>
 
           <div class="mobile-header">
-            <span style="font-size: 14px; font-weight: 600;">/@elena</span>
-            <span class="role-badge">ADMIN</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Settings &rarr; Appearance</span>
+            <span class="role-badge">SAVED</span>
           </div>
 
           <div class="mobile-content">
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
-              <div class="profile-avatar-large" style="width: 80px; height: 80px; margin-bottom: 12px;">
-                <!-- 80px SVG Avatar Preset -->
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Elena Vance avatar: Amber Studio Turntable">
-                  <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
-                  <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
-                  <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
-                  <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
-                  <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
-                  <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
-                  <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
-                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Elena Vance</h2>
-              <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280; margin-bottom: 8px;">@elena &middot; Nov 2026</div>
-              <p style="font-size: 12px; color: #9ca3af; line-height: 1.4; margin-bottom: 14px;">
-                Curating analog synth waves, ambient jazz, and late-night vinyl sessions with friends.
-              </p>
-              <button type="button" class="btn-edit-profile" style="padding: 6px 14px; font-size: 11px;">Edit Profile &amp; Avatar</button>
+            <div style="margin-bottom: 16px;">
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Choose Theme</h3>
+              <p style="font-size: 11px; color: var(--text-muted);">Select your mobile appearance:</p>
             </div>
 
-            <div style="display: flex; justify-content: space-around; border-bottom: 1px solid #1c202c; padding-bottom: 8px; margin-bottom: 16px; font-size: 12px;">
-              <span style="color: #f59e0b; font-weight: 600;">Playlists (3)</span>
-              <span style="color: #6b7280;">Liked (42)</span>
-              <span style="color: #6b7280;">History</span>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center;">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coffee icon" style="width: 24px; height: 24px;">
-                    <path d="M16 22H42V36C42 41 38 45 32 45H26C20 45 16 41 16 36V22Z" stroke="#f59e0b" stroke-width="2"/>
-                    <path d="M42 26H46C49 26 51 28 51 31C51 34 49 36 46 36H42" stroke="#f59e0b" stroke-width="2"/>
-                  </svg>
-                </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: var(--bg-card); border: 2px solid var(--accent-primary); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('obsidian-studio')">
                 <div>
-                  <div style="font-size: 13px; font-weight: 600;">Late Night Ambient</div>
-                  <div style="font-size: 11px; color: #6b7280;">18 tracks &middot; Public</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">1. Obsidian Studio</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Amber &middot; Analog Hi-Fi</div>
                 </div>
+                <div style="width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
               </div>
 
-              <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center;">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jazz icon" style="width: 24px; height: 24px;">
-                    <path d="M20 16L32 16L32 38C32 44 26 48 20 48C14 48 10 44 10 38C10 32 15 28 20 28" stroke="#f59e0b" stroke-width="2"/>
-                  </svg>
-                </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('nordic-aurora')">
                 <div>
-                  <div style="font-size: 13px; font-weight: 600;">Tokyo Coffeehouse Jazz</div>
-                  <div style="font-size: 11px; color: #6b7280;">24 tracks &middot; Public</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">2. Nordic Aurora</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Cyan &middot; Emerald Glass</div>
                 </div>
+                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
+              </div>
+
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('editorial-vinyl')">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">3. Editorial Vinyl</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Acid Lime &middot; Swiss Poster</div>
+                </div>
+                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
+              </div>
+
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('crimson-vigil')">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">4. Crimson Vigil</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Daredevil-inspired Noir</div>
+                </div>
+                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
+              </div>
+
+              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('cobalt-web')">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">5. Cobalt Web</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Spider-Man-inspired Cobalt</div>
+                </div>
+                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
               </div>
             </div>
           </div>
 
           <!-- Bottom Mobile Navigation Bar -->
-          <nav class="mobile-nav-bar" aria-label="Mobile Navigation Profile">
+          <nav class="mobile-nav-bar" aria-label="Mobile Settings Nav">
             <a href="#home" class="mobile-nav-item">
               <span style="font-size: 14px;" aria-hidden="true">&cirf;</span>
               <span>Home</span>
@@ -2041,21 +2281,20 @@
             </a>
             <a href="#profile" class="mobile-nav-item active">
               <span style="font-size: 14px;" aria-hidden="true">&odot;</span>
-              <span>Profile</span>
+              <span>Settings</span>
             </a>
           </nav>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 5: DESIGN TOKENS & AVATAR PRESETS -->
+    <!-- VIEW 6: EIGHT HANDCRAFTED SVG AVATAR PRESETS -->
     <section id="view-tokens" role="tabpanel" aria-labelledby="tab-tokens" style="display: none;">
       <div class="section-title">
         <span>Eight Handcrafted SVG Avatar Presets</span>
       </div>
-      <p class="section-desc">To maintain the absolute &yen;0 INR lifetime budget constraint, Harmoni provides 8 original, lightweight inline SVG avatars with zero external CDN dependencies.</p>
+      <p class="section-desc">Original, lightweight inline SVG avatars with zero external CDN dependencies.</p>
 
-      <!-- The 8 Handcrafted SVG Avatar Presets Grid -->
       <div class="avatar-grid">
         <!-- Avatar 1 -->
         <div class="avatar-preset-card">
@@ -2085,7 +2324,7 @@
             <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Golden Tube Preamp">
               <title>Golden Tube Preamp</title>
               <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
-              <circle cx="32" cy="27" r="14" fill="url(#tube-glow-v5)" opacity="0.4"/>
+              <circle cx="32" cy="27" r="14" fill="url(#tube-glow-v6)" opacity="0.4"/>
               <path d="M22 47H42V51C42 52.1 41.1 53 40 53H24C22.9 53 22 52.1 22 51V47Z" fill="#1c202c" stroke="#252937" stroke-width="1.5"/>
               <line x1="26" y1="53" x2="26" y2="56" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
               <line x1="32" y1="53" x2="32" y2="56" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
@@ -2095,7 +2334,7 @@
               <path d="M28 35L30 24L32 35L34 24L36 35" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <line x1="28" y1="23" x2="36" y2="23" stroke="#f59e0b" stroke-width="1.5"/>
               <defs>
-                <radialGradient id="tube-glow-v5" cx="0.5" cy="0.5" r="0.5">
+                <radialGradient id="tube-glow-v6" cx="0.5" cy="0.5" r="0.5">
                   <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8"/>
                   <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
                 </radialGradient>
@@ -2239,74 +2478,16 @@
           <div class="avatar-preset-desc">Expanding concentric soundwave propagation rings with directional ticks.</div>
         </div>
       </div>
-
-      <!-- Design Token Palette Reference Section -->
-      <div class="section-title" style="margin-top: 48px;">
-        <span>Obsidian Studio CSS Variables &amp; Tokens</span>
-      </div>
-      <p class="section-desc">Tailwind CSS v4 inline theme declarations configured for zero-runtime performance.</p>
-
-      <div style="background: #11131a; border: 1px solid #252937; border-radius: 12px; padding: 24px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; font-family: 'JetBrains Mono', monospace;">
-          <thead>
-            <tr style="border-bottom: 1px solid #1f2432; color: #6b7280; text-align: left;">
-              <th style="padding: 8px 12px;">Token Name</th>
-              <th style="padding: 8px 12px;">Value</th>
-              <th style="padding: 8px 12px;">Visual Sample</th>
-              <th style="padding: 8px 12px;">Semantic Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom: 1px solid #161922;">
-              <td style="padding: 10px 12px; color: #f59e0b;">--background</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#0b0c10</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #0b0c10; border-radius: 4px; border: 1px solid #252937;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Deep obsidian canvas</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #161922;">
-              <td style="padding: 10px 12px; color: #f59e0b;">--card</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#14161f</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #14161f; border-radius: 4px; border: 1px solid #252937;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Primary raised studio surface</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #161922;">
-              <td style="padding: 10px 12px; color: #f59e0b;">--primary</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#f59e0b</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #f59e0b; border-radius: 4px;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Amber tube glow &amp; active playheads</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #161922;">
-              <td style="padding: 10px 12px; color: #f59e0b;">--secondary</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#d97706</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #d97706; border-radius: 4px;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Burnished brass accent</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #161922;">
-              <td style="padding: 10px 12px; color: #f59e0b;">--border</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#252937</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #252937; border-radius: 4px;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Machined 1px chassis divider</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px 12px; color: #f59e0b;">--success</td>
-              <td style="padding: 10px 12px; color: #9ca3af;">#10b981</td>
-              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #10b981; border-radius: 4px;"></div></td>
-              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Creative Commons verified badge</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </section>
 
   </main>
 
   <script>
     /**
-     * Accessible view-switching coordinator.
-     * Operates without reliance on the deprecated global `event` object.
-     * Manages ARIA states (aria-selected, tabindex) and keyboard arrows.
+     * WAI-ARIA View Switching & Multi-Theme Controller
      */
-    const VIEW_IDS = ['directions', 'desktop-discover', 'desktop-profile', 'mobile', 'tokens'];
+    const VIEW_IDS = ['directions', 'appearance', 'desktop-discover', 'desktop-profile', 'mobile', 'tokens'];
+    const THEME_KEYS = ['obsidian-studio', 'nordic-aurora', 'editorial-vinyl', 'crimson-vigil', 'cobalt-web'];
 
     function activateView(viewId, triggerButton) {
       if (!VIEW_IDS.includes(viewId)) return;
@@ -2314,12 +2495,10 @@
       // 1. Hide all view sections
       VIEW_IDS.forEach(function (id) {
         const section = document.getElementById('view-' + id);
-        if (section) {
-          section.style.display = 'none';
-        }
+        if (section) section.style.display = 'none';
       });
 
-      // 2. Reset all tab buttons
+      // 2. Reset tab buttons
       const buttons = document.querySelectorAll('.view-btn');
       buttons.forEach(function (btn) {
         btn.classList.remove('active');
@@ -2327,11 +2506,9 @@
         btn.setAttribute('tabindex', '-1');
       });
 
-      // 3. Reveal target view
+      // 3. Reveal target section
       const targetSection = document.getElementById('view-' + viewId);
-      if (targetSection) {
-        targetSection.style.display = 'block';
-      }
+      if (targetSection) targetSection.style.display = 'block';
 
       // 4. Highlight target tab
       const targetBtn = triggerButton || document.querySelector('.view-btn[data-view="' + viewId + '"]');
@@ -2343,20 +2520,54 @@
       }
     }
 
+    function applyTheme(themeKey) {
+      if (!THEME_KEYS.includes(themeKey)) return;
+
+      // Set data-theme on body
+      document.body.setAttribute('data-theme', themeKey);
+
+      // Update header dropdown
+      const select = document.getElementById('quickThemeSelector');
+      if (select) select.value = themeKey;
+
+      // Update selected card state in Appearance view
+      THEME_KEYS.forEach(function (key) {
+        const card = document.getElementById('opt-' + key);
+        if (card) {
+          if (key === themeKey) {
+            card.classList.add('selected');
+          } else {
+            card.classList.remove('selected');
+          }
+        }
+      });
+
+      // Update current theme display label
+      const displayLabel = document.getElementById('currentThemeDisplay');
+      if (displayLabel) {
+        const readableNames = {
+          'obsidian-studio': 'Obsidian Studio (Default)',
+          'nordic-aurora': 'Nordic Aurora',
+          'editorial-vinyl': 'Editorial Vinyl',
+          'crimson-vigil': 'Crimson Vigil (Daredevil-inspired)',
+          'cobalt-web': 'Cobalt Web (Spider-Man-inspired)'
+        };
+        displayLabel.textContent = readableNames[themeKey] || themeKey;
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       const tabs = Array.from(document.querySelectorAll('.view-btn'));
 
+      // Wire tab click and keyboard navigation
       tabs.forEach(function (tab, index) {
-        // Explicit click handler passing element reference
         tab.addEventListener('click', function () {
           const viewId = tab.getAttribute('data-view');
           activateView(viewId, tab);
         });
 
-        // WAI-ARIA keyboard navigation (ArrowLeft, ArrowRight, Home, End)
         tab.addEventListener('keydown', function (e) {
           let nextIndex = null;
-
           if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
             e.preventDefault();
             nextIndex = (index + 1) % tabs.length;
@@ -2378,6 +2589,14 @@
           }
         });
       });
+
+      // Wire quick dropdown
+      const dropdown = document.getElementById('quickThemeSelector');
+      if (dropdown) {
+        dropdown.addEventListener('change', function () {
+          applyTheme(dropdown.value);
+        });
+      }
     });
   </script>
 </body>

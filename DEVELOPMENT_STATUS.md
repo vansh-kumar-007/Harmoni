@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL)
+**Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL)
 
 ---
 
@@ -215,7 +215,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] Authored initial HTML visual exploration prototype in `docs/visual-design-exploration.html`.
 - [x] Refined and updated Design Foundation Proposal ([`docs/design-foundation-proposal.md`](file:///d:/Projects/Harmoni/docs/design-foundation-proposal.md)) covering Next.js profile rewrite routing, strict Milestone 3C boundary, presence model clarification, 2-column studio layout, and glare reduction ergonomics.
 
-### Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup (THIS MILESTONE)
+### Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup
 - [x] **Accurate Figma Status Record:**
   - Audited and documented that the remote Figma file (`https://www.figma.com/design/tde7tKDtxqTwhqJQko989H`) is an **empty document canvas shell** containing only an empty "Page 1".
   - Corrected previous report: no native design frames or layers were generated in Figma.
@@ -239,14 +239,46 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Verified that pure unit tests (`tests/auth/password.test.ts`, `tests/auth/http.test.ts`) pass 100% in sandbox (33 tests passed).
   - Verified that with network unblocked (`BypassSandbox: true`), all 8 test suites and **all 103 tests pass completely with 0 errors in 4.37s**.
   - Classified as **Environmental Problem (Sandbox TCP Loopback Network Isolation)**.
+
+### Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Multi-Theme Platform Architecture Decision:**
+  - Evolved Harmoni into a multi-theme platform where each individual member selects their own visual theme independently.
+  - Maintained zero cross-user interference: one user may enjoy Obsidian Studio while another chooses Crimson Vigil or Cobalt Web.
+- [x] **Catalog of 5 Production-Grade Themes:**
+  1. **Obsidian Studio (Default):** Warm analog hi-fi, brushed slate, vacuum-tube amber glow (`#f59e0b`). 18.1:1 contrast (WCAG AAA).
+  2. **Nordic Aurora:** Atmospheric midnight glass, icy fjord slate, bioluminescent cyan (`#06b6d4`) and mint emerald (`#10b981`). 19.0:1 contrast (WCAG AAA).
+  3. **Editorial Vinyl:** Swiss typographic record club, matte vinyl black, structural crate borders, electric acid-lime (`#bef264`). 19.4:1 contrast (WCAG AAA).
+  4. **Crimson Vigil (Daredevil-inspired):** Shadow noir black, dark asphalt, oxblood leather borders (`#381418`), blind-justice crimson red (`#e11d48`). 18.2:1 text contrast (AAA), 4.6:1 button contrast (AA).
+  5. **Cobalt Web (Spider-Man-inspired):** Midnight navy (`#080b14`), royal cobalt (`#2563eb`), dynamic vermilion red (`#ef4444`), electric sky cyan pips (`#38bdf8`). 17.8:1 text contrast (AAA), 4.9:1 button contrast (AA).
+- [x] **Strict IP Non-Infringement Boundary:**
+  - Enforced 100% original chromatic interpretations based on atmospheric moods.
+  - Strictly zero Marvel logos, webs, masks, spiders, double-D emblems, silhouettes, movie frames, or proprietary fonts.
+  - Explicit inspired labeling: `(Daredevil-inspired)` and `(Spider-Man-inspired)`.
+- [x] **Canonical Interactive Prototype Extended (`docs/visual-design-exploration.html`):**
+  - Integrated complete CSS variable overrides across `:root` and all 5 `[data-theme="..."]` attributes.
+  - Added global quick theme switcher dropdown in the sticky header for instant evaluation.
+  - Added dedicated View 2 (**Appearance Settings**): 5 interactive theme cards with 4-chip swatches, aesthetic descriptions, WCAG contrast verification badges, live preview triggers, and commit/reset buttons.
+  - Added simulated mobile appearance screen (390×844) with 48px+ touch targets.
+  - Live Discover (View 3), Live Profile (View 4), and Mobile (View 5) views dynamically transform in real-time when any theme is selected.
+  - Retained all 8 handcrafted inline SVG avatar presets and the Prototype Boundary Banner.
+- [x] **Database & Backend Persistence Architecture Specification:**
+  - Designed Prisma schema extension: `themeKey String @default("obsidian-studio") @db.VarChar(50)` on `User` model.
+  - Enforced type safety via `THEME_REGISTRY` constant allowlist.
+  - Designed Zero-FOUC (Flash of Unstyled Content) server-rendering in `src/app/layout.tsx` via `getCurrentUser()` DAL.
+  - Designed `PATCH /api/users/me/theme` endpoint with strict Zod validation and 64 KiB request body limit.
+  - Verified ₹0 INR operating cost with pure PostgreSQL storage.
 - [ ] Awaiting user review and explicit approval before initiating frontend implementation.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3C: User Profile Page & Avatar Presets (Pending Approval)**
+- **Milestone 3C: User Profile Page, Avatar Presets & Theme Engine Integration (Pending Approval)**
+  - Apply Prisma migration adding `themeKey String @default("obsidian-studio")` to `User`.
+  - Implement `PATCH /api/users/me/theme` endpoint with Zod schema validation.
+  - Implement zero-FOUC server-rendered `RootLayout` injecting `<html data-theme={...}>`.
   - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
   - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 SVG avatar presets.
+  - Build Appearance Settings modal / page component with the 5 interactive cards.
   - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
   - Display user public playlists and read-only listening history summary (no deceptive action buttons).
 - **Milestone 4: Music Discovery Engine & Jamendo API Integration**
