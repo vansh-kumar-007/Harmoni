@@ -30,11 +30,13 @@ interface SupportedCcLicenseDefinition {
   nonCommercial: boolean;
   shareAlike: boolean;
   noDerivatives: boolean;
+  supportedVersions?: Set<string>;
 }
 
 /**
  * Officially recognized Creative Commons license identifiers:
  * https://creativecommons.org/share-your-work/cclicenses/
+ * https://wiki.creativecommons.org/wiki/License_Versions
  */
 const SUPPORTED_CC_LICENSES: Record<string, SupportedCcLicenseDefinition> = {
   by: {
@@ -85,41 +87,108 @@ const SUPPORTED_CC_LICENSES: Record<string, SupportedCcLicenseDefinition> = {
     shareAlike: false,
     noDerivatives: true,
   },
+  // Historical 1.0 license identifier used prior to standardizing on "by-nc-nd"
+  "by-nd-nc": {
+    identifier: "by-nd-nc",
+    codeSlug: "BY-ND-NC",
+    fullName: "Creative Commons Attribution-NoDerivs-NonCommercial",
+    nonCommercial: true,
+    shareAlike: false,
+    noDerivatives: true,
+    supportedVersions: new Set(["1.0"]),
+  },
 };
 
-/**
- * Officially published Creative Commons license versions:
- * 1.0 (Generic), 2.0 (Generic), 2.5 (Generic), 3.0 (Unported), 4.0 (International).
- */
-const SUPPORTED_CC_VERSIONS = new Set(["1.0", "2.0", "2.5", "3.0", "4.0"]);
-
-/**
- * Parses boolean-like flag from Jamendo licenses object.
- * Returns null if missing or unrecognized.
- */
-function parseRawLicenseFlag(value: unknown): boolean | null {
-  if (value === true || value === "true" || value === 1 || value === "1") {
-    return true;
-  }
-  if (value === false || value === "false" || value === 0 || value === "0") {
-    return false;
-  }
-  return null;
+interface VersionRule {
+  allowGeneric: boolean;
+  jurisdictions: Set<string>;
 }
 
 /**
- * Regex for standard CC license URLs:
- * /licenses/<identifier>/<version>/[<jurisdiction>/][deed.<lang>]
+ * Officially catalogued Creative Commons versions and their supported jurisdictions:
+ * Derived from https://creativecommons.org/licenses/list.en and https://wiki.creativecommons.org/wiki/License_Versions
  */
-const CC_LICENSES_PATH_REGEX =
-  /^\/licenses\/([a-z-]+)\/([0-9.]+)(?:\/([a-z]{2}(?:-[a-z]{2})?)?)?(?:\/(?:deed(?:\.[a-z]{2,5})?)?)?\/?$/i;
+const VERSION_JURISDICTION_RULES: Record<string, VersionRule> = {
+  "1.0": {
+    allowGeneric: true,
+    jurisdictions: new Set(["br", "de", "fi", "il", "nl", "tw"]),
+  },
+  "2.0": {
+    allowGeneric: true,
+    jurisdictions: new Set([
+      "at", "au", "be", "br", "ca", "cl", "de", "es", "fr", "hr",
+      "it", "jp", "kr", "nl", "pl", "tw", "uk", "za",
+    ]),
+  },
+  "2.1": {
+    // Version 2.1 was created specifically for 4 jurisdictions to resolve local porting issues; no generic 2.1 exists.
+    allowGeneric: false,
+    jurisdictions: new Set(["au", "ca", "es", "jp"]),
+  },
+  "2.5": {
+    allowGeneric: true,
+    jurisdictions: new Set([
+      "ar", "au", "bg", "br", "ca", "ch", "cn", "co", "dk", "es",
+      "hr", "hu", "il", "in", "it", "mk", "mt", "mx", "my", "nl",
+      "pe", "pl", "pt", "scotland", "se", "si", "tw", "za",
+    ]),
+  },
+  "3.0": {
+    allowGeneric: true,
+    jurisdictions: new Set([
+      "am", "at", "au", "az", "br", "ca", "ch", "cl", "cn", "cr",
+      "cz", "de", "ec", "ee", "eg", "es", "fr", "ge", "gr", "gt",
+      "hk", "hr", "ie", "igo", "it", "lu", "nl", "no", "nz", "ph",
+      "pl", "pr", "pt", "ro", "rs", "sg", "th", "tw", "ug", "us",
+      "ve", "vn", "za",
+    ]),
+  },
+  "4.0": {
+    // Version 4.0 is strictly international with no jurisdiction-specific ports.
+    allowGeneric: true,
+    jurisdictions: new Set(),
+  },
+};
+
+type ParsedFlag =
+  | { state: "valid"; value: boolean }
+  | { state: "absent" }
+  | { state: "malformed" };
 
 /**
- * Regex for CC0 Public Domain Dedication URLs:
- * /publicdomain/zero/<version>/[deed.<lang>]
+ * Parses boolean-like flag from Jamendo licenses object.
+ * Returns:
+ * - { state: "valid", value: boolean } for documented boolean-like representations (true, false, "true", "false", 1, 0, "1", "0")
+ * - { state: "absent" } when undefined, null, or empty string
+ * - { state: "malformed" } for unrecognized non-null values (e.g. "maybe", "unknown", 42, objects)
  */
-const CC0_PATH_REGEX =
-  /^\/publicdomain\/zero\/([0-9.]+)(?:\/(?:deed(?:\.[a-z]{2,5})?)?)?\/?$/i;
+function parseRawLicenseFlag(value: unknown): ParsedFlag {
+  if (value === undefined || value === null) {
+    return { state: "absent" };
+  }
+
+  if (typeof value === "boolean") {
+    return { state: "valid", value };
+  }
+
+  if (typeof value === "number") {
+    if (value === 1) return { state: "valid", value: true };
+    if (value === 0) return { state: "valid", value: false };
+    return { state: "malformed" };
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase();
+    if (trimmed === "") return { state: "absent" };
+    if (trimmed === "true" || trimmed === "1") return { state: "valid", value: true };
+    if (trimmed === "false" || trimmed === "0") return { state: "valid", value: false };
+    return { state: "malformed" };
+  }
+
+  return { state: "malformed" };
+}
+
+const DEED_REGEX = /^deed(?:\.[a-z0-9_-]+)?$/i;
 
 /**
  * Parses and strictly verifies a Creative Commons license URL from Jamendo metadata.
@@ -127,9 +196,16 @@ const CC0_PATH_REGEX =
  * 1. The protocol is strictly http: or https:
  * 2. The hostname is strictly creativecommons.org or www.creativecommons.org (no lookalikes)
  * 3. No non-standard ports or credentials are embedded in the URL
- * 4. The license identifier is one of the 6 official Creative Commons licenses or CC0
- * 5. The license version is an officially supported version (1.0, 2.0, 2.5, 3.0, 4.0 for CC, 1.0 for CC0)
- * 6. Contradictory permission flags in rawLicensesObj do not override the canonical license and instead yield an unverified license
+ * 4. The license identifier is one of the official Creative Commons licenses, historical CC 1.0 BY-ND-NC, or CC0
+ * 5. The license version and jurisdiction combination is verified against the official catalogue:
+ *    - 1.0, 2.0, 2.5, 3.0, 4.0 supported (with generic allowed)
+ *    - 2.1 supported specifically for its 4 documented jurisdictions (au, ca, es, jp); generic 2.1 rejected
+ *    - 4.0 strictly international with no jurisdictions
+ *    - Scotland (/2.5/scotland/) supported under 2.5
+ *    - Fabricated or arbitrary jurisdictions rejected
+ * 6. Raw metadata permission flags are strictly audited:
+ *    - Malformed values (e.g. "maybe") yield Unknown License
+ *    - Contradictory values yield Unknown License
  *
  * Missing, malformed, unsupported, or contradictory licenses return an unverified Unknown License.
  */
@@ -172,23 +248,48 @@ export function parseCcLicense(
     parsed.hash = "";
     const cleanUrl = parsed.toString();
 
-    // 5. Check for CC0 public domain dedication
-    const cc0Match = parsed.pathname.match(CC0_PATH_REGEX);
-    if (cc0Match) {
-      const version = cc0Match[1];
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 3) {
+      return createUnknownLicense();
+    }
+
+    // 5. Check for CC0 public domain dedication (/publicdomain/zero/<version>/...)
+    if (segments[0].toLowerCase() === "publicdomain" && segments[1].toLowerCase() === "zero") {
+      const version = segments[2];
       // Only CC0 1.0 is officially defined by Creative Commons
       if (version !== "1.0") {
         return createUnknownLicense();
       }
 
-      // Check for contradictory raw licenses object flags
+      // Check remaining segments (only optional deed allowed)
+      if (segments.length === 4) {
+        if (!DEED_REGEX.test(segments[3])) {
+          return createUnknownLicense();
+        }
+      } else if (segments.length > 4) {
+        return createUnknownLicense();
+      }
+
+      // Check raw licenses object flags
       if (rawLicensesObj && typeof rawLicensesObj === "object" && !Array.isArray(rawLicensesObj)) {
         const rawNc = parseRawLicenseFlag(rawLicensesObj.ccnc);
         const rawSa = parseRawLicenseFlag(rawLicensesObj.ccsa);
         const rawNd = parseRawLicenseFlag(rawLicensesObj.ccnd);
 
+        if (
+          rawNc.state === "malformed" ||
+          rawSa.state === "malformed" ||
+          rawNd.state === "malformed"
+        ) {
+          return createUnknownLicense();
+        }
+
         // CC0 cannot have restrictions (NC, SA, ND must not be asserted as true)
-        if (rawNc === true || rawSa === true || rawNd === true) {
+        if (
+          (rawNc.state === "valid" && rawNc.value !== false) ||
+          (rawSa.state === "valid" && rawSa.value !== false) ||
+          (rawNd.state === "valid" && rawNd.value !== false)
+        ) {
           return createUnknownLicense();
         }
       }
@@ -206,13 +307,12 @@ export function parseCcLicense(
     }
 
     // 6. Check for standard Creative Commons licenses (/licenses/<identifier>/<version>/...)
-    const ccMatch = parsed.pathname.match(CC_LICENSES_PATH_REGEX);
-    if (!ccMatch) {
+    if (segments[0].toLowerCase() !== "licenses") {
       return createUnknownLicense();
     }
 
-    const typeKey = ccMatch[1].toLowerCase();
-    const version = ccMatch[2];
+    const typeKey = segments[1].toLowerCase();
+    const version = segments[2];
 
     // Validate supported identifier
     const licenseDef = SUPPORTED_CC_LICENSES[typeKey];
@@ -220,25 +320,70 @@ export function parseCcLicense(
       return createUnknownLicense();
     }
 
-    // Validate supported version
-    if (!SUPPORTED_CC_VERSIONS.has(version)) {
+    // Check version constraint on identifier (e.g. by-nd-nc is 1.0 only)
+    if (licenseDef.supportedVersions && !licenseDef.supportedVersions.has(version)) {
       return createUnknownLicense();
     }
 
-    // Check for contradictory raw licenses object flags
+    // Check version existence in catalogue rules
+    const versionRule = VERSION_JURISDICTION_RULES[version];
+    if (!versionRule) {
+      return createUnknownLicense();
+    }
+
+    // Parse optional jurisdiction and deed segments
+    let jurisdiction: string | null = null;
+    if (segments.length === 4) {
+      if (DEED_REGEX.test(segments[3])) {
+        jurisdiction = null;
+      } else {
+        jurisdiction = segments[3].toLowerCase();
+      }
+    } else if (segments.length === 5) {
+      jurisdiction = segments[3].toLowerCase();
+      if (!DEED_REGEX.test(segments[4])) {
+        return createUnknownLicense();
+      }
+    } else if (segments.length > 5) {
+      return createUnknownLicense();
+    }
+
+    // Validate version and jurisdiction combination
+    if (jurisdiction === null) {
+      if (!versionRule.allowGeneric) {
+        // e.g. Version 2.1 requires an explicit jurisdiction
+        return createUnknownLicense();
+      }
+    } else {
+      if (!versionRule.jurisdictions.has(jurisdiction)) {
+        // Unrecognized or unsupported jurisdiction for this version
+        return createUnknownLicense();
+      }
+    }
+
+    // Check raw licenses object flags
     if (rawLicensesObj && typeof rawLicensesObj === "object" && !Array.isArray(rawLicensesObj)) {
       const rawNc = parseRawLicenseFlag(rawLicensesObj.ccnc);
       const rawSa = parseRawLicenseFlag(rawLicensesObj.ccsa);
       const rawNd = parseRawLicenseFlag(rawLicensesObj.ccnd);
 
-      // If raw flags are explicitly provided, they must not contradict the canonical license
-      if (rawNc !== null && rawNc !== licenseDef.nonCommercial) {
+      // Malformed raw flag values reject immediately
+      if (
+        rawNc.state === "malformed" ||
+        rawSa.state === "malformed" ||
+        rawNd.state === "malformed"
+      ) {
         return createUnknownLicense();
       }
-      if (rawSa !== null && rawSa !== licenseDef.shareAlike) {
+
+      // Contradictory raw flags reject immediately
+      if (rawNc.state === "valid" && rawNc.value !== licenseDef.nonCommercial) {
         return createUnknownLicense();
       }
-      if (rawNd !== null && rawNd !== licenseDef.noDerivatives) {
+      if (rawSa.state === "valid" && rawSa.value !== licenseDef.shareAlike) {
+        return createUnknownLicense();
+      }
+      if (rawNd.state === "valid" && rawNd.value !== licenseDef.noDerivatives) {
         return createUnknownLicense();
       }
     }

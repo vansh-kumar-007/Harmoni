@@ -109,8 +109,170 @@ describe("Music Licensing & Duration Utilities", () => {
       });
     });
 
+    describe("Historical CC BY-ND-NC 1.0 License", () => {
+      it("recognizes historical CC BY-ND-NC 1.0 specifically and preserves displayed designation", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by-nd-nc/1.0/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        // Correct displayed designation preserved:
+        expect(license.code).toBe("CC BY-ND-NC 1.0");
+        expect(license.name).toBe("Creative Commons Attribution-NoDerivs-NonCommercial 1.0");
+        // Canonical URL preserved without rewriting identifier to by-nc-nd:
+        expect(license.url).toBe("https://creativecommons.org/licenses/by-nd-nc/1.0/");
+        // Normalized permission flags:
+        expect(license.nonCommercial).toBe(true);
+        expect(license.noDerivatives).toBe(true);
+        expect(license.shareAlike).toBe(false);
+      });
+
+      it("rejects historical by-nd-nc on subsequent versions (2.0+) where standardized to by-nc-nd", () => {
+        const invalid20 = parseCcLicense("https://creativecommons.org/licenses/by-nd-nc/2.0/");
+        expect(invalid20.isVerified).toBe(false);
+        expect(invalid20.code).toBe("Unknown License");
+
+        const invalid40 = parseCcLicense("https://creativecommons.org/licenses/by-nd-nc/4.0/");
+        expect(invalid40.isVerified).toBe(false);
+        expect(invalid40.code).toBe("Unknown License");
+      });
+    });
+
+    describe("Version 2.1 Jurisdiction-Ported License Compatibility", () => {
+      it("supports CC 2.1 Australia (/2.1/au/)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by/2.1/au/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        expect(license.code).toBe("CC BY 2.1");
+        expect(license.url).toBe("https://creativecommons.org/licenses/by/2.1/au/");
+        expect(license.nonCommercial).toBe(false);
+        expect(license.shareAlike).toBe(false);
+        expect(license.noDerivatives).toBe(false);
+      });
+
+      it("supports CC 2.1 Canada (/2.1/ca/)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by-nc/2.1/ca/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        expect(license.code).toBe("CC BY-NC 2.1");
+        expect(license.url).toBe("https://creativecommons.org/licenses/by-nc/2.1/ca/");
+        expect(license.nonCommercial).toBe(true);
+        expect(license.shareAlike).toBe(false);
+        expect(license.noDerivatives).toBe(false);
+      });
+
+      it("supports CC 2.1 Japan (/2.1/jp/)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by-sa/2.1/jp/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        expect(license.code).toBe("CC BY-SA 2.1");
+        expect(license.url).toBe("https://creativecommons.org/licenses/by-sa/2.1/jp/");
+        expect(license.nonCommercial).toBe(false);
+        expect(license.shareAlike).toBe(true);
+        expect(license.noDerivatives).toBe(false);
+      });
+
+      it("supports CC 2.1 Spain (/2.1/es/)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by-nc-nd/2.1/es/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        expect(license.code).toBe("CC BY-NC-ND 2.1");
+        expect(license.url).toBe("https://creativecommons.org/licenses/by-nc-nd/2.1/es/");
+        expect(license.nonCommercial).toBe(true);
+        expect(license.shareAlike).toBe(false);
+        expect(license.noDerivatives).toBe(true);
+      });
+
+      it("rejects generic unported 2.1 paths as 2.1 was released exclusively for specific jurisdictions", () => {
+        const generic21 = parseCcLicense("https://creativecommons.org/licenses/by/2.1/");
+        expect(generic21.isVerified).toBe(false);
+        expect(generic21.code).toBe("Unknown License");
+        expect(generic21.url).toBeNull();
+      });
+
+      it("rejects unsupported jurisdictions under version 2.1", () => {
+        const invalidJurisdiction21 = parseCcLicense("https://creativecommons.org/licenses/by/2.1/us/");
+        expect(invalidJurisdiction21.isVerified).toBe(false);
+        expect(invalidJurisdiction21.code).toBe("Unknown License");
+      });
+    });
+
+    describe("Jurisdiction Path Validation & Scotland 2.5 Support", () => {
+      it("supports CC BY 2.5 UK: Scotland (/2.5/scotland/)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by/2.5/scotland/");
+        expect(license.isVerified).toBe(true);
+        expect(license.isCreativeCommons).toBe(true);
+        expect(license.code).toBe("CC BY 2.5");
+        expect(license.url).toBe("https://creativecommons.org/licenses/by/2.5/scotland/");
+        expect(license.nonCommercial).toBe(false);
+        expect(license.shareAlike).toBe(false);
+        expect(license.noDerivatives).toBe(false);
+      });
+
+      it("supports CC BY 2.5 Scotland with deed path (/2.5/scotland/deed.en)", () => {
+        const license = parseCcLicense("https://creativecommons.org/licenses/by/2.5/scotland/deed.en");
+        expect(license.isVerified).toBe(true);
+        expect(license.url).toBe("https://creativecommons.org/licenses/by/2.5/scotland/deed.en");
+      });
+
+      it("supports documented ported jurisdictions under versions 1.0, 2.0, 2.5, 3.0", () => {
+        // 1.0 Netherlands
+        const lic10 = parseCcLicense("https://creativecommons.org/licenses/by/1.0/nl/");
+        expect(lic10.isVerified).toBe(true);
+
+        // 2.0 England & Wales
+        const lic20 = parseCcLicense("https://creativecommons.org/licenses/by/2.0/uk/");
+        expect(lic20.isVerified).toBe(true);
+
+        // 2.5 India
+        const lic25 = parseCcLicense("https://creativecommons.org/licenses/by/2.5/in/");
+        expect(lic25.isVerified).toBe(true);
+
+        // 3.0 United States
+        const lic30 = parseCcLicense("https://creativecommons.org/licenses/by/3.0/us/");
+        expect(lic30.isVerified).toBe(true);
+
+        // 3.0 Intergovernmental Organization (IGO)
+        const lic30Igo = parseCcLicense("https://creativecommons.org/licenses/by/3.0/igo/");
+        expect(lic30Igo.isVerified).toBe(true);
+      });
+
+      it("rejects arbitrary or fabricated jurisdiction identifiers (e.g. zz, xx, fake)", () => {
+        const fabricated = [
+          "https://creativecommons.org/licenses/by/2.5/zz/",
+          "https://creativecommons.org/licenses/by/3.0/fake/",
+          "https://creativecommons.org/licenses/by/2.1/xx/",
+          "https://creativecommons.org/licenses/by/2.0/nowhere/",
+        ];
+        for (const url of fabricated) {
+          const lic = parseCcLicense(url);
+          expect(lic.isVerified).toBe(false);
+          expect(lic.code).toBe("Unknown License");
+          expect(lic.url).toBeNull();
+        }
+      });
+
+      it("rejects jurisdictions on version 4.0 as 4.0 is strictly international with no ports", () => {
+        const invalid40Jurisdictions = [
+          "https://creativecommons.org/licenses/by/4.0/us/",
+          "https://creativecommons.org/licenses/by/4.0/scotland/",
+          "https://creativecommons.org/licenses/by/4.0/au/",
+        ];
+        for (const url of invalid40Jurisdictions) {
+          const lic = parseCcLicense(url);
+          expect(lic.isVerified).toBe(false);
+          expect(lic.code).toBe("Unknown License");
+        }
+      });
+
+      it("rejects invalid version and jurisdiction combinations", () => {
+        // Scotland was only ported under 2.5, not 1.0 or 2.0
+        const lic = parseCcLicense("https://creativecommons.org/licenses/by/1.0/scotland/");
+        expect(lic.isVerified).toBe(false);
+        expect(lic.code).toBe("Unknown License");
+      });
+    });
+
     describe("Supported and Unsupported Versions", () => {
-      it("accepts all officially published CC versions (1.0, 2.0, 2.5, 3.0, 4.0)", () => {
+      it("accepts all officially published generic CC versions (1.0, 2.0, 2.5, 3.0, 4.0)", () => {
         const versions = ["1.0", "2.0", "2.5", "3.0", "4.0"];
         for (const ver of versions) {
           const lic = parseCcLicense(`https://creativecommons.org/licenses/by/${ver}/`);
@@ -231,7 +393,52 @@ describe("Music Licensing & Duration Utilities", () => {
       });
     });
 
-    describe("Contradictory License URL vs Permission Flags", () => {
+    describe("Strict Raw Metadata Validation & Contradiction Protection", () => {
+      it("rejects recognized permission flags with malformed values (e.g. 'maybe', 'unknown', 42)", () => {
+        const malformedFlags = [
+          { ccnc: "maybe" },
+          { ccsa: "unknown" },
+          { ccnd: 42 },
+          { ccnc: "invalid" },
+          { ccsa: {} },
+          { ccnd: [] },
+        ];
+
+        for (const flags of malformedFlags) {
+          const lic = parseCcLicense("https://creativecommons.org/licenses/by/4.0/", flags);
+          expect(lic.isVerified).toBe(false);
+          expect(lic.code).toBe("Unknown License");
+        }
+      });
+
+      it("supports documented boolean-like representations (true, false, 'true', 'false', 1, 0, '1', '0')", () => {
+        const validRepresentations = [
+          { ccnc: true, ccsa: true, ccnd: false },
+          { ccnc: "true", ccsa: "true", ccnd: "false" },
+          { ccnc: 1, ccsa: 1, ccnd: 0 },
+          { ccnc: "1", ccsa: "1", ccnd: "0" },
+        ];
+
+        for (const flags of validRepresentations) {
+          const lic = parseCcLicense("https://creativecommons.org/licenses/by-nc-sa/3.0/", flags);
+          expect(lic.isVerified).toBe(true);
+          expect(lic.nonCommercial).toBe(true);
+          expect(lic.shareAlike).toBe(true);
+          expect(lic.noDerivatives).toBe(false);
+        }
+      });
+
+      it("preserves compatibility when flags are genuinely absent (undefined or null)", () => {
+        const lic = parseCcLicense("https://creativecommons.org/licenses/by-nc-sa/3.0/", {
+          ccnc: null,
+          ccsa: undefined,
+        });
+        expect(lic.isVerified).toBe(true);
+        expect(lic.nonCommercial).toBe(true);
+        expect(lic.shareAlike).toBe(true);
+        expect(lic.noDerivatives).toBe(false);
+      });
+
       it("rejects CC BY when raw flags claim non-commercial (ccnc: true)", () => {
         const lic = parseCcLicense("https://creativecommons.org/licenses/by/4.0/", {
           ccnc: true,
@@ -270,18 +477,6 @@ describe("Music Licensing & Duration Utilities", () => {
         });
         expect(lic.isVerified).toBe(false);
         expect(lic.code).toBe("Unknown License");
-      });
-
-      it("accepts consistent raw flags that match the canonical license URL", () => {
-        const lic = parseCcLicense("https://creativecommons.org/licenses/by-nc-sa/3.0/", {
-          ccnc: "true",
-          ccsa: true,
-          ccnd: false,
-        });
-        expect(lic.isVerified).toBe(true);
-        expect(lic.nonCommercial).toBe(true);
-        expect(lic.shareAlike).toBe(true);
-        expect(lic.noDerivatives).toBe(false);
       });
     });
 

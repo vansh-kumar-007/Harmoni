@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 4.2: Strict Music License Validation & Jamendo Provider Readiness** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
+**Milestone 4.2.1: Complete Creative Commons License Compatibility & Validation Audit** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
 
 ---
 
@@ -572,7 +572,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - ₹0 INR expenditure permanently maintained.
 - [x] Completed and verified.
 
-### Milestone 4.2: Strict Music License Validation & Jamendo Provider Readiness (THIS MILESTONE — COMPLETED & VERIFIED)
+### Milestone 4.2: Strict Music License Validation & Jamendo Provider Readiness (COMPLETED & VERIFIED)
 - [x] **Strict Creative Commons License Validation (`src/lib/music/licenses.ts`):**
   - Implemented strict protocol and hostname validation: accepts only `http:` and `https:`, exact hostnames `creativecommons.org` and `www.creativecommons.org`.
   - Rejects lookalike hostnames (e.g. `creativecommons.org.attacker.com`, `evil-creativecommons.org`, `creativecommons.net`), non-standard ports, and embedded credentials.
@@ -602,25 +602,8 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Preserves sanitized error code mapping for codes 1–11 (mapping codes 5 and 11 to `INVALID_CREDENTIALS`, code 6 to `RATE_LIMITED`).
   - Guarantees zero credential or URL leakage in error messages and client bundles.
 - [x] **Comprehensive Automated Test Coverage:**
-  - Expanded `tests/music/licenses.test.ts` to **29 tests** (up from 9 tests):
-    - All 6 supported license identifiers.
-    - Supported versions (1.0, 2.0, 2.5, 3.0, 4.0) and unsupported versions (0.5, 5.0, 99.0).
-    - CC0 1.0 and invalid CC0 2.0.
-    - Fake license slugs on legitimate hostname.
-    - Malformed paths (missing version, arbitrary paths).
-    - Lookalike or attacker hostnames, ports, credentials, and protocols.
-    - Missing and null URLs.
-    - Contradictory license URL vs raw flags (e.g., CC BY with ccnc: true, CC BY-NC with ccnc: false, CC0 with restrictions).
-    - Consistent raw flags matching canonical license definition.
-    - Strict `Unknown License` verification guarantee (`isVerified: false`).
-  - Expanded `tests/music/jamendo-provider.test.ts` to **33 tests** (up from 23 tests):
-    - Valid code 0 with "succeed" and "success", including case variations ("SUCCEED", "Success").
-    - Rejection of code 0 with "failed".
-    - Rejection of blank, whitespace, or null status.
-    - Rejection of unrecognized status values ("pending", "ok", "unknown").
-    - Rejection of non-integer, non-numeric, or missing codes.
-    - Complete API code 1–11 mappings, including generic code 99 fallback.
-    - Standalone singles compatibility, 429 rate limit, 500 error, 504 timeout, malformed JSON, and credential privacy.
+  - Expanded `tests/music/licenses.test.ts` to **29 tests** (up from 9 tests).
+  - Expanded `tests/music/jamendo-provider.test.ts` to **33 tests** (up from 23 tests).
   - Full Vitest suite passes: **25 test files, 279 tests passed (100% pass rate)**.
   - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
   - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
@@ -629,6 +612,63 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Environment inspection confirms `JAMENDO_CLIENT_ID` is unconfigured (`.env.local` is absent; `.env` retains non-functional placeholder `your_free_jamendo_client_id_here`).
   - Genuine live Jamendo requests were not executed to avoid using demo keys, fabricating results, or violating rate limits.
   - The mocked test suite remains 100% independent of live credentials.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains completely clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
+- [x] Completed and verified.
+
+### Milestone 4.2.1: Complete Creative Commons License Compatibility & Validation Audit (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Version 2.1 Jurisdiction-Ported License Support (`src/lib/music/licenses.ts`):**
+  - Explicitly added `2.1` to the version-aware jurisdiction catalogue rules with `allowGeneric: false`.
+  - Strictly validates version 2.1 against its 4 officially documented jurisdictions: Australia (`au`), Canada (`ca`), Spain (`es`), and Japan (`jp`).
+  - Rejects generic unported 2.1 URLs (`/licenses/by/2.1/`) as CC version 2.1 was created exclusively for local legal adaptations.
+  - Rejects unsupported jurisdictions under version 2.1 (e.g. `us`, `zz`).
+- [x] **Historical CC BY-ND-NC 1.0 License Support:**
+  - Specifically recognized the official historical 1.0 identifier `by-nd-nc` constrained to version `1.0`.
+  - Preserved the correct displayed designation: `CC BY-ND-NC 1.0`.
+  - Preserved canonical URL (`https://creativecommons.org/licenses/by-nd-nc/1.0/`) without rewriting the identifier.
+  - Correctly normalized permission flags: `nonCommercial: true`, `noDerivatives: true`, `shareAlike: false`.
+  - Strictly rejected `by-nd-nc` on versions 2.0+ where standardized to `by-nc-nd`.
+- [x] **Catalogue-Audited Version-Aware Jurisdiction Allowlist:**
+  - Added support for the Scotland jurisdiction path under version 2.5: `/licenses/by/2.5/scotland/`.
+  - Built explicit version-aware jurisdiction rules matching the official Creative Commons catalogue:
+    - **1.0 (Generic + Ported):** `br`, `de`, `fi`, `il`, `nl`, `tw`.
+    - **2.0 (Generic + Ported):** `at`, `au`, `be`, `br`, `ca`, `cl`, `de`, `es`, `fr`, `hr`, `it`, `jp`, `kr`, `nl`, `pl`, `tw`, `uk`, `za`.
+    - **2.1 (Ported only, no generic):** `au`, `ca`, `es`, `jp`.
+    - **2.5 (Generic + Ported):** `ar`, `au`, `bg`, `br`, `ca`, `ch`, `cn`, `co`, `dk`, `es`, `hr`, `hu`, `il`, `in`, `it`, `mk`, `mt`, `mx`, `my`, `nl`, `pe`, `pl`, `pt`, `scotland`, `se`, `si`, `tw`, `za`.
+    - **3.0 (Unported + Ported):** `am`, `at`, `au`, `az`, `br`, `ca`, `ch`, `cl`, `cn`, `cr`, `cz`, `de`, `ec`, `ee`, `eg`, `es`, `fr`, `ge`, `gr`, `gt`, `hk`, `hr`, `ie`, `igo`, `it`, `lu`, `nl`, `no`, `nz`, `ph`, `pl`, `pr`, `pt`, `ro`, `rs`, `sg`, `th`, `tw`, `ug`, `us`, `ve`, `vn`, `za`.
+    - **4.0 (International only):** strictly zero jurisdictions permitted.
+  - Fabricated or arbitrary jurisdiction codes (e.g. `zz`, `xx`, `fake`) and mismatched version/jurisdiction combinations return `Unknown License` (`isVerified: false`).
+  - Preserved legitimate generic, unported, and international license URLs.
+  - Supported optional deed paths (`deed`, `deed.en`, `deed.fr`, etc.).
+- [x] **Strict Raw Permission Flag Validation (`parseRawLicenseFlag`):**
+  - Audited `ccnc`, `ccsa`, and `ccnd` fields in `rawLicensesObj`.
+  - If a recognized permission flag is present with an unrecognized non-null value (e.g. `"maybe"`, `"unknown"`, `42`, `{}`), it is treated as untrustworthy malformed metadata, returning `Unknown License`.
+  - Supported documented boolean-like representations: `true`, `false`, `"true"`, `"false"`, `1`, `0`, `"1"`, `"0"`.
+  - Safely handles genuinely absent flags (`undefined`, `null`, `""`).
+  - Rejected any contradiction between valid raw flags and the canonical license definition.
+- [x] **Expanded Automated Test Suite Coverage:**
+  - Expanded `tests/music/licenses.test.ts` from 29 to **45 tests**:
+    - CC 2.1 Australia (`/2.1/au/`).
+    - CC 2.1 Canada (`/2.1/ca/`).
+    - CC 2.1 Japan (`/2.1/jp/`).
+    - CC 2.1 Spain (`/2.1/es/`).
+    - Rejection of generic unported 2.1 (`/2.1/`).
+    - Rejection of unsupported 2.1 jurisdictions (`/2.1/us/`).
+    - Historical CC BY-ND-NC 1.0 (designation, canonical URL, flags).
+    - Rejection of by-nd-nc on 2.0+ (`/by-nd-nc/2.0/`).
+    - CC BY 2.5 UK: Scotland (`/2.5/scotland/` and `/2.5/scotland/deed.en`).
+    - Legitimate ported jurisdictions under 1.0, 2.0, 2.5, 3.0 (e.g. Netherlands, UK, India, US, IGO).
+    - Rejection of arbitrary/fabricated jurisdictions (`zz`, `xx`, `fake`).
+    - Rejection of jurisdictions on 4.0 (`/4.0/scotland/`, `/4.0/au/`).
+    - Rejection of mismatched version/jurisdiction combinations (`/1.0/scotland/`).
+    - Rejection of malformed raw permission flags (`maybe`, `unknown`, `42`, `{}`).
+    - Preservation of boolean-like flag parsing and absent flag handling.
+    - Preservation of contradiction rejection, protocol/hostname security, and unknown license guarantee.
+  - Full Vitest suite passes: **25 test files, 295 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds.
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - Database remains completely clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
@@ -659,7 +699,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (160 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 279 tests pass cleanly with 0 errors in ~9s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (176 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 295 tests pass cleanly with 0 errors in ~9s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
