@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/auth/dal";
 import { getValidThemeKey } from "@/lib/theme/constants";
+import { Navbar } from "@/components/layout/navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,7 +25,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <Navbar user={user} />
+        <div className="flex-1 flex flex-col">{children}</div>
       </body>
     </html>
   );

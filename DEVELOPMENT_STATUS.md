@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.2.1: Profile Accessibility, Artwork & Test Coverage Correction** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
+**Milestone 3D: Invitation-Only Authentication Experience & Admin Invitation Management** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
 
 ---
 
@@ -391,7 +391,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Production build passes: `pnpm build` generates all dynamic routes including `/users/[username]` and `/api/users/me/profile`.
 - [x] Awaiting user review and explicit approval before initiating Milestone 4.
 
-### Milestone 3C.2.1: Profile Accessibility, Artwork & Test Coverage Correction (THIS MILESTONE — COMPLETED & VERIFIED)
+### Milestone 3C.2.1: Profile Accessibility, Artwork & Test Coverage Correction
 - [x] **Genuine Keyboard Focus Trap & Dismissal Guard (`src/components/profile/edit-profile-dialog.tsx`):**
   - Implemented keyboard focus trap without external dependencies: Tab wraps from the last focusable element back to the first, and Shift+Tab wraps from the first focusable element to the last.
   - Automatically moves focus to the dialog close button upon opening via accessible timeout.
@@ -417,21 +417,55 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Audited date formatting in `src/app/users/[username]/profile-tabs.tsx` and `src/app/users/[username]/page.tsx`.
   - Configured deterministic `timeZone: "UTC"` across all `Intl.DateTimeFormat` calls (`formatListenedDate`, `formatMonthYear`, `memberSinceFormatted`), eliminating timezone mismatches between server rendering and browser hydration.
 - [x] **Real Server Component Testing & Accessibility Coverage (`tests/profile/page.test.ts` & `tests/profile/components.test.ts`):**
-  - Upgraded `tests/profile/page.test.ts` (12 tests) to directly import and execute the actual `UserProfilePage` Server Component and `generateMetadata` function against live PostgreSQL test fixtures:
-    1. Verified existing usernames resolve to full profile data.
-    2. Verified nonexistent usernames trigger `notFound()` throwing `NEXT_NOT_FOUND`.
-    3. Verified authenticated owner mode renders `EditProfileDialog` and omits the visitor badge.
-    4. Verified visitor mode renders the neutral "Harmoni Member" badge and omits `EditProfileDialog`.
-    5. Verified visitor mode receives zero profile-editing controls even with `@` handle casing variations.
-    6. Verified only public playlists are passed to the UI while private playlists are strictly excluded.
-    7. Verified completed scrobbles are displayed while incomplete scrobbles are excluded.
-    8. Verified actual playlist and track artwork URLs reach the UI.
-    9. Verified sensitive fields (`passwordHash`, `sessions`) are never leaked in rendered HTML or props.
-    10. Verified empty profiles render genuine empty states.
-    11. Verified dynamic metadata generation for valid and 404 users.
-    12. Verified Next.js rewrite rule mapping `/@:username` to `/users/:username`.
+  - Upgraded `tests/profile/page.test.ts` (12 tests) to directly import and execute the actual `UserProfilePage` Server Component and `generateMetadata` function against live PostgreSQL test fixtures.
   - Created `tests/profile/components.test.ts` (14 tests) covering `ArtworkImage` protocol security, fallback symbols, `ProfileTabs` roving tabindex, panel DOM persistence, UTC formatting, avatar normalization, focus trap wrapping, and save in-flight dismissal guards.
   - Full Vitest suite passes: **15 test files, 171 tests passed (100% pass rate)**.
+- [x] Completed and verified.
+
+### Milestone 3D: Invitation-Only Authentication Experience & Admin Invitation Management (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Safe Destination Redirect Protection (`src/lib/auth/redirect.ts`):**
+  - Created `getSafeRedirectUrl(target, fallback)` enforcing strict relative URL paths.
+  - Mitigates open-redirect vulnerabilities by rejecting protocol-relative URLs (`//evil.com`), absolute URLs (`https://evil.com`), backslash bypasses (`/\evil.com`), whitespace, and control characters.
+- [x] **Sign In Experience (`/login`, `src/app/login/page.tsx`, `src/app/login/login-form.tsx`):**
+  - Responsive, accessible sign-in page styled with design system variables.
+  - Server-side redirect to dashboard (`/`) if the user is already authenticated.
+  - Preserves safe return destination via `?returnTo=...`.
+  - Accessible password visibility toggle (`aria-label`, `aria-pressed`, `tabIndex={0}`).
+  - Loading states, disabled inputs during request, and generic anti-enumeration error feedback ("Invalid username or password").
+- [x] **Invitation Registration Experience (`/register`, `src/app/register/page.tsx`, `src/app/register/register-form.tsx`):**
+  - Responsive registration page styled with design system tokens.
+  - Automatically prefills invitation code from query param (`?code=...`).
+  - Client-side validation matching backend constraints (username format, display name length, min 8 char password, password confirmation matching).
+  - Integrates atomically with `POST /api/auth/register`, redeeming code, creating user, and establishing session in one transaction.
+  - Direct link to `/login` for existing members.
+- [x] **Admin Invitation Portal (`/admin/invitations`, `src/app/admin/invitations/page.tsx`, `src/app/admin/invitations/invite-generator.tsx`):**
+  - Server-side access control with `requireAdmin()` redirecting unauthenticated users to `/login` and rendering a clean 403 Forbidden screen for non-admin members.
+  - Configurable expiration selector (1, 3, 7, 14, or 30 days).
+  - Calls `POST /api/admin/invites`, creating a 256-bit cryptographically secure invitation code.
+  - Single-use raw code display with one-click copy to clipboard and explicit warning that codes cannot be recovered once navigated away (only SHA-256 hash is persisted).
+- [x] **Client Logout Component (`src/components/auth/logout-button.tsx`):**
+  - Reusable, accessible sign-out button calling `POST /api/auth/logout`.
+  - Clears session cookie and redirects to `/` or specified destination.
+  - Accessible loading spinner and error feedback if network fails.
+- [x] **Navigation Bar & Session-Aware Home (`src/components/layout/navbar.tsx`, `src/app/page.tsx`, `src/app/layout.tsx`):**
+  - Responsive top navigation bar displaying Harmoni branding, navigation links, current user avatar, username, role badges, and logout button.
+  - Session-aware Home Landing Page:
+    - Unauthenticated: Hero landing screen with branding, invitation messaging, Sign In, and Join with Invitation Code links.
+    - Authenticated: Member dashboard with personalized greeting, profile card with AvatarPreset, theme info, quick links to Profile, Appearance Settings, Admin Portal (for Admins), and Logout.
+- [x] **Comprehensive Automated Test Coverage:**
+  - Added `tests/auth/redirect.test.ts` (6 tests).
+  - Added `tests/auth/login-page.test.ts` (5 tests).
+  - Added `tests/auth/register-page.test.ts` (4 tests).
+  - Added `tests/auth/logout-component.test.ts` (2 tests).
+  - Added `tests/auth/admin-invitations-page.test.ts` (4 tests).
+  - Added `tests/auth/home-navigation.test.ts` (6 tests).
+  - Full Vitest suite passes: **21 test files, 198 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` generates all routes including `/login`, `/register`, `/admin/invitations`, and `/`.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - No real administrator account created; `pnpm auth:bootstrap-admin` remains documented for the developer to run manually when desired.
+  - ₹0 INR expenditure permanently maintained.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 4.
 
 ---
@@ -462,7 +496,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit tests pass (62 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`). When unsandboxed, all 15 test files and **all 171 tests pass cleanly with 0 errors in ~7s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (79 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`). When unsandboxed, all 21 test files and **all 198 tests pass cleanly with 0 errors in ~7s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.

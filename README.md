@@ -121,6 +121,29 @@ Harmoni provides clean public profile pages and customizable profiles without ex
 
 ---
 
+## User Interface & Authentication Experience (Milestone 3D)
+
+Harmoni provides a clean, responsive frontend for invitation-only access:
+- **Landing & Member Dashboard (`/`):** Session-aware home view presenting a welcoming landing page with sign-in and invite registration links for visitors, and a personalized entry dashboard (greeting, profile summary, current theme, and quick action cards) for authenticated members.
+- **Sign In (`/login`):** Accessible authentication interface with password visibility toggle, safe same-origin return destination validation (`getSafeRedirectUrl` preventing open redirects), and generic error messages that avoid username enumeration.
+- **Invitation Registration (`/register`):** Single-use invitation redemption page supporting query prefill (`?code=...`), password confirmation validation, and atomic transaction redemption against PostgreSQL.
+- **Admin Invitation Management (`/admin/invitations`):** Administrator-only portal protected by server-side `requireAdmin()` DAL. Allows selecting validity (1–30 days), generating 256-bit cryptographically secure invitation codes, and viewing the raw code once with copy-to-clipboard functionality.
+- **Top Navigation Bar:** Persistent, responsive header connecting Home, Profile (`/@username`), Appearance Settings, Admin Invitations (for admins only), and interactive sign out.
+
+---
+
+## Initial Administrator Bootstrap
+
+Harmoni is invitation-only. The first administrator account is created manually via the dedicated bootstrap utility:
+
+```bash
+pnpm auth:bootstrap-admin
+```
+
+This prompts for an administrator username, display name, and password, hashes credentials with OWASP-compliant Argon2id, and writes the `ADMIN` record directly into PostgreSQL. Subsequent member invitations can then be generated directly through the web UI at `/admin/invitations`.
+
+---
+
 ## Appearance Settings & Multi-Theme Engine (Milestone 3C.1)
 
 Harmoni provides five distinct selectable visual themes with independent, per-user persistent storage:
