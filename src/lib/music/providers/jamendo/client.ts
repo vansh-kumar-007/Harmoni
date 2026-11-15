@@ -214,26 +214,65 @@ export async function fetchFromJamendo<T>(options: FetchJamendoOptions): Promise
   }
 
   // Inspect Jamendo headers status and code per official documentation:
-  // Status can be "success" or "succeed" on success, or "failed" on error.
+  // Status must be documented "succeed" or official example "success" on success, or "failed" on error.
   // Code 0 indicates success. Any non-zero code is an API failure.
   if (
     typeof data === "object" &&
     data !== null &&
     "headers" in data &&
     typeof (data as { headers?: unknown }).headers === "object" &&
-    (data as { headers?: unknown }).headers !== null
+    (data as { headers?: unknown }).headers !== null &&
+    !Array.isArray((data as { headers?: unknown }).headers)
   ) {
-    const headers = (data as {
+    const rawHeaders = (data as {
       headers: { status?: unknown; code?: unknown; error_message?: unknown };
     }).headers;
 
-    const code = typeof headers.code === "number" ? headers.code : -1;
-    const statusStr = typeof headers.status === "string" ? headers.status.toLowerCase().trim() : "";
+    // 1. Validate response code: must be a finite integer number
+    if (typeof rawHeaders.code !== "number" || !Number.isInteger(rawHeaders.code)) {
+      throw new JamendoError(
+        "Malformed API response: missing or malformed response code from Jamendo API",
+        "API_ERROR",
+        502
+      );
+    }
+    const code = rawHeaders.code;
 
-    // If code is not 0, or status is explicitly failed, map to documented error
-    if (code !== 0 || statusStr === "failed") {
+    // 2. Validate status: must be a non-empty string
+    if (typeof rawHeaders.status !== "string" || rawHeaders.status.trim() === "") {
+      throw new JamendoError(
+        "Malformed API response: missing or blank status in response headers from Jamendo API",
+        "API_ERROR",
+        502
+      );
+    }
+    const statusStr = rawHeaders.status.toLowerCase().trim();
+
+    // 3. Handle non-zero response codes (API failure codes 1-11, etc.)
+    if (code !== 0) {
       handleJamendoApiCode(code);
     }
+
+    // 4. When code is 0:
+    // If status is "failed", reject as upstream failure
+    if (statusStr === "failed") {
+      throw new JamendoError(
+        "Jamendo API error: upstream operation failed",
+        "API_ERROR",
+        502
+      );
+    }
+
+    // Status must be documented "succeed" or official example "success"
+    if (statusStr !== "succeed" && statusStr !== "success") {
+      throw new JamendoError(
+        `Malformed API response: unrecognized status value "${statusStr}" in response headers from Jamendo API`,
+        "API_ERROR",
+        502
+      );
+    }
+
+    // Valid successful response: code === 0 and status in ("succeed", "success")
   } else if (!response.ok) {
     throw new JamendoError(
       `Jamendo API responded with HTTP ${response.status}`,

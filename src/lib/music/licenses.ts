@@ -23,20 +23,115 @@ export function formatDuration(seconds: number): string {
   return `${mins}:${paddedSecs}`;
 }
 
-const CC_NAMES: Record<string, string> = {
-  by: "Creative Commons Attribution",
-  "by-sa": "Creative Commons Attribution-ShareAlike",
-  "by-nc": "Creative Commons Attribution-NonCommercial",
-  "by-nc-sa": "Creative Commons Attribution-NonCommercial-ShareAlike",
-  "by-nc-nd": "Creative Commons Attribution-NonCommercial-NoDerivatives",
-  "by-nd": "Creative Commons Attribution-NoDerivatives",
-  zero: "Creative Commons CC0 Public Domain Dedication",
+interface SupportedCcLicenseDefinition {
+  identifier: string;
+  codeSlug: string;
+  fullName: string;
+  nonCommercial: boolean;
+  shareAlike: boolean;
+  noDerivatives: boolean;
+}
+
+/**
+ * Officially recognized Creative Commons license identifiers:
+ * https://creativecommons.org/share-your-work/cclicenses/
+ */
+const SUPPORTED_CC_LICENSES: Record<string, SupportedCcLicenseDefinition> = {
+  by: {
+    identifier: "by",
+    codeSlug: "BY",
+    fullName: "Creative Commons Attribution",
+    nonCommercial: false,
+    shareAlike: false,
+    noDerivatives: false,
+  },
+  "by-sa": {
+    identifier: "by-sa",
+    codeSlug: "BY-SA",
+    fullName: "Creative Commons Attribution-ShareAlike",
+    nonCommercial: false,
+    shareAlike: true,
+    noDerivatives: false,
+  },
+  "by-nd": {
+    identifier: "by-nd",
+    codeSlug: "BY-ND",
+    fullName: "Creative Commons Attribution-NoDerivatives",
+    nonCommercial: false,
+    shareAlike: false,
+    noDerivatives: true,
+  },
+  "by-nc": {
+    identifier: "by-nc",
+    codeSlug: "BY-NC",
+    fullName: "Creative Commons Attribution-NonCommercial",
+    nonCommercial: true,
+    shareAlike: false,
+    noDerivatives: false,
+  },
+  "by-nc-sa": {
+    identifier: "by-nc-sa",
+    codeSlug: "BY-NC-SA",
+    fullName: "Creative Commons Attribution-NonCommercial-ShareAlike",
+    nonCommercial: true,
+    shareAlike: true,
+    noDerivatives: false,
+  },
+  "by-nc-nd": {
+    identifier: "by-nc-nd",
+    codeSlug: "BY-NC-ND",
+    fullName: "Creative Commons Attribution-NonCommercial-NoDerivatives",
+    nonCommercial: true,
+    shareAlike: false,
+    noDerivatives: true,
+  },
 };
 
 /**
- * Parses and verifies a Creative Commons license URL from Jamendo metadata.
- * Validates that the URL belongs to creativecommons.org and extracts
- * the canonical CC designation, human-readable name, and permission flags.
+ * Officially published Creative Commons license versions:
+ * 1.0 (Generic), 2.0 (Generic), 2.5 (Generic), 3.0 (Unported), 4.0 (International).
+ */
+const SUPPORTED_CC_VERSIONS = new Set(["1.0", "2.0", "2.5", "3.0", "4.0"]);
+
+/**
+ * Parses boolean-like flag from Jamendo licenses object.
+ * Returns null if missing or unrecognized.
+ */
+function parseRawLicenseFlag(value: unknown): boolean | null {
+  if (value === true || value === "true" || value === 1 || value === "1") {
+    return true;
+  }
+  if (value === false || value === "false" || value === 0 || value === "0") {
+    return false;
+  }
+  return null;
+}
+
+/**
+ * Regex for standard CC license URLs:
+ * /licenses/<identifier>/<version>/[<jurisdiction>/][deed.<lang>]
+ */
+const CC_LICENSES_PATH_REGEX =
+  /^\/licenses\/([a-z-]+)\/([0-9.]+)(?:\/([a-z]{2}(?:-[a-z]{2})?)?)?(?:\/(?:deed(?:\.[a-z]{2,5})?)?)?\/?$/i;
+
+/**
+ * Regex for CC0 Public Domain Dedication URLs:
+ * /publicdomain/zero/<version>/[deed.<lang>]
+ */
+const CC0_PATH_REGEX =
+  /^\/publicdomain\/zero\/([0-9.]+)(?:\/(?:deed(?:\.[a-z]{2,5})?)?)?\/?$/i;
+
+/**
+ * Parses and strictly verifies a Creative Commons license URL from Jamendo metadata.
+ * Validates that:
+ * 1. The protocol is strictly http: or https:
+ * 2. The hostname is strictly creativecommons.org or www.creativecommons.org (no lookalikes)
+ * 3. No non-standard ports or credentials are embedded in the URL
+ * 4. The license identifier is one of the 6 official Creative Commons licenses or CC0
+ * 5. The license version is an officially supported version (1.0, 2.0, 2.5, 3.0, 4.0 for CC, 1.0 for CC0)
+ * 6. Contradictory permission flags in rawLicensesObj do not override the canonical license and instead yield an unverified license
+ *
+ * Missing, malformed, unsupported, or contradictory licenses return an unverified Unknown License.
  */
 export function parseCcLicense(
   rawUrl?: string | null,
@@ -49,22 +144,55 @@ export function parseCcLicense(
   try {
     const parsed = new URL(rawUrl.trim());
 
-    // Strict validation: must be HTTP or HTTPS on creativecommons.org
-    if (
-      (parsed.protocol !== "http:" && parsed.protocol !== "https:") ||
-      (parsed.hostname !== "creativecommons.org" && parsed.hostname !== "www.creativecommons.org")
-    ) {
+    // 1. Protocol must be http: or https:
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return createUnknownLicense();
     }
 
-    // Always standardize to https for modern secure browsing
+    // 2. Hostname must strictly be creativecommons.org or www.creativecommons.org
+    const hostname = parsed.hostname.toLowerCase();
+    if (hostname !== "creativecommons.org" && hostname !== "www.creativecommons.org") {
+      return createUnknownLicense();
+    }
+
+    // 3. Port must not be a non-standard port
+    if (parsed.port && parsed.port !== "80" && parsed.port !== "443") {
+      return createUnknownLicense();
+    }
+
+    // 4. Reject URLs with username / password credentials
+    if (parsed.username || parsed.password) {
+      return createUnknownLicense();
+    }
+
+    // Standardize URL to https and clean query / hash
     parsed.protocol = "https:";
+    parsed.port = "";
+    parsed.search = "";
+    parsed.hash = "";
     const cleanUrl = parsed.toString();
 
-    // Check for CC0 public domain
-    if (parsed.pathname.includes("/publicdomain/zero/")) {
-      const match = parsed.pathname.match(/\/publicdomain\/zero\/([0-9.]+)/i);
-      const version = match ? match[1] : "1.0";
+    // 5. Check for CC0 public domain dedication
+    const cc0Match = parsed.pathname.match(CC0_PATH_REGEX);
+    if (cc0Match) {
+      const version = cc0Match[1];
+      // Only CC0 1.0 is officially defined by Creative Commons
+      if (version !== "1.0") {
+        return createUnknownLicense();
+      }
+
+      // Check for contradictory raw licenses object flags
+      if (rawLicensesObj && typeof rawLicensesObj === "object" && !Array.isArray(rawLicensesObj)) {
+        const rawNc = parseRawLicenseFlag(rawLicensesObj.ccnc);
+        const rawSa = parseRawLicenseFlag(rawLicensesObj.ccsa);
+        const rawNd = parseRawLicenseFlag(rawLicensesObj.ccnd);
+
+        // CC0 cannot have restrictions (NC, SA, ND must not be asserted as true)
+        if (rawNc === true || rawSa === true || rawNd === true) {
+          return createUnknownLicense();
+        }
+      }
+
       return {
         code: `CC0 ${version}`,
         name: `Creative Commons CC0 ${version} Public Domain Dedication`,
@@ -77,50 +205,63 @@ export function parseCcLicense(
       };
     }
 
-    // Match standard /licenses/<type>/<version>/
-    const match = parsed.pathname.match(/\/licenses\/([a-z-]+)\/([0-9.]+)/i);
-    if (!match) {
+    // 6. Check for standard Creative Commons licenses (/licenses/<identifier>/<version>/...)
+    const ccMatch = parsed.pathname.match(CC_LICENSES_PATH_REGEX);
+    if (!ccMatch) {
       return createUnknownLicense();
     }
 
-    const typeKey = match[1].toLowerCase();
-    const version = match[2];
+    const typeKey = ccMatch[1].toLowerCase();
+    const version = ccMatch[2];
 
-    const baseName = CC_NAMES[typeKey] || `Creative Commons ${typeKey.toUpperCase()}`;
-    const code = `CC ${typeKey.toUpperCase()} ${version}`;
+    // Validate supported identifier
+    const licenseDef = SUPPORTED_CC_LICENSES[typeKey];
+    if (!licenseDef) {
+      return createUnknownLicense();
+    }
 
-    // Flags can be derived from the license slug or the raw Jamendo licenses object
-    const nonCommercial =
-      typeKey.includes("nc") ||
-      rawLicensesObj?.ccnc === true ||
-      rawLicensesObj?.ccnc === "true";
+    // Validate supported version
+    if (!SUPPORTED_CC_VERSIONS.has(version)) {
+      return createUnknownLicense();
+    }
 
-    const shareAlike =
-      typeKey.includes("sa") ||
-      rawLicensesObj?.ccsa === true ||
-      rawLicensesObj?.ccsa === "true";
+    // Check for contradictory raw licenses object flags
+    if (rawLicensesObj && typeof rawLicensesObj === "object" && !Array.isArray(rawLicensesObj)) {
+      const rawNc = parseRawLicenseFlag(rawLicensesObj.ccnc);
+      const rawSa = parseRawLicenseFlag(rawLicensesObj.ccsa);
+      const rawNd = parseRawLicenseFlag(rawLicensesObj.ccnd);
 
-    const noDerivatives =
-      typeKey.includes("nd") ||
-      rawLicensesObj?.ccnd === true ||
-      rawLicensesObj?.ccnd === "true";
+      // If raw flags are explicitly provided, they must not contradict the canonical license
+      if (rawNc !== null && rawNc !== licenseDef.nonCommercial) {
+        return createUnknownLicense();
+      }
+      if (rawSa !== null && rawSa !== licenseDef.shareAlike) {
+        return createUnknownLicense();
+      }
+      if (rawNd !== null && rawNd !== licenseDef.noDerivatives) {
+        return createUnknownLicense();
+      }
+    }
+
+    const code = `CC ${licenseDef.codeSlug} ${version}`;
+    const name = `${licenseDef.fullName} ${version}`;
 
     return {
       code,
-      name: `${baseName} ${version}`,
+      name,
       url: cleanUrl,
       isCreativeCommons: true,
       isVerified: true,
-      nonCommercial,
-      shareAlike,
-      noDerivatives,
+      nonCommercial: licenseDef.nonCommercial,
+      shareAlike: licenseDef.shareAlike,
+      noDerivatives: licenseDef.noDerivatives,
     };
   } catch {
     return createUnknownLicense();
   }
 }
 
-function createUnknownLicense(): LicenseInfo {
+export function createUnknownLicense(): LicenseInfo {
   return {
     code: "Unknown License",
     name: "Unspecified or Unknown License",

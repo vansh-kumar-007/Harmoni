@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 4.1: Jamendo API Correctness & Track Discovery Fixes** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
+**Milestone 4.2: Strict Music License Validation & Jamendo Provider Readiness** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
 
 ---
 
@@ -526,7 +526,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - ₹0 INR expenditure permanently maintained.
 - [x] Completed and verified.
 
-### Milestone 4.1: Jamendo API Correctness & Track Discovery Fixes (THIS MILESTONE — COMPLETED & VERIFIED)
+### Milestone 4.1: Jamendo API Correctness & Track Discovery Fixes (COMPLETED & VERIFIED)
 - [x] **Standalone Singles Inclusion in Track Discovery (`src/lib/music/providers/jamendo/index.ts`):**
   - Updated outgoing track search requests to explicitly send `type: "single albumtrack"`.
   - Ensures both standalone singles and album tracks are returned in search results per official Jamendo API documentation, overriding the default behavior which only returns album tracks.
@@ -570,6 +570,68 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - Database remains clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
+- [x] Completed and verified.
+
+### Milestone 4.2: Strict Music License Validation & Jamendo Provider Readiness (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Strict Creative Commons License Validation (`src/lib/music/licenses.ts`):**
+  - Implemented strict protocol and hostname validation: accepts only `http:` and `https:`, exact hostnames `creativecommons.org` and `www.creativecommons.org`.
+  - Rejects lookalike hostnames (e.g. `creativecommons.org.attacker.com`, `evil-creativecommons.org`, `creativecommons.net`), non-standard ports, and embedded credentials.
+  - Standardizes valid URLs to canonical `https:` without query params or fragments.
+  - Explicitly recognizes the 6 officially supported Creative Commons license identifiers per official specification:
+    - `by` (Attribution)
+    - `by-sa` (Attribution-ShareAlike)
+    - `by-nd` (Attribution-NoDerivatives)
+    - `by-nc` (Attribution-NonCommercial)
+    - `by-nc-sa` (Attribution-NonCommercial-ShareAlike)
+    - `by-nc-nd` (Attribution-NonCommercial-NoDerivatives)
+  - Explicitly recognizes officially supported CC license versions: `1.0`, `2.0`, `2.5`, `3.0`, and `4.0`. Rejects non-existent versions (e.g. `0.5`, `5.0`, `99.0`).
+  - Correctly validates CC0 public domain dedication (`/publicdomain/zero/1.0/`), requiring exact version `1.0`.
+  - Rejects fake license slugs on valid domain (e.g. `commercial`, `gpl`, `bsd`, `fake-by`), malformed paths (missing version, missing slug, arbitrary non-license paths), and unsupported protocols (`ftp:`, `javascript:`).
+  - Enforces strict consistency between canonical license definitions and raw Jamendo license flags (`rawLicensesObj` with `ccnc`, `ccsa`, `ccnd`):
+    - Any contradictory raw flag immediately causes the parser to reject the license and return `Unknown License` with `isVerified: false`.
+    - Contradictory raw flags can never override a canonical license.
+    - An unknown or contradictory license is guaranteed to never be presented as a verified playable license.
+  - Preserved the existing `LicenseInfo` interface without regression.
+- [x] **Jamendo Response-Header Validation (`src/lib/music/providers/jamendo/client.ts`):**
+  - Enforces that response headers contain a valid finite integer `code` and a non-empty `status` string.
+  - Accepts a successful response only when `code === 0` AND `status` is either documented `"succeed"` or official example `"success"` (evaluated case-insensitively).
+  - Explicitly rejects `status === "failed"` when code is 0 as an upstream failure.
+  - Explicitly rejects missing, blank, or whitespace status values (`API_ERROR`, 502).
+  - Explicitly rejects unrecognized status values (e.g. `"pending"`, `"ok"`, `"unknown"`) (`API_ERROR`, 502).
+  - Explicitly rejects missing, non-numeric, or non-integer response codes (`API_ERROR`, 502).
+  - Preserves sanitized error code mapping for codes 1–11 (mapping codes 5 and 11 to `INVALID_CREDENTIALS`, code 6 to `RATE_LIMITED`).
+  - Guarantees zero credential or URL leakage in error messages and client bundles.
+- [x] **Comprehensive Automated Test Coverage:**
+  - Expanded `tests/music/licenses.test.ts` to **29 tests** (up from 9 tests):
+    - All 6 supported license identifiers.
+    - Supported versions (1.0, 2.0, 2.5, 3.0, 4.0) and unsupported versions (0.5, 5.0, 99.0).
+    - CC0 1.0 and invalid CC0 2.0.
+    - Fake license slugs on legitimate hostname.
+    - Malformed paths (missing version, arbitrary paths).
+    - Lookalike or attacker hostnames, ports, credentials, and protocols.
+    - Missing and null URLs.
+    - Contradictory license URL vs raw flags (e.g., CC BY with ccnc: true, CC BY-NC with ccnc: false, CC0 with restrictions).
+    - Consistent raw flags matching canonical license definition.
+    - Strict `Unknown License` verification guarantee (`isVerified: false`).
+  - Expanded `tests/music/jamendo-provider.test.ts` to **33 tests** (up from 23 tests):
+    - Valid code 0 with "succeed" and "success", including case variations ("SUCCEED", "Success").
+    - Rejection of code 0 with "failed".
+    - Rejection of blank, whitespace, or null status.
+    - Rejection of unrecognized status values ("pending", "ok", "unknown").
+    - Rejection of non-integer, non-numeric, or missing codes.
+    - Complete API code 1–11 mappings, including generic code 99 fallback.
+    - Standalone singles compatibility, 429 rate limit, 500 error, 504 timeout, malformed JSON, and credential privacy.
+  - Full Vitest suite passes: **25 test files, 279 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds.
+- [x] **Live Provider Readiness Check:**
+  - Environment inspection confirms `JAMENDO_CLIENT_ID` is unconfigured (`.env.local` is absent; `.env` retains non-functional placeholder `your_free_jamendo_client_id_here`).
+  - Genuine live Jamendo requests were not executed to avoid using demo keys, fabricating results, or violating rate limits.
+  - The mocked test suite remains 100% independent of live credentials.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains completely clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 5.
 
 ---
@@ -597,7 +659,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (130 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 249 tests pass cleanly with 0 errors in ~9s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (160 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 279 tests pass cleanly with 0 errors in ~9s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
