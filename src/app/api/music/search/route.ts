@@ -102,7 +102,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          configured: err.code !== "NOT_CONFIGURED",
+          configured:
+            err.code !== "NOT_CONFIGURED" && err.code !== "INVALID_CREDENTIALS",
           error: err.message,
         },
         { status, headers: NO_STORE_HEADERS }

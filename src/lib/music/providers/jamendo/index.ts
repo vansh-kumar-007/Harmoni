@@ -71,6 +71,7 @@ export async function searchJamendoTracks(
     endpoint: "tracks",
     params: {
       search: trimmedQuery,
+      type: "single albumtrack",
       limit,
       offset,
       include: "licenses",

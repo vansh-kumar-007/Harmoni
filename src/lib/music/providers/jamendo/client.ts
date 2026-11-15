@@ -3,13 +3,21 @@ import "server-only";
 const JAMENDO_BASE_URL = "https://api.jamendo.com/v3.0";
 const DEFAULT_TIMEOUT_MS = 8000;
 
+export type JamendoErrorCode =
+  | "NOT_CONFIGURED"
+  | "INVALID_CREDENTIALS"
+  | "RATE_LIMITED"
+  | "API_ERROR"
+  | "TIMEOUT"
+  | "NETWORK_ERROR";
+
 export class JamendoError extends Error {
-  code: "NOT_CONFIGURED" | "RATE_LIMITED" | "API_ERROR" | "TIMEOUT" | "NETWORK_ERROR";
+  code: JamendoErrorCode;
   statusCode?: number;
 
   constructor(
     message: string,
-    code: "NOT_CONFIGURED" | "RATE_LIMITED" | "API_ERROR" | "TIMEOUT" | "NETWORK_ERROR",
+    code: JamendoErrorCode,
     statusCode?: number
   ) {
     super(message);
@@ -47,6 +55,87 @@ export interface FetchJamendoOptions {
   endpoint: "tracks" | "artists" | "albums";
   params: Record<string, string | number | undefined>;
   timeoutMs?: number;
+}
+
+/**
+ * Maps documented Jamendo API response codes (https://developer.jamendo.com/v3.0/response-codes)
+ * to sanitized, typed JamendoError instances without exposing credentials or internal exceptions.
+ */
+function handleJamendoApiCode(code: number): never {
+  switch (code) {
+    case 1:
+      throw new JamendoError(
+        "Jamendo API error: generic upstream exception occurred",
+        "API_ERROR",
+        502
+      );
+    case 2:
+      throw new JamendoError(
+        "Jamendo API error: unsupported HTTP method",
+        "API_ERROR",
+        502
+      );
+    case 3:
+      throw new JamendoError(
+        "Jamendo API error: invalid query parameter value",
+        "API_ERROR",
+        502
+      );
+    case 4:
+      throw new JamendoError(
+        "Jamendo API error: required parameter missing",
+        "API_ERROR",
+        502
+      );
+    case 5:
+      throw new JamendoError(
+        "Jamendo API client ID is invalid. Please check your JAMENDO_CLIENT_ID configuration.",
+        "INVALID_CREDENTIALS",
+        503
+      );
+    case 6:
+      throw new JamendoError(
+        "Jamendo API rate limit exceeded. Please try again shortly.",
+        "RATE_LIMITED",
+        429
+      );
+    case 7:
+      throw new JamendoError(
+        "Jamendo API error: requested method not found",
+        "API_ERROR",
+        502
+      );
+    case 8:
+      throw new JamendoError(
+        "Jamendo API error: required conditional parameter missing",
+        "API_ERROR",
+        502
+      );
+    case 9:
+      throw new JamendoError(
+        "Jamendo API error: invalid response format",
+        "API_ERROR",
+        502
+      );
+    case 10:
+      throw new JamendoError(
+        "Jamendo API error: invalid API entry point",
+        "API_ERROR",
+        502
+      );
+    case 11:
+      throw new JamendoError(
+        "Jamendo developer application is suspended. Please verify your application status at developer.jamendo.com.",
+        "INVALID_CREDENTIALS",
+        503
+      );
+    default:
+      throw new JamendoError(
+        `Jamendo API error: upstream operation failed (code ${code})`,
+        "API_ERROR",
+        502
+      );
+  }
 }
 
 /**
@@ -106,18 +195,17 @@ export async function fetchFromJamendo<T>(options: FetchJamendoOptions): Promise
     );
   }
 
-  if (!response.ok) {
-    throw new JamendoError(
-      `Jamendo API responded with HTTP ${response.status}`,
-      "API_ERROR",
-      response.status
-    );
-  }
-
   let data: unknown;
   try {
     data = await response.json();
   } catch {
+    if (!response.ok) {
+      throw new JamendoError(
+        `Jamendo API responded with HTTP ${response.status}`,
+        "API_ERROR",
+        response.status
+      );
+    }
     throw new JamendoError(
       "Malformed JSON response received from Jamendo API",
       "API_ERROR",
@@ -125,30 +213,48 @@ export async function fetchFromJamendo<T>(options: FetchJamendoOptions): Promise
     );
   }
 
-  // Inspect Jamendo headers status and code
+  // Inspect Jamendo headers status and code per official documentation:
+  // Status can be "success" or "succeed" on success, or "failed" on error.
+  // Code 0 indicates success. Any non-zero code is an API failure.
   if (
     typeof data === "object" &&
     data !== null &&
     "headers" in data &&
-    typeof (data as { headers?: unknown }).headers === "object"
+    typeof (data as { headers?: unknown }).headers === "object" &&
+    (data as { headers?: unknown }).headers !== null
   ) {
-    const headers = (data as { headers: { status?: string; code?: number; error_message?: string } }).headers;
-    if (headers && headers.status === "failed") {
-      const code = headers.code ?? -1;
-      const msg = headers.error_message || "Unknown Jamendo API error";
-      if (code === 4 || code === 2 || response.status === 429) {
-        throw new JamendoError(
-          "Jamendo API rate limit exceeded. Please try again shortly.",
-          "RATE_LIMITED",
-          429
-        );
-      }
-      throw new JamendoError(
-        `Jamendo API error (${code}): ${msg}`,
-        "API_ERROR",
-        502
-      );
+    const headers = (data as {
+      headers: { status?: unknown; code?: unknown; error_message?: unknown };
+    }).headers;
+
+    const code = typeof headers.code === "number" ? headers.code : -1;
+    const statusStr = typeof headers.status === "string" ? headers.status.toLowerCase().trim() : "";
+
+    // If code is not 0, or status is explicitly failed, map to documented error
+    if (code !== 0 || statusStr === "failed") {
+      handleJamendoApiCode(code);
     }
+  } else if (!response.ok) {
+    throw new JamendoError(
+      `Jamendo API responded with HTTP ${response.status}`,
+      "API_ERROR",
+      response.status
+    );
+  } else {
+    // Missing or invalid headers object on HTTP OK response
+    throw new JamendoError(
+      "Malformed API response: missing or invalid headers from Jamendo API",
+      "API_ERROR",
+      502
+    );
+  }
+
+  if (!response.ok) {
+    throw new JamendoError(
+      `Jamendo API responded with HTTP ${response.status}`,
+      "API_ERROR",
+      response.status
+    );
   }
 
   return data as T;

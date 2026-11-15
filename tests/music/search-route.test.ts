@@ -257,5 +257,21 @@ describe("Protected Music Search Route (GET /api/music/search)", () => {
       expect(data.error).toContain("rate limit exceeded");
       expect(response.headers.get("Cache-Control")).toContain("no-store");
     });
+
+    it("returns 503 and configured=false when upstream throws INVALID_CREDENTIALS", async () => {
+      searchTracksMock.mockRejectedValueOnce(
+        new JamendoError("Jamendo API client ID is invalid.", "INVALID_CREDENTIALS", 503)
+      );
+
+      const request = new Request("http://localhost:3000/api/music/search?q=chill");
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(503);
+      expect(data.success).toBe(false);
+      expect(data.configured).toBe(false);
+      expect(data.error).toContain("client ID is invalid");
+      expect(response.headers.get("Cache-Control")).toContain("no-store");
+    });
   });
 });

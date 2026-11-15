@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 4: Music Discovery Engine & Jamendo Read-Only API Integration** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
+**Milestone 4.1: Jamendo API Correctness & Track Discovery Fixes** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
 
 ---
 
@@ -468,7 +468,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - ₹0 INR expenditure permanently maintained.
 - [x] Completed and verified.
 
-### Milestone 4: Music Discovery Engine & Jamendo Read-Only API Integration (THIS MILESTONE — COMPLETED & VERIFIED)
+### Milestone 4: Music Discovery Engine & Jamendo Read-Only API Integration (COMPLETED & VERIFIED)
 - [x] **Typed Server-Side Jamendo API Client (`src/lib/music/providers/jamendo/client.ts`):**
   - Built typed, read-only Jamendo API client targeting official base URL `https://api.jamendo.com/v3.0/`.
   - Enforced strict server-only execution (`import "server-only"`) isolating the `JAMENDO_CLIENT_ID` credential from client bundles and log outputs.
@@ -524,6 +524,52 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - No real administrator account or user created; database remains clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
+- [x] Completed and verified.
+
+### Milestone 4.1: Jamendo API Correctness & Track Discovery Fixes (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Standalone Singles Inclusion in Track Discovery (`src/lib/music/providers/jamendo/index.ts`):**
+  - Updated outgoing track search requests to explicitly send `type: "single albumtrack"`.
+  - Ensures both standalone singles and album tracks are returned in search results per official Jamendo API documentation, overriding the default behavior which only returns album tracks.
+  - Preserved existing parameter validation, pagination, licensing metadata, and discovery-only constraints.
+- [x] **Official Jamendo API Response-Code Mapping (`src/lib/music/providers/jamendo/client.ts`):**
+  - Aligned API error code handling with the official Jamendo specification (https://developer.jamendo.com/v3.0/response-codes):
+    - Code 0: Success (safely accepting both `"success"` and `"succeed"` status strings).
+    - Code 1: Generic upstream exception (`API_ERROR`, 502).
+    - Code 2: Unsupported HTTP method (`API_ERROR`, 502).
+    - Code 3: Invalid query parameter value (`API_ERROR`, 502).
+    - Code 4: Required parameter missing (`API_ERROR`, 502).
+    - Code 5: Invalid client ID (`INVALID_CREDENTIALS`, 503).
+    - Code 6: Rate limit exceeded (`RATE_LIMITED`, 429).
+    - Code 7: Requested method not found (`API_ERROR`, 502).
+    - Code 8: Required conditional parameter missing (`API_ERROR`, 502).
+    - Code 9: Invalid response format (`API_ERROR`, 502).
+    - Code 10: Invalid API entry point (`API_ERROR`, 502).
+    - Code 11: Suspended developer application (`INVALID_CREDENTIALS`, 503).
+  - Removed previous incorrect assumption that codes 2 and 4 indicated rate-limiting.
+  - Code 6 correctly maps to `RATE_LIMITED` and HTTP 429.
+  - Codes 5 and 11 map to `INVALID_CREDENTIALS` and HTTP 503 with `configured: false`, allowing the UI to present the configuration guide safely.
+  - Ensured HTTP OK responses inspect `headers.code` and failure status before accepting the response.
+  - Handled malformed upstream headers without crashing or leaking sensitive credentials or URLs.
+- [x] **Expanded Test Suite Coverage (`tests/music/`):**
+  - Updated `tests/music/jamendo-provider.test.ts` (expanded to 23 tests):
+    - Verified track searches include decoded parameter `type=single albumtrack`.
+    - Verified genuine singles with null album fields are normalized cleanly.
+    - Verified code 0 success with `"success"` and `"succeed"`.
+    - Verified codes 2, 3, 4 map to `API_ERROR` (502).
+    - Verified code 5 and code 11 map to `INVALID_CREDENTIALS` (503).
+    - Verified code 6 maps to `RATE_LIMITED` (429).
+    - Verified code 7 maps to `API_ERROR` (502).
+    - Verified missing/malformed headers map to `API_ERROR` (502).
+    - Verified zero credential leakage across all error scenarios.
+  - Updated `tests/music/search-route.test.ts` (expanded to 11 tests):
+    - Verified 503 response and `configured: false` when `INVALID_CREDENTIALS` is thrown.
+  - Full Vitest suite passes: **25 test files, 249 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 5.
 
 ---
@@ -551,7 +597,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (120 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 239 tests pass cleanly with 0 errors in ~9s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (130 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 249 tests pass cleanly with 0 errors in ~9s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
