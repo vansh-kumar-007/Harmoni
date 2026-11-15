@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 5.1: Final Playback Acceptance & Hardening** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 6)
+**Milestone 5.1.1: Correct Playback Failure States** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 6)
 
 ---
 
@@ -756,6 +756,27 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - Database remains completely clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
+### Milestone 5.1.1: Correct Playback Failure States (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Missing Audio-Controller Handling in Stream Resolution:**
+  - Removed fallback in `playTrack()` that set `playbackState: "playing"` when `audioHandle` was null.
+  - Required that only the native audio element's actual `playing` event transitions the state to `"playing"`.
+  - Transitioned cleanly to `"error"` with message `"Audio player is not ready. Please retry."` and `streamUrl: null` if the stream resolves when no audio controller is registered.
+  - Kept `retry()` functional once the controller registers without fake playback or test-only production logic.
+- [x] **Stale Audio Prevention on Failed Track Switches:**
+  - Audited and updated all failure paths in `playTrack()`: unverified licenses, non-success API responses, missing stream URLs, null audio handle, and network/runtime exceptions.
+  - Explicitly stopped the old audio source by invoking `handle.pause()` on all failed track switches, ensuring UI error state and physical audio output cannot disagree.
+  - Protected against race conditions: obsolete failed requests whose `resolutionId` no longer matches do not pause or clear playback for a newer track that has already started.
+  - Preserved playback history and queue semantics completely during failed switches.
+  - Guarded `setPlaybackState` and `AudioController` native `pause`/`waiting`/`playing` handlers so native audio events never overwrite the final `"error"` state.
+- [x] **Comprehensive Testing & Verification:**
+  - Added 4 regression tests to `tests/player/player-store.test.ts` covering missing audio handle, failed track switch audio pause, obsolete failed request immunity, and native event error protection.
+  - Full Vitest suite passes: **29 test files, 364 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds with 16 optimized routes.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains completely clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 6.
 
 ---
@@ -789,7 +810,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (241 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`, `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, `tests/player/player-ui.test.ts`). When unsandboxed, all 29 test files and **all 360 tests pass cleanly with 0 errors in ~10s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (245 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`, `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, `tests/player/player-ui.test.ts`). When unsandboxed, all 29 test files and **all 364 tests pass cleanly with 0 errors in ~10s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.

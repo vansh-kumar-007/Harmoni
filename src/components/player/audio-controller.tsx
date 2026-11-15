@@ -112,16 +112,20 @@ export function AudioController() {
         }
       }}
       onPlaying={() => {
+        const currentState = usePlayerStore.getState().playbackState;
+        if (currentState === "error") return;
         setPlaybackState("playing");
       }}
       onWaiting={() => {
         const currentState = usePlayerStore.getState().playbackState;
+        if (currentState === "error") return;
         if (currentState === "playing") {
           setPlaybackState("loading");
         }
       }}
       onPause={() => {
         const currentState = usePlayerStore.getState().playbackState;
+        if (currentState === "error") return;
         if (currentState === "playing" || currentState === "loading") {
           setPlaybackState("paused");
         }

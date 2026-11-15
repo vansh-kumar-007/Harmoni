@@ -320,6 +320,173 @@ describe("Player Store (Zustand In-Memory Store)", () => {
       expect(usePlayerStore.getState().currentTrack?.id).toBe("102");
       expect(usePlayerStore.getState().streamUrl).toBe("https://prod-1.storage.jamendo.com/?trackid=102");
     });
+
+    it("transitions to error and never becomes playing when stream resolves but audioHandle is null", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            streamUrl: "https://prod-1.storage.jamendo.com/?trackid=101&format=mp32",
+            format: "mp3",
+            bitrate: 128,
+          },
+        }),
+      });
+
+      // Explicitly unregister audioHandle
+      usePlayerStore.setState({ audioHandle: null });
+
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+
+      const state = usePlayerStore.getState();
+      expect(state.playbackState).toBe("error");
+      expect(state.playbackState).not.toBe("playing");
+      expect(state.errorMessage).toBe("Audio player is not ready. Please retry.");
+      expect(state.streamUrl).toBeNull();
+      expect(state.currentTrack?.id).toBe("101");
+
+      // Verify retry functions cleanly once audioHandle is registered
+      usePlayerStore.getState().registerAudioHandle(mockAudioHandle);
+      await usePlayerStore.getState().retry();
+
+      expect(mockAudioHandle.loadAndPlay).toHaveBeenCalledWith(
+        "https://prod-1.storage.jamendo.com/?trackid=101&format=mp32"
+      );
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
+    });
+
+    it("pauses old audio source, sets error state, and preserves queue/history on failed track switch", async () => {
+      // 1. Start Track A
+      global.fetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            streamUrl: "https://prod-1.storage.jamendo.com/?trackid=101&format=mp32",
+            format: "mp3",
+            bitrate: 128,
+          },
+        }),
+      });
+
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
+      expect(mockAudioHandle.loadAndPlay).toHaveBeenCalledTimes(1);
+
+      // Set upcoming queue
+      usePlayerStore.setState({ queue: [sampleVerifiedTrack3] });
+      vi.mocked(mockAudioHandle.pause).mockClear();
+
+      // 2. User selects Track B, but the stream resolution fails
+      global.fetch = vi.fn().mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => ({
+          success: false,
+          error: "Jamendo server error 500: failed to resolve stream for track 102",
+        }),
+      });
+
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack2);
+
+      const state = usePlayerStore.getState();
+      // Old audio source must be paused
+      expect(mockAudioHandle.pause).toHaveBeenCalledTimes(1);
+      // Final state must be error describing the failed Track B request
+      expect(state.playbackState).toBe("error");
+      expect(state.errorMessage).toBe(
+        "Jamendo server error 500: failed to resolve stream for track 102"
+      );
+      expect(state.currentTrack?.id).toBe("102");
+      expect(state.streamUrl).toBeNull();
+      // Queue and history must remain consistent
+      expect(state.history).toHaveLength(1);
+      expect(state.history[0].id).toBe("101");
+      expect(state.queue).toHaveLength(1);
+      expect(state.queue[0].id).toBe("103");
+    });
+
+    it("ensures an obsolete failed request cannot pause a newer track that has already started", async () => {
+      // 1. Track A is playing
+      global.fetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: { streamUrl: "https://prod-1.storage.jamendo.com/?trackid=101" },
+        }),
+      });
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+
+      // 2. Track B fetch starts but hangs
+      let rejectTrackB: (err: unknown) => void;
+      const trackBPromise = new Promise((_, reject) => {
+        rejectTrackB = reject;
+      });
+
+      let resolveTrackC: (value: unknown) => void;
+      const trackCPromise = new Promise((resolve) => {
+        resolveTrackC = resolve;
+      });
+
+      global.fetch = vi.fn()
+        .mockImplementationOnce(() => trackBPromise)
+        .mockImplementationOnce(() => trackCPromise);
+
+      // User selects Track B (resolutionId 2)
+      const playB = usePlayerStore.getState().playTrack(sampleVerifiedTrack2);
+
+      // User quickly selects Track C (resolutionId 3)
+      const playC = usePlayerStore.getState().playTrack(sampleVerifiedTrack3);
+
+      // Track C resolves successfully and starts playing
+      resolveTrackC!({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: { streamUrl: "https://prod-1.storage.jamendo.com/?trackid=103" },
+        }),
+      });
+      await playC;
+
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("103");
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
+      vi.mocked(mockAudioHandle.pause).mockClear();
+
+      // Now Track B's obsolete request rejects with a network error
+      rejectTrackB!(new Error("Network timeout on track 102"));
+      await playB;
+
+      // Obsolete failure must NOT pause the newer track or corrupt its state
+      expect(mockAudioHandle.pause).not.toHaveBeenCalled();
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("103");
+      expect(usePlayerStore.getState().errorMessage).toBeNull();
+    });
+
+    it("ensures native pause/waiting/playing events do not overwrite the final error state", () => {
+      usePlayerStore.setState({
+        playbackState: "error",
+        errorMessage: "Failed to resolve stream",
+      });
+
+      // Simulate native audio controller emitting pause/waiting/playing events
+      usePlayerStore.getState().setPlaybackState("paused");
+      expect(usePlayerStore.getState().playbackState).toBe("error");
+
+      usePlayerStore.getState().setPlaybackState("loading");
+      expect(usePlayerStore.getState().playbackState).toBe("error");
+
+      usePlayerStore.getState().setPlaybackState("playing");
+      expect(usePlayerStore.getState().playbackState).toBe("error");
+    });
   });
 
   describe("Playback History & Queue Behaviour (Scenarios 1-6)", () => {

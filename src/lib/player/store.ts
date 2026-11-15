@@ -95,6 +95,10 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
         playbackState: "error",
         errorMessage: `Playback unavailable: track "${track.title}" has an unverified or unrecognized license (${track.license.code})`,
       });
+      const handle = get().audioHandle;
+      if (handle) {
+        handle.pause();
+      }
       return;
     }
 
@@ -148,6 +152,10 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
           errorMessage: errorMsg,
           streamUrl: null,
         });
+        const handle = get().audioHandle;
+        if (handle) {
+          handle.pause();
+        }
         return;
       }
 
@@ -156,6 +164,27 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
         set({
           playbackState: "error",
           errorMessage: "No valid stream URL returned by provider",
+          streamUrl: null,
+        });
+        const handle = get().audioHandle;
+        if (handle) {
+          handle.pause();
+        }
+        return;
+      }
+
+      // Check for stale response before interacting with audio controller
+      if (get().resolutionId !== currentResolutionId) {
+        return;
+      }
+
+      const handle = get().audioHandle;
+      if (!handle) {
+        // Successful API response does not prove playback has started.
+        // If no audio controller is mounted/registered, transition to an explicit error state.
+        set({
+          playbackState: "error",
+          errorMessage: "Audio player is not ready. Please retry.",
           streamUrl: null,
         });
         return;
@@ -169,16 +198,10 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       });
 
       // Instruct audio handle to load and play
-      const handle = get().audioHandle;
-      if (handle) {
-        await handle.loadAndPlay(streamUrl);
-        // Verify again after async loadAndPlay in case another request intervened
-        if (get().resolutionId !== currentResolutionId) {
-          return;
-        }
-      } else {
-        // Fallback for headless testing environments without an active AudioController
-        set({ playbackState: "playing" });
+      await handle.loadAndPlay(streamUrl);
+      // Verify again after async loadAndPlay in case another request intervened
+      if (get().resolutionId !== currentResolutionId) {
+        return;
       }
     } catch (err: unknown) {
       if (get().resolutionId !== currentResolutionId) {
@@ -192,6 +215,10 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
             : "Network error while resolving audio stream",
         streamUrl: null,
       });
+      const handle = get().audioHandle;
+      if (handle) {
+        handle.pause();
+      }
     }
   },
 
@@ -330,8 +357,8 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
   },
 
   resume: async () => {
-    const { audioHandle, currentTrack } = get();
-    if (audioHandle) {
+    const { audioHandle, currentTrack, streamUrl } = get();
+    if (audioHandle && streamUrl) {
       set({ playbackState: "loading" });
       await audioHandle.play();
     } else if (currentTrack) {
@@ -394,6 +421,11 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
   },
 
   setPlaybackState: (state: PlaybackState) => {
+    // If the player is currently in an error state, do not let native pause/waiting/playing events
+    // accidentally overwrite the error state.
+    if (get().playbackState === "error" && state !== "error") {
+      return;
+    }
     set({ playbackState: state });
   },
 
