@@ -105,6 +105,7 @@ Harmoni implements a hardened, invitation-only authentication backend with stric
 | `POST` | `/api/auth/login` | Public | Username/password authentication with dummy Argon2id verification for anti-enumeration and timing protection. |
 | `POST` | `/api/auth/logout` | Authenticated | Idempotent session revocation in PostgreSQL and cookie clearance. |
 | `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. Rejects unsupported payloads. |
+| `GET` | `/api/music/search` | Authenticated | Searches Creative Commons tracks, artists, and albums via Jamendo v3.0 API. Ephemeral results with `Cache-Control: no-store`. |
 | `PATCH` | `/api/users/me/theme` | Authenticated | Updates personal visual theme preference (`obsidian-studio`, `nordic-aurora`, `editorial-vinyl`, `crimson-vigil`, `cobalt-web`). |
 | `PATCH` | `/api/users/me/profile` | Authenticated | Updates personal profile (`avatarKey`, `bio`). Validates against 8 preset avatar keys and 250-character limit. Empty bio normalizes to `null`. |
 
@@ -129,6 +130,22 @@ Harmoni provides a clean, responsive frontend for invitation-only access:
 - **Invitation Registration (`/register`):** Single-use invitation redemption page supporting query prefill (`?code=...`), password confirmation validation, and atomic transaction redemption against PostgreSQL.
 - **Admin Invitation Management (`/admin/invitations`):** Administrator-only portal protected by server-side `requireAdmin()` DAL. Allows selecting validity (1–30 days), generating 256-bit cryptographically secure invitation codes, and viewing the raw code once with copy-to-clipboard functionality.
 - **Top Navigation Bar:** Persistent, responsive header connecting Home, Profile (`/@username`), Appearance Settings, Admin Invitations (for admins only), and interactive sign out.
+
+---
+
+## Music Discovery Engine & Jamendo API Integration (Milestone 4)
+
+Harmoni integrates a typed, server-only provider layer for legal music discovery using the [Jamendo API v3.0](https://developer.jamendo.com/):
+
+- **Protected Search Interface (`/search`):** Accessible exclusively to authenticated Harmoni users. Offers a unified search input with instant suggestion pills, responsive category tabs (**Tracks**, **Artists**, **Albums**), accessible WAI-ARIA tablists with roving tabindex, animated loading skeletons, empty states, and pagination via "Load More".
+- **Strictly Ephemeral Data Architecture:** In strict compliance with Jamendo API Terms of Use, search results are kept ephemeral in memory. No persistent catalog database cache or Redis is used; the Search API emits `Cache-Control: no-store, no-cache, must-revalidate, private` and writes 0 records to PostgreSQL on search queries.
+- **Creative Commons Licensing & Attribution:** Every track result displays its exact Creative Commons license designation (e.g. `CC BY-NC-SA 3.0`), permission badges (`NC` for Non-Commercial, `SA` for Share-Alike, `ND` for No-Derivatives), direct link to the legal deed on `creativecommons.org`, full artist credit, and verified direct backlink to Jamendo (`target="_blank" rel="noopener noreferrer"`).
+- **Single Tracks vs. Albums:** Handles both standalone singles and album releases gracefully without assuming all tracks belong to an album.
+- **Provider Security & Isolation:** The `JAMENDO_CLIENT_ID` environment variable is strictly server-only (`import "server-only"`). It is never sent to the browser or logged in error messages. Upstream audio streaming and download URLs are stripped in the normalization mapper to keep the search layer strictly discovery-only.
+- **Graceful Unconfigured State:** If `JAMENDO_CLIENT_ID` is not yet configured, the UI renders a clear, non-blocking setup guide instructing the developer on how to create a free application at developer.jamendo.com and configure `.env.local`.
+
+### Jamendo API Terms Notice
+*The published Jamendo Developer Terms of Use indicate a last modification date of **September 17, 2013**. Terms govern non-commercial API usage, attribution requirements, and restrictions on offline access and catalog caching. Terms must be re-checked prior to public deployments.*
 
 ---
 

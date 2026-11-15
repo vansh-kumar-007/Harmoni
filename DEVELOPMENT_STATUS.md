@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3D: Invitation-Only Authentication Experience & Admin Invitation Management** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
+**Milestone 4: Music Discovery Engine & Jamendo Read-Only API Integration** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
 
 ---
 
@@ -466,18 +466,73 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - No real administrator account created; `pnpm auth:bootstrap-admin` remains documented for the developer to run manually when desired.
   - ₹0 INR expenditure permanently maintained.
-- [ ] Awaiting user review and explicit approval before initiating Milestone 4.
+- [x] Completed and verified.
+
+### Milestone 4: Music Discovery Engine & Jamendo Read-Only API Integration (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Typed Server-Side Jamendo API Client (`src/lib/music/providers/jamendo/client.ts`):**
+  - Built typed, read-only Jamendo API client targeting official base URL `https://api.jamendo.com/v3.0/`.
+  - Enforced strict server-only execution (`import "server-only"`) isolating the `JAMENDO_CLIENT_ID` credential from client bundles and log outputs.
+  - Constructed query parameters securely with `URLSearchParams`.
+  - Implemented 8-second request timeouts using `AbortSignal.timeout(8000)`.
+  - Structured error hierarchy (`JamendoError`) categorizing `NOT_CONFIGURED` (503), `RATE_LIMITED` (429), `TIMEOUT` (504), `NETWORK_ERROR` (502), and `API_ERROR` (502).
+  - Provided `isJamendoConfigured()` utility reporting whether a valid, non-placeholder developer client ID is set.
+- [x] **Upstream Validation & Normalization Mapper (`src/lib/music/providers/jamendo/types.ts` & `mapper.ts`):**
+  - Defined strict Zod schemas for upstream Jamendo response headers, tracks, artists, and albums.
+  - Mapped upstream payloads to clean application DTOs: `NormalizedTrack`, `NormalizedArtist`, and `NormalizedAlbum`.
+  - Strictly stripped upstream audio stream URLs (`audio`), direct download links (`audiodownload`), and album archives (`zip`) to enforce discovery-only scope.
+  - Supported both standalone singles (`albumTitle: null`) and album tracks without making invalid album assumptions.
+- [x] **Creative Commons Licensing & Attribution Engine (`src/lib/music/licenses.ts` & `src/components/music/license-badge.tsx`):**
+  - Integrated required `include=licenses` parameter in all Jamendo track queries.
+  - Built robust `parseCcLicense` parser verifying `creativecommons.org` URLs, mapping standard codes (`CC BY-NC-SA 3.0`, `CC BY 4.0`, `CC0 1.0`), and extracting permission tags: `NC` (Non-Commercial), `SA` (Share-Alike), and `ND` (No-Derivatives).
+  - Unverified or missing license URLs are explicitly designated as "Unknown License" and not claimed as verified playable.
+  - Created accessible `LicenseBadge` linking directly to the verified Creative Commons legal deed with `rel="noopener noreferrer"`.
+  - Built `formatDuration` converting duration seconds to standard `m:ss` and `h:mm:ss` display strings.
+- [x] **Protected Music Search API (`GET /api/music/search`, `src/app/api/music/search/route.ts`):**
+  - Protected via `getCurrentUser()` DAL requiring an authenticated Harmoni session (401 Unauthorized for guests).
+  - Validates and bounds query parameters via Zod: `q` (non-empty, max 100 chars), `type` (`tracks`, `artists`, or `albums`), `limit` (clamped 1..50, default 20), and `offset` (>= 0, default 0).
+  - Strictly complies with Jamendo Terms of Use by keeping all search results ephemeral in memory; emits `Cache-Control: no-store, no-cache, must-revalidate, private` and persists 0 database records.
+  - Returns friendly 503 response with `configured: false` when `JAMENDO_CLIENT_ID` is unconfigured.
+  - Sanitized error handling ensuring internal exceptions, upstream keys, and stack traces are never leaked.
+- [x] **Interactive Search UI (`/search`, `src/app/search/page.tsx`, `search-view.tsx`):**
+  - Protected page redirecting unauthenticated visitors to `/login?returnTo=/search`.
+  - Responsive search bar with instant query suggestions ("Ambient", "Jazz", "Electronic", etc.), clear button, and accessible submit trigger.
+  - WAI-ARIA tab navigation across **Tracks**, **Artists**, and **Albums** with keyboard arrow switching and roving tabindex.
+  - Dedicated UI states:
+    - Initial discovery state with catalog guidance.
+    - Friendly "Jamendo API Not Configured" banner with clear steps to add `JAMENDO_CLIENT_ID` to `.env.local` without errors.
+    - Animated loading skeleton placeholders (`aria-busy="true"`).
+    - Friendly empty state when no results match a query.
+    - Error state with "Retry Search" button.
+    - "Load More" pagination button fetching subsequent offsets.
+  - Seamlessly styled for all 5 visual themes using existing design tokens.
+- [x] **Responsive Content Cards (`src/components/music/`):**
+  - `TrackCard`: Displays cover artwork with lazy-loading and fallback icon (`♫`), track title, artist name, album name or "Single" badge, formatted duration, CC license badge, and direct Jamendo backlink (`rel="noopener noreferrer"`).
+  - `ArtistCard`: Displays artist avatar, name, join year, website link, and direct Jamendo Profile link.
+  - `AlbumCard`: Displays cover artwork, album title, artist name, release year, and direct Jamendo Album link.
+- [x] **Navigation & Dashboard Integration:**
+  - Added "Search" navigation link to top header (`Navbar`) for authenticated users.
+  - Added "Discover Music" quick action card to authenticated dashboard (`HomePage`).
+- [x] **Comprehensive Automated Test Coverage:**
+  - Added `tests/music/licenses.test.ts` (9 tests covering formatting and CC URL parsing).
+  - Added `tests/music/jamendo-provider.test.ts` (14 tests covering API client, query parameters, singles, rate limits, timeouts, and secret isolation).
+  - Added `tests/music/search-route.test.ts` (10 tests covering auth guard, parameter validation, provider dispatch, 503 unconfigured state, and error handling).
+  - Added `tests/music/search-ui.test.ts` (8 tests covering server rendering, unconfigured state, and Track/Artist/Album card rendering).
+  - Full Vitest suite passes: **25 test files, 239 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` generates all routes including `/search` and `/api/music/search`.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - No real administrator account or user created; database remains clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
+- [ ] Awaiting user review and explicit approval before initiating Milestone 5.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 4: Music Discovery Engine & Jamendo API Integration (Next Pending Milestone)**
-  - Implement server-side Jamendo API client keeping credentials secret.
-  - Create track, artist, and album search endpoints with server-side caching.
-  - Parse and display verified Creative Commons license badges and artist attribution links.
-- **Milestone 5: Persistent Audio Player & Queue Controller**
+- **Milestone 5: Persistent Audio Player & Queue Controller (Next Pending Milestone)**
   - Implement global Zustand player store coordinating HTML5 audio state.
   - Build docked root-layout player bar (play/pause, seek scrubber, volume control, queue drawer).
+  - Resolve ephemeral stream URLs dynamically without persisting transient CDN URLs as canonical data.
   - Ensure audio playback persists uninterrupted across all route transitions.
 - **Milestone 6: Personal Library, Playlists & Local Scrobbling**
   - Liked tracks collection and user playlist CRUD with track reordering.
@@ -496,11 +551,12 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (79 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`). When unsandboxed, all 21 test files and **all 198 tests pass cleanly with 0 errors in ~7s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (120 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 239 tests pass cleanly with 0 errors in ~9s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
 6. **Figma MCP Server Capabilities:** Remote Figma MCP server (`figma_figma`) creates files and queries metadata, but lacks `use_figma` scene-graph script execution. Native generative AI tools consume paid credits and are strictly prohibited. The canonical visual prototype is maintained in HTML.
+7. **Jamendo API Terms & Developer Credentials:** Jamendo developer API access operates under published Developer Terms of Use last updated on September 17, 2013, governing non-commercial usage, direct content backlinks, attribution, and restrictions on caching and offline access. Search results are strictly ephemeral and not persisted in PostgreSQL. In development and production, the user supplies their own free `JAMENDO_CLIENT_ID` in `.env.local`; when unconfigured, the UI displays a helpful setup guide.
 
 ---
 

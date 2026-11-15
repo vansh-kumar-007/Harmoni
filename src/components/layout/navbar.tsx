@@ -46,6 +46,15 @@ export function Navbar({ user }: NavbarProps) {
                 </span>
               </Link>
 
+              {/* Search Link */}
+              <Link
+                href="/search"
+                className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center gap-1"
+              >
+                <span aria-hidden="true">🔍</span>
+                <span>Search</span>
+              </Link>
+
               {/* Appearance Link */}
               <Link
                 href="/settings/appearance"

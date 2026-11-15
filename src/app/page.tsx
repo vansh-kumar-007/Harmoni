@@ -156,7 +156,29 @@ export default async function HomePage() {
 
         {/* Dashboard Navigation Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Card 1: Your Profile */}
+          {/* Card 1: Discover Music */}
+          <Link
+            href="/search"
+            className="group p-6 rounded-2xl border border-primary/40 bg-card hover:bg-surface-hover hover:border-primary transition-all shadow-xs flex flex-col justify-between space-y-4"
+          >
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/30 group-hover:scale-105 transition-transform">
+                🎵
+              </div>
+              <h2 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                Discover Music
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Search legal Creative Commons tracks, independent artists, and albums powered by Jamendo.
+              </p>
+            </div>
+            <div className="text-xs font-semibold text-primary flex items-center gap-1 pt-2 border-t border-border/60">
+              <span>Start Exploring</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+
+          {/* Card 2: Your Profile */}
           <Link
             href={`/@${user.username}`}
             className="group p-6 rounded-2xl border border-border bg-card hover:bg-surface-hover hover:border-primary/50 transition-all shadow-xs flex flex-col justify-between space-y-4"
@@ -178,7 +200,7 @@ export default async function HomePage() {
             </div>
           </Link>
 
-          {/* Card 2: Appearance Settings */}
+          {/* Card 3: Appearance Settings */}
           <Link
             href="/settings/appearance"
             className="group p-6 rounded-2xl border border-border bg-card hover:bg-surface-hover hover:border-primary/50 transition-all shadow-xs flex flex-col justify-between space-y-4"
@@ -235,10 +257,10 @@ export default async function HomePage() {
         <div className="p-5 rounded-2xl border border-border bg-surface/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="space-y-1">
             <span className="font-semibold text-foreground block">
-              Music Engine Ready for Milestone 4
+              Music Discovery Active (Milestone 4)
             </span>
             <p className="text-[11px] leading-relaxed">
-              Your authentication and identity foundation is verified. Next milestone: Jamendo API legal streaming integration & music search.
+              Explore tracks, artists, and albums powered by the Jamendo v3.0 API with verified Creative Commons licensing and attribution.
             </p>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card border border-border text-[11px] font-mono shrink-0">

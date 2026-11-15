@@ -63,6 +63,8 @@ describe("Home Page & Application Navigation", () => {
       expect(html).toContain("Your Profile");
       expect(html).toContain('href="/settings/appearance"');
       expect(html).toContain("Appearance Settings");
+      expect(html).toContain('href="/search"');
+      expect(html).toContain("Discover Music");
       expect(html).toContain("Sign Out");
 
       // Standard user must NOT receive the admin invitation card
@@ -127,6 +129,8 @@ describe("Home Page & Application Navigation", () => {
       expect(html).toContain("@elena");
       expect(html).toContain('href="/settings/appearance"');
       expect(html).toContain("Theme");
+      expect(html).toContain('href="/search"');
+      expect(html).toContain("Search");
       expect(html).toContain("Sign Out");
       expect(html).not.toContain('href="/admin/invitations"');
     });
