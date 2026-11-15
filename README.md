@@ -106,6 +106,18 @@ Harmoni implements a hardened, invitation-only authentication backend with stric
 | `POST` | `/api/auth/logout` | Authenticated | Idempotent session revocation in PostgreSQL and cookie clearance. |
 | `POST` | `/api/admin/invites` | Admin Only | Generates 256-bit cryptographically secure single-use invitation codes. Returns code once. Rejects unsupported payloads. |
 | `PATCH` | `/api/users/me/theme` | Authenticated | Updates personal visual theme preference (`obsidian-studio`, `nordic-aurora`, `editorial-vinyl`, `crimson-vigil`, `cobalt-web`). |
+| `PATCH` | `/api/users/me/profile` | Authenticated | Updates personal profile (`avatarKey`, `bio`). Validates against 8 preset avatar keys and 250-character limit. Empty bio normalizes to `null`. |
+
+---
+
+## User Profiles & Avatar Presets (Milestone 3C.2)
+
+Harmoni provides clean public profile pages and customizable profiles without external CDN or storage costs:
+- **Clean Profile Routing:** Accessible via `/@username` (rewritten server-side to `/users/[username]`).
+- **Eight Original SVG Avatar Presets:** Handcrafted vector avatars (`avatar_1` through `avatar_8`) embedded as inline SVGs with zero external fonts or icon CDNs.
+- **Real Database-Backed Profiles:** Displays display name, `@username`, role badge (`USER` / `ADMIN`), membership date, bio, public playlists, and completed listening history.
+- **Self-Service Edit Profile Dialog:** Authenticated account owners can switch avatar presets and edit their bio (up to 250 characters) with real-time character counting.
+- **Strict Privacy Enforcement:** Private playlists are strictly hidden from other users; only public playlists (`isPublic === true`) are shown. Non-owner profiles display read-only listening history without deceptive action buttons.
 
 ---
 

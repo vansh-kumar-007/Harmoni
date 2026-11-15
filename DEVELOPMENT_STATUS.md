@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.1: Multi-Theme Engine & Per-User Theme Preference Persistence** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 3C.2)
+**Milestone 3C.2: User Profiles & Avatar Presets** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
 
 ---
 
@@ -340,17 +340,61 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
   - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
   - Production build passes: `pnpm build` creates all 8 static and dynamic routes.
-- [ ] Awaiting user review and explicit approval before initiating Milestone 3C.2.
+- [x] Awaiting user review and explicit approval before initiating Milestone 3C.2.
+
+### Milestone 3C.2: User Profiles & Avatar Presets (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Preflight & Milestone 3C.1 Regression Correction (`1f939bf`):**
+  - Resolved theme-save interaction race condition in `src/app/settings/appearance/appearance-form.tsx`.
+  - Disabled theme selection cards, keyboard selection, and reset button during in-flight save requests (`status === "saving"`).
+  - Verified with 19 theme and auth tests; committed as `fix(ui): prevent theme changes during save` and pushed to `origin/main`.
+- [x] **Clean Profile URL Rewriting (`next.config.ts`):**
+  - Configured Next.js 16 server-side rewrite mapping `/@:username` to `/users/:username`.
+  - Ensures clean, modern vanity profile routing while keeping code organized under standard Next.js route segments.
+- [x] **Bundled SVG Avatar Presets & Registry (`src/lib/profile/constants.ts` & `src/components/profile/avatar-preset.tsx`):**
+  - Created strongly-typed avatar registry with 8 presets: `avatar_1` (Midnight Resonance), `avatar_2` (Neon Groove), `avatar_3` (Analog Warmth), `avatar_4` (Emerald Drift), `avatar_5` (Sunset Frequency), `avatar_6` (Cyber Pulse), `avatar_7` (Solar Flare), and `avatar_8` (Deep Horizon).
+  - Implemented 100% original inline SVG artwork without external fonts, icons, or CDNs (preserving permanent ₹0 INR cost).
+  - Provided responsive size tiers (`xs`, `sm`, `md`, `lg`, `xl`), halo lighting effects, and accessible `<title>` and `aria-label` elements.
+  - Added robust validation helpers: `isAvatarKey()` and `getValidAvatarKey()`.
+- [x] **Self-Service Edit Profile Dialog (`src/components/profile/edit-profile-dialog.tsx`):**
+  - Accessible modal dialog for authenticated account owners to customize their profile.
+  - Interactive 8-avatar selection grid with visual selection rings and checkmark indicators.
+  - Biography textarea with real-time character counting against a strict 250-character limit (`MAX_BIO_LENGTH`).
+  - Automatically normalizes empty or whitespace-only biographies to `null`.
+  - Full keyboard accessibility with Escape key dismissal, backdrop click closing, and focus traps.
+- [x] **Authenticated Profile Update Endpoint (`PATCH /api/users/me/profile`):**
+  - Protected via `requireUser()` DAL; enforces user authentication.
+  - Enforces strict 64 KiB streaming request-body limit and `application/json` Content-Type via `parseJsonBody()`.
+  - Validates request payload with Zod against valid avatar keys and maximum 250 characters.
+  - Modifies strictly the authenticated user's record (`where: { id: currentUser.id }`).
+  - Returns sanitized `SafeUser` object without exposing password hashes or session tokens; sets `Cache-Control: no-store`.
+- [x] **Real Database-Backed Public Profile (`src/app/users/[username]/page.tsx`):**
+  - Server Component with Next.js 16 awaited `params`.
+  - Normalizes username and executes selective Prisma query preventing any sensitive column leaks.
+  - Renders user display name, `@username`, role badge (`USER` or `ADMIN`), member-since date, avatar preset, and bio.
+  - Dynamic page metadata: title `[displayName] (@[username]) • Harmoni` and custom description.
+  - Strictly distinguishes profile owner from visitors:
+    - Profile owner: renders the `EditProfileDialog` button.
+    - Other users: renders a neutral "Harmoni Member" status badge with zero deceptive/mocked action buttons (no fake add-friend or chat buttons).
+  - Handles non-existent users gracefully via Next.js `notFound()`.
+- [x] **Tabbed Content & Privacy Enforcement (`src/app/users/[username]/profile-tabs.tsx`):**
+  - Accessible WAI-ARIA tabbed interface (`role="tablist"`, `role="tab"`, `role="tabpanel"`) with Overview, Playlists, and History tabs.
+  - Strict privacy enforcement: filters playlists with `isPublic: true` so private playlists are never exposed to others.
+  - Displays completed listening history (`Scrobble` where `isCompleted === true`) with scrobble timestamps and duration formatting.
+  - Polished empty states when users have no public playlists or scrobbles.
+- [x] **Comprehensive Automated Test Coverage:**
+  - Added `tests/profile/constants.test.ts` (8 tests).
+  - Added `tests/profile/route.test.ts` (12 tests).
+  - Added `tests/profile/page.test.ts` (6 tests).
+  - Full Vitest suite passes: **14 test files, 148 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` generates all dynamic routes including `/users/[username]` and `/api/users/me/profile`.
+- [ ] Awaiting user review and explicit approval before initiating Milestone 4.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3C.2: User Profiles & Avatar Presets (Next Pending Milestone)**
-  - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
-  - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 bundled SVG avatar presets (`avatar_1` to `avatar_8`).
-  - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
-  - Display user public playlists and read-only listening history summary (no deceptive action buttons).
-- **Milestone 4: Music Discovery Engine & Jamendo API Integration**
+- **Milestone 4: Music Discovery Engine & Jamendo API Integration (Next Pending Milestone)**
   - Implement server-side Jamendo API client keeping credentials secret.
   - Create track, artist, and album search endpoints with server-side caching.
   - Parse and display verified Creative Commons license badges and artist attribution links.
@@ -375,7 +419,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`), while pure unit tests pass (40 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`). When unsandboxed, all 11 test files and **all 122 tests pass cleanly with 0 errors in ~5.5s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit tests pass (48 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`). When unsandboxed, all 14 test files and **all 148 tests pass cleanly with 0 errors in ~6.2s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
