@@ -39,6 +39,7 @@ export function AudioController() {
             return;
           }
           if (err instanceof Error && err.name === "NotAllowedError") {
+            // Browser blocked autoplay
             setPlaybackState("paused");
             return;
           }
@@ -113,9 +114,15 @@ export function AudioController() {
       onPlaying={() => {
         setPlaybackState("playing");
       }}
-      onPause={() => {
+      onWaiting={() => {
         const currentState = usePlayerStore.getState().playbackState;
         if (currentState === "playing") {
+          setPlaybackState("loading");
+        }
+      }}
+      onPause={() => {
+        const currentState = usePlayerStore.getState().playbackState;
+        if (currentState === "playing" || currentState === "loading") {
           setPlaybackState("paused");
         }
       }}

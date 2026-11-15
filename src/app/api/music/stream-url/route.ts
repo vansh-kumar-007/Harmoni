@@ -34,7 +34,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  if (!/^\d+$/.test(trackIdParam)) {
+  if (!/^[1-9]\d*$/.test(trackIdParam)) {
     return NextResponse.json(
       { success: false, error: "Track ID must be a positive integer" },
       { status: 400, headers: NO_STORE_HEADERS }

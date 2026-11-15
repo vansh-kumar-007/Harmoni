@@ -11,7 +11,7 @@ export function QueueDrawer() {
   const queue = usePlayerStore((s) => s.queue);
   const currentTrack = usePlayerStore((s) => s.currentTrack);
   const playbackState = usePlayerStore((s) => s.playbackState);
-  const playTrack = usePlayerStore((s) => s.playTrack);
+  const playFromQueue = usePlayerStore((s) => s.playFromQueue);
   const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
   const clearQueue = usePlayerStore((s) => s.clearQueue);
 
@@ -190,10 +190,7 @@ export function QueueDrawer() {
 
                       <button
                         type="button"
-                        onClick={() => {
-                          removeFromQueue(idx);
-                          playTrack(track);
-                        }}
+                        onClick={() => playFromQueue(idx)}
                         aria-label={`Play ${track.title} now`}
                         title="Play now"
                         className="p-1 rounded text-muted-foreground hover:text-primary hover:bg-card transition-colors opacity-80 group-hover:opacity-100"

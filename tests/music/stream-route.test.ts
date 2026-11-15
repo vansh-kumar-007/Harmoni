@@ -91,14 +91,32 @@ describe("Protected Stream URL Route (GET /api/music/stream-url)", () => {
       expect(data.error).toContain("positive integer");
     });
 
-    it("returns 400 Bad Request when trackId is negative", async () => {
-      const request = new Request("http://localhost:3000/api/music/stream-url?trackId=-12345");
+    it("returns 400 Bad Request when trackId is zero", async () => {
+      const request = new Request("http://localhost:3000/api/music/stream-url?trackId=0");
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
       expect(data.success).toBe(false);
       expect(data.error).toContain("positive integer");
+    });
+
+    it("returns 400 Bad Request when trackId is negative or decimal", async () => {
+      const requestNeg = new Request("http://localhost:3000/api/music/stream-url?trackId=-12345");
+      const responseNeg = await GET(requestNeg);
+      const dataNeg = await responseNeg.json();
+
+      expect(responseNeg.status).toBe(400);
+      expect(dataNeg.success).toBe(false);
+      expect(dataNeg.error).toContain("positive integer");
+
+      const requestDec = new Request("http://localhost:3000/api/music/stream-url?trackId=12.34");
+      const responseDec = await GET(requestDec);
+      const dataDec = await responseDec.json();
+
+      expect(responseDec.status).toBe(400);
+      expect(dataDec.success).toBe(false);
+      expect(dataDec.error).toContain("positive integer");
     });
   });
 

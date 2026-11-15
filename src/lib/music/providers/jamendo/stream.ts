@@ -13,7 +13,14 @@ export interface ResolvedTrackStream {
 
 /**
  * Validates that an audio stream URL uses HTTPS and belongs strictly
- * to a verified Jamendo CDN domain or subdomain.
+ * to Jamendo's legitimate audio storage infrastructure: storage.jamendo.com
+ * or its verified storage subdomains (e.g. prod-1.storage.jamendo.com).
+ * 
+ * Explicitly rejects:
+ * - Arbitrary *.jamendo.com hosts (e.g. api, www, usercontent image CDN)
+ * - Download-oriented hosts (e.g. mp3d.jamendo.com, mp3l.jamendo.com)
+ * - Licensing hosts (e.g. *.jamendo-licensing.com)
+ * - Plain HTTP, embedded credentials, non-standard ports, IP addresses, spoofed domains
  */
 export function isValidJamendoStreamUrl(urlStr: string): boolean {
   if (!urlStr || typeof urlStr !== "string") return false;
@@ -24,19 +31,17 @@ export function isValidJamendoStreamUrl(urlStr: string): boolean {
     if (parsed.port && parsed.port !== "443") return false;
 
     const hostname = parsed.hostname.toLowerCase();
-    // Validate hostname characters
+    // Validate strict hostname characters (alphanumeric, hyphen, dot)
     if (!/^[a-z0-9.-]+$/.test(hostname)) return false;
     if (hostname.includes("..") || hostname.startsWith(".") || hostname.endsWith(".")) {
       return false;
     }
 
-    const isJamendoDomain =
-      hostname === "jamendo.com" ||
-      hostname.endsWith(".jamendo.com") ||
-      hostname === "jamendo-licensing.com" ||
-      hostname.endsWith(".jamendo-licensing.com");
+    // Must strictly be storage.jamendo.com or [subdomain].storage.jamendo.com
+    // e.g. "storage.jamendo.com", "prod-1.storage.jamendo.com", "prod-2.storage.jamendo.com"
+    const isLegitimateStorageHost = /^(?:[a-z0-9-]+\.)*storage\.jamendo\.com$/.test(hostname);
 
-    return isJamendoDomain;
+    return isLegitimateStorageHost;
   } catch {
     return false;
   }
@@ -46,17 +51,21 @@ export function isValidJamendoStreamUrl(urlStr: string): boolean {
  * Resolves a playable audio stream for a track from Jamendo.
  * 
  * Enforces:
- * - Specific track query with audioformat=mp32 and include=licenses
- * - Verified Creative Commons license requirement (refuses playback if unverified)
+ * - Strictly positive integer track ID format (/^[1-9]\d*$/), avoiding unsafe JS number conversions
+ * - Specific track query with audioformat=mp32, type="single albumtrack", and include=licenses
+ * - Upstream response verification: exactly 1 result with matching track ID
+ * - Verified Creative Commons license requirement (refuses playback if unverified with HTTP 403)
  * - Exclusive extraction of the `audio` field (never audiodownload)
- * - HTTPS and trusted Jamendo CDN host validation
+ * - Strict HTTPS and storage.jamendo.com CDN host validation
  * - Normalized track metadata with all secrets protected
  */
 export async function resolveJamendoTrackStream(
   trackId: string
 ): Promise<ResolvedTrackStream> {
   const trimmedId = trackId ? String(trackId).trim() : "";
-  if (!trimmedId || !/^\d+$/.test(trimmedId)) {
+  // Strictly enforce positive decimal integer format (reject 0, negatives, decimals, alphabetic, empty)
+  // Processed purely as a string to preserve precision for arbitrarily large IDs
+  if (!trimmedId || !/^[1-9]\d*$/.test(trimmedId)) {
     throw new JamendoError(
       "Invalid track ID. Track ID must be a positive integer.",
       "API_ERROR",
@@ -83,7 +92,26 @@ export async function resolveJamendoTrackStream(
     );
   }
 
+  // Upstream response must contain exactly 1 result for a single-track ID query
+  if (parsed.results.length !== 1) {
+    throw new JamendoError(
+      `Jamendo API returned ${parsed.results.length} tracks for single-track ID query "${trimmedId}"`,
+      "API_ERROR",
+      502
+    );
+  }
+
   const rawTrack = parsed.results[0];
+
+  // Verify returned track ID exactly matches the requested ID without lossy number conversion
+  if (String(rawTrack.id).trim() !== trimmedId) {
+    throw new JamendoError(
+      `Jamendo API returned track ID "${rawTrack.id}", which does not match requested ID "${trimmedId}"`,
+      "API_ERROR",
+      502
+    );
+  }
+
   const track = mapJamendoTrack(rawTrack);
 
   // Strictly enforce verified Creative Commons license
@@ -95,7 +123,7 @@ export async function resolveJamendoTrackStream(
     );
   }
 
-  // Stream URL validation: strictly from rawTrack.audio
+  // Stream URL validation: strictly extracted from rawTrack.audio (never audiodownload)
   const audioUrl = rawTrack.audio;
   if (!audioUrl || typeof audioUrl !== "string" || !audioUrl.trim()) {
     throw new JamendoError(

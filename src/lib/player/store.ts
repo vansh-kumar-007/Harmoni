@@ -13,6 +13,10 @@ export interface AudioControllerHandle {
   setMuted: (muted: boolean) => void;
 }
 
+export interface PlayTrackOptions {
+  addToHistory?: boolean;
+}
+
 export interface PlayerState {
   // Current playback state
   currentTrack: NormalizedTrack | null;
@@ -37,7 +41,8 @@ export interface PlayerState {
 
   // Actions
   registerAudioHandle: (handle: AudioControllerHandle | null) => void;
-  playTrack: (track: NormalizedTrack) => Promise<void>;
+  playTrack: (track: NormalizedTrack, options?: PlayTrackOptions) => Promise<void>;
+  playFromQueue: (index: number) => Promise<void>;
   playQueue: (tracks: NormalizedTrack[], startIndex?: number) => Promise<void>;
   addToQueue: (track: NormalizedTrack) => void;
   playNextInQueue: (track: NormalizedTrack) => void;
@@ -81,7 +86,7 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
     set({ audioHandle: handle });
   },
 
-  playTrack: async (track: NormalizedTrack) => {
+  playTrack: async (track: NormalizedTrack, options?: PlayTrackOptions) => {
     // 1. Guard against unverified licenses
     if (!track.license.isVerified) {
       set({
@@ -93,10 +98,24 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       return;
     }
 
-    // 2. Increment resolution ID to guard against out-of-order race conditions
+    // 2. Manage chronological playback history
+    // If a previous track was active and is being replaced by a different track,
+    // record it into history (unless explicitly instructed not to, e.g. during backward navigation).
+    const previousTrack = get().currentTrack;
+    const shouldAddToHistory =
+      options?.addToHistory !== false &&
+      previousTrack !== null &&
+      previousTrack.id !== track.id;
+
+    const nextHistory = shouldAddToHistory
+      ? [...get().history, previousTrack]
+      : get().history;
+
+    // 3. Increment resolution ID to guard against out-of-order race conditions
     const currentResolutionId = get().resolutionId + 1;
     set({
       currentTrack: track,
+      history: nextHistory,
       playbackState: "loading",
       errorMessage: null,
       currentTime: 0,
@@ -104,7 +123,7 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       resolutionId: currentResolutionId,
     });
 
-    // 3. Resolve ephemeral stream URL via protected API route
+    // 4. Resolve ephemeral stream URL via protected API route
     try {
       const response = await fetch(`/api/music/stream-url?trackId=${encodeURIComponent(track.id)}`, {
         method: "GET",
@@ -142,9 +161,10 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
         return;
       }
 
+      // Keep playbackState as "loading" until the native HTMLAudioElement confirms playback
+      // via its onPlaying event, preventing prematurely claiming a playing state.
       set({
         streamUrl,
-        playbackState: "playing",
         errorMessage: null,
       });
 
@@ -152,6 +172,13 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       const handle = get().audioHandle;
       if (handle) {
         await handle.loadAndPlay(streamUrl);
+        // Verify again after async loadAndPlay in case another request intervened
+        if (get().resolutionId !== currentResolutionId) {
+          return;
+        }
+      } else {
+        // Fallback for headless testing environments without an active AudioController
+        set({ playbackState: "playing" });
       }
     } catch (err: unknown) {
       if (get().resolutionId !== currentResolutionId) {
@@ -166,6 +193,15 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
         streamUrl: null,
       });
     }
+  },
+
+  playFromQueue: async (index: number) => {
+    const { queue } = get();
+    if (index < 0 || index >= queue.length) return;
+    const targetTrack = queue[index];
+    const nextQueue = queue.filter((_, i) => i !== index);
+    set({ queue: nextQueue });
+    await get().playTrack(targetTrack);
   },
 
   playQueue: async (tracks: NormalizedTrack[], startIndex = 0) => {
@@ -209,16 +245,13 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
   },
 
   nextTrack: async () => {
-    const { queue, currentTrack, history } = get();
+    const { queue } = get();
     if (queue.length > 0) {
       const next = queue[0];
       const remainingQueue = queue.slice(1);
-      const nextHistory = currentTrack ? [...history, currentTrack] : history;
 
-      set({
-        queue: remainingQueue,
-        history: nextHistory,
-      });
+      set({ queue: remainingQueue });
+      // playTrack will automatically record currentTrack into history exactly once
       await get().playTrack(next);
     } else {
       const handle = get().audioHandle;
@@ -235,6 +268,7 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
   previousTrack: async () => {
     const { currentTime, history, currentTrack, queue, audioHandle } = get();
 
+    // If more than 3 seconds played, restart the current track without modifying history or queue
     if (currentTime > 3) {
       if (audioHandle) {
         audioHandle.seek(0);
@@ -243,17 +277,21 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       return;
     }
 
+    // Otherwise navigate to previous track from history if available
     if (history.length > 0) {
       const prevTrack = history[history.length - 1];
       const nextHistory = history.slice(0, -1);
+      // Put the current track back at the front of the upcoming queue
       const nextQueue = currentTrack ? [currentTrack, ...queue] : queue;
 
       set({
         history: nextHistory,
         queue: nextQueue,
       });
-      await get().playTrack(prevTrack);
+      // Do NOT re-add currentTrack to history since it was just pushed to queue
+      await get().playTrack(prevTrack, { addToHistory: false });
     } else {
+      // No prior history, simply restart current track
       if (audioHandle) {
         audioHandle.seek(0);
       }
@@ -271,9 +309,11 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
       set({ playbackState: "paused" });
     } else if (playbackState === "paused") {
       if (audioHandle) {
+        set({ playbackState: "loading" });
         await audioHandle.play();
+      } else if (currentTrack) {
+        await get().playTrack(currentTrack);
       }
-      set({ playbackState: "playing" });
     } else if (playbackState === "error" || !streamUrl) {
       if (currentTrack) {
         await get().playTrack(currentTrack);
@@ -292,8 +332,8 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
   resume: async () => {
     const { audioHandle, currentTrack } = get();
     if (audioHandle) {
+      set({ playbackState: "loading" });
       await audioHandle.play();
-      set({ playbackState: "playing" });
     } else if (currentTrack) {
       await get().playTrack(currentTrack);
     }

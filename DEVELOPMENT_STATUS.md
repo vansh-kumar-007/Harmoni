@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 5: Persistent Audio Player & Queue Controller** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 6)
+**Milestone 5.1: Final Playback Acceptance & Hardening** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 6)
 
 ---
 
@@ -722,6 +722,40 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - Database remains completely clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
+- [x] Milestone 5 approved and verified.
+
+### Milestone 5.1: Final Playback Acceptance & Hardening
+- [x] **Strict Jamendo Audio Stream Host Validation:**
+  - Hardened `isValidJamendoStreamUrl`: strictly restricted audio hostnames to `/^(?:[a-z0-9-]+\.)*storage\.jamendo\.com$/` (`storage.jamendo.com` and its verified storage subdomains such as `prod-1.storage.jamendo.com`, `prod-2.storage.jamendo.com`).
+  - Explicitly rejects arbitrary `*.jamendo.com` subdomains (e.g. `api.jamendo.com`, `www.jamendo.com`, `jamendo.com`), image CDNs (`usercontent.jamendo.com`), download-oriented endpoints (`mp3d.jamendo.com`, `mp3l.jamendo.com`), licensing domains (`jamendo-licensing.com`), plain HTTP, credentials, non-standard ports, IP addresses, and spoofed hostnames.
+  - Preserved exclusive stream URL extraction from Jamendo's `audio` field, strictly ignoring `audiodownload`.
+- [x] **Strict Track ID & Upstream Response Validation:**
+  - Updated `resolveJamendoTrackStream` and `GET /api/music/stream-url` to enforce strictly positive integer track IDs via `/^[1-9]\d*$/`. Rejects `0`, negative, decimal, non-numeric, and empty track IDs with HTTP 400.
+  - Handled track IDs purely as strings without lossy number conversions (protecting arbitrarily large integer IDs).
+  - Validated upstream response structure: requires exactly 1 track result, verifies that returned track ID exactly matches requested ID, rejects mismatched IDs with HTTP 502, and enforces verified Creative Commons licenses with HTTP 403.
+  - Preserved DAL authentication guard (HTTP 401 on unauthenticated requests) and `Cache-Control: no-store, no-cache, must-revalidate, private` headers.
+- [x] **Playback History & Queue Behaviour Hardening (Scenarios 1–6):**
+  - **Scenario 1 & 2:** When starting Track A and directly selecting Track B from search, Track A is recorded into history. Pressing Previous restores Track A, while Track B is placed back into the queue.
+  - **Scenario 3 & 4:** When starting Track A, queuing Tracks B and C, and selecting Play Now on Track C (`playFromQueue(1)`), Track A is moved to history, Track C becomes current, and remaining queue is `[Track B]`. Subsequent Next plays Track B; Previous from Track C restores Track A.
+  - **Scenario 5:** Repeated Next calls across a queue record each played track into history exactly once; upon queue exhaustion, playback cleanly pauses without duplicating entries into history.
+  - **Scenario 6:** Repeated Previous calls pop history sequentially and prepend tracks to the queue. When history is exhausted or elapsed time $> 3$s, seeks to 0 without corrupting state or accumulating duplicate entries.
+- [x] **Playback State Realism:**
+  - Preserves `playbackState: "loading"` during stream resolution and until the browser's native `<audio>` confirms playback through its `onPlaying` event.
+  - Handles browser autoplay blocks (`NotAllowedError`) and pauses gracefully without claiming a false playing state.
+  - Discards outdated asynchronous track resolutions via generation ID (`resolutionId`) before and after loading.
+  - Synchronizes buffering via `onWaiting` and pause via `onPause` in `AudioController`.
+- [x] **Real Playback Acceptance Check:**
+  - Inspected local environment for `JAMENDO_CLIENT_ID`: not configured locally (`isConfigured: false`).
+  - Correctly and truthfully marked real Jamendo live playback as **NOT VERIFIED — credentials unavailable**, without fabricating demo credentials or bypassing authentication.
+- [x] **Comprehensive Testing & Verification:**
+  - Expanded test suites in `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, and `tests/player/player-ui.test.ts`.
+  - Full Vitest suite passes: **29 test files, 360 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds with 16 optimized routes.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains completely clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 6.
 
 ---
@@ -755,7 +789,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (232 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`, `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, `tests/player/player-ui.test.ts`). When unsandboxed, all 29 test files and **all 351 tests pass cleanly with 0 errors in ~10s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (241 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`, `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, `tests/player/player-ui.test.ts`). When unsandboxed, all 29 test files and **all 360 tests pass cleanly with 0 errors in ~10s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.

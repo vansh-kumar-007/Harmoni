@@ -53,6 +53,30 @@ describe("Player Store (Zustand In-Memory Store)", () => {
     },
   };
 
+  const sampleVerifiedTrack3: NormalizedTrack = {
+    id: "103",
+    provider: "JAMENDO",
+    title: "Track Three",
+    artistId: "3",
+    artistName: "Artist Three",
+    albumId: "30",
+    albumTitle: "Album Three",
+    durationSeconds: 210,
+    durationFormatted: "3:30",
+    coverUrl: null,
+    jamendoUrl: "https://www.jamendo.com/track/103",
+    license: {
+      code: "CC BY-NC 4.0",
+      name: "Creative Commons Attribution-NonCommercial 4.0",
+      url: "https://creativecommons.org/licenses/by-nc/4.0/",
+      isCreativeCommons: true,
+      isVerified: true,
+      nonCommercial: true,
+      shareAlike: false,
+      noDerivatives: false,
+    },
+  };
+
   const sampleUnverifiedTrack: NormalizedTrack = {
     id: "999",
     provider: "JAMENDO",
@@ -82,9 +106,15 @@ describe("Player Store (Zustand In-Memory Store)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAudioHandle = {
-      loadAndPlay: vi.fn().mockResolvedValue(undefined),
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn(),
+      loadAndPlay: vi.fn().mockImplementation(async () => {
+        usePlayerStore.getState().setPlaybackState("playing");
+      }),
+      play: vi.fn().mockImplementation(async () => {
+        usePlayerStore.getState().setPlaybackState("playing");
+      }),
+      pause: vi.fn().mockImplementation(() => {
+        usePlayerStore.getState().setPlaybackState("paused");
+      }),
       seek: vi.fn(),
       setVolume: vi.fn(),
       setMuted: vi.fn(),
@@ -141,6 +171,59 @@ describe("Player Store (Zustand In-Memory Store)", () => {
       expect(state.streamUrl).toBeNull();
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockAudioHandle.loadAndPlay).not.toHaveBeenCalled();
+    });
+
+    it("keeps state as loading until the audio controller confirms playback", async () => {
+      let resolveFetch: (value: unknown) => void;
+      const fetchPromise = new Promise((resolve) => {
+        resolveFetch = resolve;
+      });
+
+      global.fetch = vi.fn().mockImplementation(() => fetchPromise);
+
+      // Custom mock handle that does NOT immediately set playing
+      const pendingHandle: AudioControllerHandle = {
+        loadAndPlay: vi.fn().mockReturnValue(new Promise(() => {})), // keeps pending
+        play: vi.fn(),
+        pause: vi.fn(),
+        seek: vi.fn(),
+        setVolume: vi.fn(),
+        setMuted: vi.fn(),
+      };
+      usePlayerStore.setState({ audioHandle: pendingHandle });
+
+      void usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+
+      // While fetch is in progress, state must be loading
+      expect(usePlayerStore.getState().playbackState).toBe("loading");
+
+      // Resolve fetch response
+      resolveFetch!({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            streamUrl: "https://prod-1.storage.jamendo.com/?trackid=101&format=mp32",
+            format: "mp3",
+            bitrate: 128,
+          },
+        }),
+      });
+
+      // Allow microtasks to run
+      await Promise.resolve();
+      await Promise.resolve();
+
+      // State remains loading until native audio element fires playing
+      expect(usePlayerStore.getState().playbackState).toBe("loading");
+      expect(usePlayerStore.getState().streamUrl).toBe(
+        "https://prod-1.storage.jamendo.com/?trackid=101&format=mp32"
+      );
+
+      // Native audio fires onPlaying
+      usePlayerStore.getState().setPlaybackState("playing");
+      expect(usePlayerStore.getState().playbackState).toBe("playing");
     });
 
     it("successfully fetches stream URL and starts playback for verified track", async () => {
@@ -239,6 +322,169 @@ describe("Player Store (Zustand In-Memory Store)", () => {
     });
   });
 
+  describe("Playback History & Queue Behaviour (Scenarios 1-6)", () => {
+    beforeEach(() => {
+      global.fetch = vi.fn().mockImplementation((url: string) => {
+        const parsedUrl = new URL(url, "http://localhost:3000");
+        const trackId = parsedUrl.searchParams.get("trackId");
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            success: true,
+            data: {
+              streamUrl: `https://prod-1.storage.jamendo.com/?trackid=${trackId}&format=mp32`,
+              format: "mp3",
+              bitrate: 128,
+            },
+          }),
+        });
+      });
+    });
+
+    it("Scenario 1 & 2: Start Track A, directly select Track B from search, then press Previous to restore Track A", async () => {
+      // 1. Start Track A
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+      expect(usePlayerStore.getState().history).toEqual([]);
+
+      // Directly select Track B from search
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack2);
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("102");
+      // Track A must be recorded into history
+      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
+
+      // 2. Press Previous: Track A must be restored, Track B moves to queue
+      await usePlayerStore.getState().previousTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+      expect(usePlayerStore.getState().history).toEqual([]);
+      expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack2]);
+    });
+
+    it("Scenario 3 & 4: Start Track A, queue B and C, then use Play Now on C; verify remaining queue and history", async () => {
+      // Start Track A
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+
+      // Queue Tracks B and C
+      usePlayerStore.getState().addToQueue(sampleVerifiedTrack2);
+      usePlayerStore.getState().addToQueue(sampleVerifiedTrack3);
+
+      expect(usePlayerStore.getState().queue).toEqual([
+        sampleVerifiedTrack2,
+        sampleVerifiedTrack3,
+      ]);
+
+      // Use Play Now on Track C (index 1 in queue)
+      await usePlayerStore.getState().playFromQueue(1);
+
+      // Track C is now playing
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("103");
+      // Track A moved to history
+      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
+      // Remaining queue contains Track B
+      expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack2]);
+
+      // Next advances to Track B
+      await usePlayerStore.getState().nextTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("102");
+      // Track C was added to history
+      expect(usePlayerStore.getState().history).toEqual([
+        sampleVerifiedTrack1,
+        sampleVerifiedTrack3,
+      ]);
+      expect(usePlayerStore.getState().queue).toEqual([]);
+    });
+
+    it("Scenario 5: Use Next repeatedly across queue and verify current track is added to history exactly once", async () => {
+      // Start Track A, queue B and C
+      await usePlayerStore.getState().playTrack(sampleVerifiedTrack1);
+      usePlayerStore.getState().addToQueue(sampleVerifiedTrack2);
+      usePlayerStore.getState().addToQueue(sampleVerifiedTrack3);
+
+      expect(usePlayerStore.getState().history).toEqual([]);
+
+      // 1. Next: advances to Track B
+      await usePlayerStore.getState().nextTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("102");
+      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
+
+      // 2. Next: advances to Track C
+      await usePlayerStore.getState().nextTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("103");
+      expect(usePlayerStore.getState().history).toEqual([
+        sampleVerifiedTrack1,
+        sampleVerifiedTrack2,
+      ]);
+
+      // 3. Next: queue exhausted -> pauses, resets time, history unchanged
+      await usePlayerStore.getState().nextTrack();
+      expect(usePlayerStore.getState().playbackState).toBe("paused");
+      expect(usePlayerStore.getState().currentTime).toBe(0);
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("103");
+      // Current track was not duplicated into history upon queue exhaustion
+      expect(usePlayerStore.getState().history).toEqual([
+        sampleVerifiedTrack1,
+        sampleVerifiedTrack2,
+      ]);
+    });
+
+    it("Scenario 6: Use Previous repeatedly and ensure history and queue do not accumulate duplicate entries", async () => {
+      // Setup state: History has [Track 1, Track 2], Current is Track 3, Queue is []
+      usePlayerStore.setState({
+        history: [sampleVerifiedTrack1, sampleVerifiedTrack2],
+        currentTrack: sampleVerifiedTrack3,
+        queue: [],
+        currentTime: 0,
+      });
+
+      // 1. Previous: plays Track 2, puts Track 3 in queue
+      await usePlayerStore.getState().previousTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("102");
+      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
+      expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack3]);
+
+      // 2. Previous: plays Track 1, puts Track 2 at front of queue
+      await usePlayerStore.getState().previousTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+      expect(usePlayerStore.getState().history).toEqual([]);
+      expect(usePlayerStore.getState().queue).toEqual([
+        sampleVerifiedTrack2,
+        sampleVerifiedTrack3,
+      ]);
+
+      // 3. Previous when history is empty: seeks to 0, does NOT modify queue or history
+      await usePlayerStore.getState().previousTrack();
+      expect(usePlayerStore.getState().currentTrack?.id).toBe("101");
+      expect(usePlayerStore.getState().history).toEqual([]);
+      expect(usePlayerStore.getState().queue).toEqual([
+        sampleVerifiedTrack2,
+        sampleVerifiedTrack3,
+      ]);
+
+      // 4. Repeated Previous when history is empty continues seeking to 0 safely
+      await usePlayerStore.getState().previousTrack();
+      expect(usePlayerStore.getState().history).toEqual([]);
+      expect(usePlayerStore.getState().queue).toHaveLength(2);
+    });
+
+    it("previousTrack restarts track if played for more than 3 seconds without altering queue or history", async () => {
+      usePlayerStore.setState({
+        currentTrack: sampleVerifiedTrack2,
+        currentTime: 10,
+        history: [sampleVerifiedTrack1],
+        queue: [sampleVerifiedTrack3],
+      });
+
+      await usePlayerStore.getState().previousTrack();
+
+      expect(mockAudioHandle.seek).toHaveBeenCalledWith(0);
+      expect(usePlayerStore.getState().currentTime).toBe(0);
+      // History and queue must remain unchanged
+      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
+      expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack3]);
+    });
+  });
+
   describe("Queue Operations", () => {
     it("addToQueue plays immediately if no track is currently playing", () => {
       const playTrackSpy = vi.spyOn(usePlayerStore.getState(), "playTrack");
@@ -296,70 +542,6 @@ describe("Player Store (Zustand In-Memory Store)", () => {
       await usePlayerStore.getState().playQueue([sampleVerifiedTrack1, sampleVerifiedTrack2], 0);
 
       expect(playTrackSpy).toHaveBeenCalledWith(sampleVerifiedTrack1);
-      expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack2]);
-    });
-  });
-
-  describe("Navigation (nextTrack / previousTrack)", () => {
-    it("nextTrack advances to next item and archives current track into history", async () => {
-      const playTrackSpy = vi.spyOn(usePlayerStore.getState(), "playTrack").mockResolvedValue();
-
-      usePlayerStore.setState({
-        currentTrack: sampleVerifiedTrack1,
-        queue: [sampleVerifiedTrack2],
-        history: [],
-      });
-
-      await usePlayerStore.getState().nextTrack();
-
-      expect(playTrackSpy).toHaveBeenCalledWith(sampleVerifiedTrack2);
-      expect(usePlayerStore.getState().queue).toEqual([]);
-      expect(usePlayerStore.getState().history).toEqual([sampleVerifiedTrack1]);
-    });
-
-    it("nextTrack pauses and resets when queue is empty", async () => {
-      usePlayerStore.setState({
-        currentTrack: sampleVerifiedTrack1,
-        queue: [],
-        playbackState: "playing",
-      });
-
-      await usePlayerStore.getState().nextTrack();
-
-      expect(mockAudioHandle.pause).toHaveBeenCalled();
-      expect(usePlayerStore.getState().playbackState).toBe("paused");
-      expect(usePlayerStore.getState().currentTime).toBe(0);
-    });
-
-    it("previousTrack restarts track if played for more than 3 seconds", async () => {
-      usePlayerStore.setState({
-        currentTrack: sampleVerifiedTrack1,
-        currentTime: 10,
-        history: [sampleVerifiedTrack2],
-      });
-
-      await usePlayerStore.getState().previousTrack();
-
-      expect(mockAudioHandle.seek).toHaveBeenCalledWith(0);
-      expect(usePlayerStore.getState().currentTime).toBe(0);
-      // History should NOT have been popped
-      expect(usePlayerStore.getState().history).toHaveLength(1);
-    });
-
-    it("previousTrack plays previous track from history if played for <= 3 seconds", async () => {
-      const playTrackSpy = vi.spyOn(usePlayerStore.getState(), "playTrack").mockResolvedValue();
-
-      usePlayerStore.setState({
-        currentTrack: sampleVerifiedTrack2,
-        currentTime: 2,
-        history: [sampleVerifiedTrack1],
-        queue: [],
-      });
-
-      await usePlayerStore.getState().previousTrack();
-
-      expect(playTrackSpy).toHaveBeenCalledWith(sampleVerifiedTrack1);
-      expect(usePlayerStore.getState().history).toEqual([]);
       expect(usePlayerStore.getState().queue).toEqual([sampleVerifiedTrack2]);
     });
   });
