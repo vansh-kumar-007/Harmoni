@@ -34,6 +34,9 @@ export function AppearanceForm({ initialThemeKey, username }: AppearanceFormProp
 
   // Handle immediate visual preview when a card is selected
   const handleSelectTheme = (themeKey: ThemeKey) => {
+    if (status === "saving") {
+      return;
+    }
     setPreviewTheme(themeKey);
     if (status === "saved" || status === "error") {
       setStatus("idle");
@@ -43,6 +46,9 @@ export function AppearanceForm({ initialThemeKey, username }: AppearanceFormProp
 
   // Keyboard navigation across radio buttons in the radiogroup
   const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
+    if (status === "saving") {
+      return;
+    }
     let nextIndex = -1;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault();
@@ -106,6 +112,9 @@ export function AppearanceForm({ initialThemeKey, username }: AppearanceFormProp
 
   // Reset to default theme ("obsidian-studio")
   const handleResetToDefault = () => {
+    if (status === "saving") {
+      return;
+    }
     handleSelectTheme("obsidian-studio");
   };
 
@@ -209,9 +218,12 @@ export function AppearanceForm({ initialThemeKey, username }: AppearanceFormProp
               role="radio"
               aria-checked={isSelected}
               tabIndex={isSelected ? 0 : -1}
+              disabled={status === "saving"}
               onClick={() => handleSelectTheme(themeKey)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className={`group relative text-left p-5 rounded-xl border transition-all duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+              className={`group relative text-left p-5 rounded-xl border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+                status === "saving" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+              } ${
                 isSelected
                   ? "border-primary bg-surface shadow-md ring-1 ring-primary/40"
                   : "border-border bg-card hover:bg-surface-hover hover:border-border/80"
