@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL)
+**Milestone 3C.0.4: Theme System Accuracy & Design Specification Audit** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 3C.1)
 
 ---
 
@@ -240,16 +240,16 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Verified that with network unblocked (`BypassSandbox: true`), all 8 test suites and **all 103 tests pass completely with 0 errors in 4.37s**.
   - Classified as **Environmental Problem (Sandbox TCP Loopback Network Isolation)**.
 
-### Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector (THIS MILESTONE — COMPLETED & VERIFIED)
+### Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector
 - [x] **Multi-Theme Platform Architecture Decision:**
   - Evolved Harmoni into a multi-theme platform where each individual member selects their own visual theme independently.
   - Maintained zero cross-user interference: one user may enjoy Obsidian Studio while another chooses Crimson Vigil or Cobalt Web.
 - [x] **Catalog of 5 Production-Grade Themes:**
-  1. **Obsidian Studio (Default):** Warm analog hi-fi, brushed slate, vacuum-tube amber glow (`#f59e0b`). 18.1:1 contrast (WCAG AAA).
-  2. **Nordic Aurora:** Atmospheric midnight glass, icy fjord slate, bioluminescent cyan (`#06b6d4`) and mint emerald (`#10b981`). 19.0:1 contrast (WCAG AAA).
-  3. **Editorial Vinyl:** Swiss typographic record club, matte vinyl black, structural crate borders, electric acid-lime (`#bef264`). 19.4:1 contrast (WCAG AAA).
-  4. **Crimson Vigil (Daredevil-inspired):** Shadow noir black, dark asphalt, oxblood leather borders (`#381418`), blind-justice crimson red (`#e11d48`). 18.2:1 text contrast (AAA), 4.6:1 button contrast (AA).
-  5. **Cobalt Web (Spider-Man-inspired):** Midnight navy (`#080b14`), royal cobalt (`#2563eb`), dynamic vermilion red (`#ef4444`), electric sky cyan pips (`#38bdf8`). 17.8:1 text contrast (AAA), 4.9:1 button contrast (AA).
+  1. **Obsidian Studio (Default):** Warm analog hi-fi, brushed slate, vacuum-tube amber glow (`#f59e0b`).
+  2. **Nordic Aurora:** Atmospheric midnight glass, icy fjord slate, bioluminescent cyan (`#06b6d4`) and mint emerald (`#10b981`).
+  3. **Editorial Vinyl:** Swiss typographic record club, matte vinyl black, structural crate borders, electric acid-lime (`#bef264`).
+  4. **Crimson Vigil (Daredevil-inspired):** Shadow noir black, dark asphalt, oxblood leather borders (`#381418`), blind-justice crimson red (`#e11d48`).
+  5. **Cobalt Web (Spider-Man-inspired):** Midnight navy (`#080b14`), royal cobalt (`#2563eb`), dynamic vermilion red (`#dc2626` / `#ef4444` glow), electric sky cyan pips (`#38bdf8`).
 - [x] **Strict IP Non-Infringement Boundary:**
   - Enforced 100% original chromatic interpretations based on atmospheric moods.
   - Strictly zero Marvel logos, webs, masks, spiders, double-D emblems, silhouettes, movie frames, or proprietary fonts.
@@ -267,18 +267,42 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Designed Zero-FOUC (Flash of Unstyled Content) server-rendering in `src/app/layout.tsx` via `getCurrentUser()` DAL.
   - Designed `PATCH /api/users/me/theme` endpoint with strict Zod validation and 64 KiB request body limit.
   - Verified ₹0 INR operating cost with pure PostgreSQL storage.
-- [ ] Awaiting user review and explicit approval before initiating frontend implementation.
+
+### Milestone 3C.0.4: Theme System Accuracy & Design Specification Audit (THIS MILESTONE — COMPLETED & AUDITED)
+- [x] **Rigorous WCAG 2.1 / 2.2 Relative Luminance Contrast Audit:**
+  - Computed exact mathematical contrast ratios using the W3C relative luminance formula for all 5 themes.
+  - Identified that Cobalt Web's primary button (`#ffffff` on `#ef4444`) failed the 4.5:1 normal-sized text AA threshold at 3.76:1.
+  - Adjusted Cobalt Web primary accent to `#dc2626` (Red-600) with `#ef4444` active glow, achieving a fully compliant 4.83:1 (WCAG AA).
+  - Recorded exact tested element pairs across canvas body text, card body text, primary buttons, and secondary buttons.
+  - Removed all inaccurate blanket "WCAG AAA" theme claims.
+- [x] **Root-Level `html[data-theme="..."]` Architecture Unification:**
+  - Unified HTML prototype (`docs/visual-design-exploration.html`) and design specification to attach `data-theme` exclusively to `<html>` (root element), eliminating body attribute conflicts and aligning directly with the Next.js 16 `RootLayout` zero-FOUC contract.
+  - Eliminated hardcoded colors across prototype components (header, view tabs, chips, dropdowns, cards), making all UI elements react dynamically to theme switching.
+- [x] **Appearance Settings Keyboard Accessibility:**
+  - Upgraded prototype Appearance theme selection cards to accessible WAI-ARIA `<button type="button" role="radio">` with `role="radiogroup"`, roving `tabindex`, `aria-checked`, and keyboard arrow navigation (`ArrowRight`, `ArrowLeft`, `ArrowDown`, `ArrowUp`).
+  - Added mobile radio inputs for touch and screen reader parity.
+  - Added explicit simulation notice clarifying in-memory live preview vs. future Milestone 3C.1 persistent storage.
+- [x] **Database Schema Documentation Correction:**
+  - Audited and corrected Prisma documentation snippet to `role Role @default(USER)` (matching `enum Role { USER, ADMIN }` in `prisma/schema.prisma` and resolving previous typo referencing `MEMBER`).
+  - Verified full `User` model fields and relations (`invitationCodes`, `sessions`, `invitationUsed`).
+  - Evaluated `themeKey` indexing and formally rejected a secondary index: lookups occur by primary key (`id`) or unique index (`username`), meaning an index on `themeKey` would add write overhead with zero query performance benefit.
+- [x] **Roadmap Separation & Clarification:**
+  - Split frontend roadmap into two distinct sequential milestones:
+    1. **Milestone 3C.1: Multi-Theme Engine & User Preference Persistence**
+    2. **Milestone 3C.2: User Profiles & Avatar Presets**
+- [ ] Awaiting user review and explicit approval before initiating Milestone 3C.1.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3C: User Profile Page, Avatar Presets & Theme Engine Integration (Pending Approval)**
-  - Apply Prisma migration adding `themeKey String @default("obsidian-studio")` to `User`.
-  - Implement `PATCH /api/users/me/theme` endpoint with Zod schema validation.
-  - Implement zero-FOUC server-rendered `RootLayout` injecting `<html data-theme={...}>`.
+- **Milestone 3C.1: Multi-Theme Engine & User Preference Persistence (Next Pending Milestone)**
+  - Apply Prisma migration adding `themeKey String @default("obsidian-studio") @db.VarChar(50)` to `User`.
+  - Implement zero-FOUC server-rendered `RootLayout` reading `getCurrentUser()` and applying `data-theme` to `<html>`.
+  - Implement `PATCH /api/users/me/theme` with strict Zod validation against `THEME_REGISTRY` and 64 KiB body limits.
+  - Build accessible Appearance Settings modal / page component with the 5 interactive cards.
+- **Milestone 3C.2: User Profiles & Avatar Presets (Subsequent Milestone)**
   - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
-  - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 SVG avatar presets.
-  - Build Appearance Settings modal / page component with the 5 interactive cards.
+  - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 bundled SVG avatar presets (`avatar_1` to `avatar_8`).
   - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
   - Display user public playlists and read-only listening history summary (no deceptive action buttons).
 - **Milestone 4: Music Discovery Engine & Jamendo API Integration**

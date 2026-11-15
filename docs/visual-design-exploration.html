@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="obsidian-studio">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,9 @@
        Theme 5: Cobalt Web (Spider-Man-inspired)
        ========================================================================= */
 
-    :root, body, [data-theme="obsidian-studio"] {
+    /* Default Theme Tokens on :root & explicitly on html[data-theme="obsidian-studio"] */
+    :root,
+    html[data-theme="obsidian-studio"] {
       --theme-name: "Obsidian Studio";
       --theme-key: "obsidian-studio";
       --bg-canvas: #0b0c10;
@@ -28,113 +30,119 @@
       --accent-primary: #f59e0b;
       --accent-glow: #fbbf24;
       --accent-secondary: #d97706;
+      --button-primary-text: #0b0c10;
+      --button-secondary-text: #0b0c10;
       --text-primary: #f3f4f6;
       --text-muted: #9ca3af;
       --status-success: #10b981;
-      --badge-bg: rgba(245, 158, 11, 0.15);
-      --badge-border: rgba(245, 158, 11, 0.3);
+      --badge-bg: #1c202c;
+      --badge-border: #252936;
       --badge-text: #f59e0b;
       --player-bg: #0e1017;
       --hero-gradient: linear-gradient(135deg, #181b26 0%, #11131a 100%);
       --hero-glow: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
-      --button-primary-text: #0b0c10;
       --font-display: 'Plus Jakarta Sans', sans-serif;
     }
 
-    [data-theme="nordic-aurora"] {
+    html[data-theme="nordic-aurora"] {
       --theme-name: "Nordic Aurora";
       --theme-key: "nordic-aurora";
-      --bg-canvas: #08090d;
-      --bg-surface: #10131d;
-      --bg-card: #141926;
-      --bg-card-hover: #1c2438;
-      --border-hairline: #222d42;
+      --bg-canvas: #070a12;
+      --bg-surface: #0d131f;
+      --bg-card: #131c2e;
+      --bg-card-hover: #1c273e;
+      --border-hairline: #1e2b45;
       --accent-primary: #06b6d4;
-      --accent-glow: #38bdf8;
+      --accent-glow: #22d3ee;
       --accent-secondary: #10b981;
-      --text-primary: #f8fafc;
-      --text-muted: #8b949e;
+      --button-primary-text: #070a12;
+      --button-secondary-text: #070a12;
+      --text-primary: #f0fdf4;
+      --text-muted: #94a3b8;
       --status-success: #10b981;
-      --badge-bg: rgba(6, 182, 212, 0.15);
-      --badge-border: rgba(6, 182, 212, 0.3);
-      --badge-text: #06b6d4;
-      --player-bg: #0c0e15;
-      --hero-gradient: linear-gradient(135deg, #121829 0%, #0c101c 100%);
+      --badge-bg: #102235;
+      --badge-border: #1e2b45;
+      --badge-text: #22d3ee;
+      --player-bg: #0a0e19;
+      --hero-gradient: linear-gradient(135deg, #121c2e 0%, #0c121f 100%);
       --hero-glow: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
-      --button-primary-text: #08090d;
       --font-display: 'Space Grotesk', sans-serif;
     }
 
-    [data-theme="editorial-vinyl"] {
+    html[data-theme="editorial-vinyl"] {
       --theme-name: "Editorial Vinyl";
       --theme-key: "editorial-vinyl";
-      --bg-canvas: #0d0e11;
-      --bg-surface: #14161d;
-      --bg-card: #191c24;
-      --bg-card-hover: #222632;
-      --border-hairline: #2d313f;
-      --accent-primary: #ccff00;
-      --accent-glow: #d9ff33;
-      --accent-secondary: #3b82f6;
-      --text-primary: #ffffff;
-      --text-muted: #94a3b8;
-      --status-success: #ccff00;
-      --badge-bg: rgba(204, 255, 0, 0.15);
-      --badge-border: rgba(204, 255, 0, 0.3);
-      --badge-text: #ccff00;
-      --player-bg: #101217;
-      --hero-gradient: linear-gradient(135deg, #1b1e28 0%, #13151c 100%);
-      --hero-glow: radial-gradient(circle, rgba(204, 255, 0, 0.12) 0%, transparent 70%);
-      --button-primary-text: #0d0e11;
+      --bg-canvas: #090a0d;
+      --bg-surface: #101217;
+      --bg-card: #161920;
+      --bg-card-hover: #1e222c;
+      --border-hairline: #272b38;
+      --accent-primary: #bef264;
+      --accent-glow: #d9f99d;
+      --accent-secondary: #a3e635;
+      --button-primary-text: #090a0d;
+      --button-secondary-text: #090a0d;
+      --text-primary: #fafafa;
+      --text-muted: #a1a1aa;
+      --status-success: #bef264;
+      --badge-bg: #182218;
+      --badge-border: #272b38;
+      --badge-text: #bef264;
+      --player-bg: #0d0f14;
+      --hero-gradient: linear-gradient(135deg, #181b24 0%, #101219 100%);
+      --hero-glow: radial-gradient(circle, rgba(190, 242, 100, 0.12) 0%, transparent 70%);
       --font-display: 'Syne', sans-serif;
     }
 
-    [data-theme="crimson-vigil"] {
+    html[data-theme="crimson-vigil"] {
       --theme-name: "Crimson Vigil";
       --theme-key: "crimson-vigil";
-      --bg-canvas: #09070a;
-      --bg-surface: #130c11;
-      --bg-card: #1a0f16;
-      --bg-card-hover: #261420;
-      --border-hairline: #331725;
+      --bg-canvas: #08080a;
+      --bg-surface: #101014;
+      --bg-card: #16161c;
+      --bg-card-hover: #201e24;
+      --border-hairline: #381418;
       --accent-primary: #e11d48;
       --accent-glow: #f43f5e;
       --accent-secondary: #be123c;
-      --text-primary: #f1f1f4;
-      --text-muted: #9da1ad;
-      --status-success: #10b981;
-      --badge-bg: rgba(225, 29, 72, 0.15);
-      --badge-border: rgba(225, 29, 72, 0.3);
-      --badge-text: #f43f5e;
-      --player-bg: #0e090d;
-      --hero-gradient: linear-gradient(135deg, #22101b 0%, #12090e 100%);
-      --hero-glow: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
       --button-primary-text: #ffffff;
+      --button-secondary-text: #ffffff;
+      --text-primary: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --status-success: #10b981;
+      --badge-bg: #2b0f14;
+      --badge-border: #381418;
+      --badge-text: #fda4af;
+      --player-bg: #0d0c10;
+      --hero-gradient: linear-gradient(135deg, #241118 0%, #120b0f 100%);
+      --hero-glow: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
       --font-display: 'Plus Jakarta Sans', sans-serif;
     }
 
-    [data-theme="cobalt-web"] {
+    html[data-theme="cobalt-web"] {
       --theme-name: "Cobalt Web";
       --theme-key: "cobalt-web";
-      --bg-canvas: #070b14;
-      --bg-surface: #0c1322;
-      --bg-card: #111a2e;
-      --bg-card-hover: #182542;
-      --border-hairline: #1e2e4f;
-      --accent-primary: #ef4444;
-      --accent-glow: #f87171;
-      --accent-secondary: #2563eb;
-      --text-primary: #f8fafc;
+      --bg-canvas: #080b14;
+      --bg-surface: #0e1424;
+      --bg-card: #141d33;
+      --bg-card-hover: #1c2744;
+      --border-hairline: #202c49;
+      --accent-primary: #dc2626; /* Red-600 vermilion: 4.83:1 contrast with #ffffff text (WCAG AA compliant) */
+      --accent-glow: #ef4444;
+      --accent-secondary: #2563eb; /* Royal blue: 5.17:1 contrast with #ffffff text (WCAG AA compliant) */
+      --accent-pip: #38bdf8;
+      --button-primary-text: #ffffff;
+      --button-secondary-text: #ffffff;
+      --text-primary: #f1f5f9;
       --text-muted: #94a3b8;
       --status-success: #06b6d4;
-      --badge-bg: rgba(239, 68, 68, 0.15);
-      --badge-border: rgba(239, 68, 68, 0.3);
-      --badge-text: #f87171;
-      --player-bg: #090e1b;
-      --hero-gradient: linear-gradient(135deg, #141f38 0%, #0a101f 100%);
+      --badge-bg: #24121e;
+      --badge-border: #202c49;
+      --badge-text: #fca5a5;
+      --player-bg: #0a0f1b;
+      --hero-gradient: linear-gradient(135deg, #15223e 0%, #0b1122 100%);
       --hero-glow: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
-      --button-primary-text: #ffffff;
-      --font-display: 'Inter', sans-serif;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
     }
 
     /* Base Elements */
@@ -158,8 +166,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(11, 12, 16, 0.95);
-      backdrop-filter: blur(12px);
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--border-hairline);
       padding: 12px 24px;
       display: flex;
@@ -167,6 +174,7 @@
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
     }
 
     .brand-group {
@@ -186,46 +194,48 @@
       font-weight: 800;
       font-size: 16px;
       color: var(--button-primary-text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+      font-family: var(--font-display);
+      box-shadow: 0 0 12px var(--accent-glow);
       flex-shrink: 0;
       transition: all 0.25s ease;
     }
 
     .brand-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-display);
       font-weight: 700;
       font-size: 16px;
       letter-spacing: -0.02em;
-      color: #f3f4f6;
+      color: var(--text-primary);
+      transition: color 0.25s ease;
     }
 
     .brand-badge {
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      background: #1c202c;
-      color: var(--accent-primary);
+      background: var(--badge-bg);
+      color: var(--badge-text);
       padding: 3px 8px;
       border-radius: 9999px;
-      border: 1px solid var(--border-hairline);
+      border: 1px solid var(--badge-border);
       white-space: nowrap;
-      transition: color 0.25s ease;
+      transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
     }
 
     .view-tabs {
       display: flex;
-      background: #11131a;
-      border: 1px solid #252936;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
       border-radius: 8px;
       padding: 3px;
       gap: 2px;
       overflow-x: auto;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
     }
 
     .view-btn {
       background: transparent;
       border: none;
-      color: #9ca3af;
+      color: var(--text-muted);
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
@@ -237,7 +247,8 @@
     }
 
     .view-btn:hover {
-      color: #f3f4f6;
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
     }
 
     .view-btn:focus-visible {
@@ -246,9 +257,9 @@
     }
 
     .view-btn.active {
-      background: #252937;
-      color: var(--accent-primary);
-      font-weight: 600;
+      background: var(--accent-primary);
+      color: var(--button-primary-text);
+      font-weight: 700;
     }
 
     /* Active Theme Quick Selector in Header */
@@ -258,12 +269,12 @@
       gap: 8px;
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .theme-select-dropdown {
-      background: #14161f;
-      color: var(--accent-primary);
+      background: var(--bg-card);
+      color: var(--text-primary);
       border: 1px solid var(--border-hairline);
       padding: 4px 8px;
       border-radius: 6px;
@@ -277,6 +288,7 @@
 
     .theme-select-dropdown:focus {
       border-color: var(--accent-primary);
+      outline: 2px solid var(--accent-primary);
     }
 
     /* Container */
@@ -354,13 +366,13 @@
 
     .direction-card-5 {
       border-radius: 14px;
-      border: 1px solid #252936;
+      border: 1px solid var(--border-hairline);
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      background: #14161f;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      background: var(--bg-card);
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
     }
 
     .direction-card-5:hover {
@@ -384,12 +396,12 @@
     .dir-title-text {
       font-size: 17px;
       font-weight: 700;
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .dir-desc-text {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted);
       line-height: 1.45;
       min-height: 52px;
     }
@@ -414,9 +426,9 @@
     }
 
     .btn-apply-theme-chip {
-      background: #1c202c;
-      color: #f3f4f6;
-      border: 1px solid #252936;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-hairline);
       padding: 7px 12px;
       border-radius: 6px;
       font-size: 11px;
@@ -426,6 +438,20 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-apply-theme-chip:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .btn-apply-theme-chip:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 1px;
+    }
       transition: all 0.15s ease;
       font-family: inherit;
     }
@@ -1290,11 +1316,20 @@
       cursor: pointer;
       position: relative;
       transition: all 0.2s ease;
+      text-align: left;
+      font-family: inherit;
+      width: 100%;
+      outline: none;
     }
 
     .theme-option-card:hover {
       border-color: var(--accent-primary);
       transform: translateY(-2px);
+    }
+
+    .theme-option-card:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 3px;
     }
 
     .theme-option-card.selected {
@@ -1317,12 +1352,12 @@
     .theme-title {
       font-size: 16px;
       font-weight: 700;
-      color: #f3f4f6;
+      color: var(--text-primary);
     }
 
     .theme-tagline {
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -1330,7 +1365,7 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      border: 2px solid #374151;
+      border: 2px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1368,14 +1403,14 @@
 
     .theme-description-text {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted);
       line-height: 1.45;
     }
 
     .theme-contrast-badge {
-      font-size: 10px;
+      font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #10b981;
+      color: var(--status-success);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -1428,7 +1463,7 @@
     }
   </style>
 </head>
-<body data-theme="obsidian-studio">
+<body>
 
   <!-- Top Sticky Navigation Bar -->
   <header class="prototype-header">
@@ -1436,7 +1471,7 @@
       <div class="brand-logo" aria-hidden="true">H</div>
       <div>
         <div class="brand-title">Harmoni Multi-Theme System</div>
-        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.3 Architecture Exploration</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Milestone 3C.0.4 Architecture Exploration</div>
       </div>
       <span class="brand-badge">FIVE THEMES AVAILABLE</span>
     </div>
@@ -1470,8 +1505,8 @@
     <div class="prototype-notice-banner" role="region" aria-label="Prototype Scope and Limitations">
       <div class="notice-badge">// MULTI-THEME PLATFORM ARCHITECTURE SPECIFICATION</div>
       <div class="notice-content">
-        <p><strong>Interactive Multi-Theme Architecture:</strong> Harmoni has evolved into a multi-theme music platform. Every signed-in user chooses their preferred theme independently. Use the <strong>Theme Selector</strong> in the header or in View 2 to switch between all five themes in real-time. Notice how the sidebar, hero cards, vinyl artwork, track listings, and docked music player immediately transform their surfaces, accents, and contrast.</p>
-        <p><strong>Prototype State vs. Production Storage:</strong> In this HTML exploration, theme selection is held dynamically in client-side memory. In production, every user's selection will be securely persisted to PostgreSQL on the <code>User.themeKey</code> column and server-rendered onto <code>&lt;html data-theme="..."&gt;</code> in Next.js 16 to completely eliminate any theme flash (FOUC).</p>
+        <p><strong>Interactive Multi-Theme Architecture:</strong> Harmoni is a multi-theme music platform. Every signed-in user chooses their preferred theme independently. Use the <strong>Theme Selector</strong> in the header or in View 2 to switch between all five themes in real-time. Notice how the sidebar, hero cards, vinyl artwork, track listings, and docked music player immediately transform their surfaces, accents, and contrast.</p>
+        <p><strong>Root-Level &lt;html data-theme="..."&gt; Architecture:</strong> Themes are applied directly on the root <code>&lt;html&gt;</code> element to mirror the production contract where Next.js 16 server-renders the user's preference with zero flash of unstyled theme (zero-FOUC).</p>
       </div>
       <div class="notice-meta">
         <span>Figma Shell: <a href="https://www.figma.com/design/tde7tKDtxqTwhqJQko989H" target="_blank" rel="noreferrer" style="color: var(--accent-primary); text-decoration: underline;">tde7tKDtxqTwhqJQko989H</a> (Verified Empty Document Shell)</span>
@@ -1491,17 +1526,17 @@
         <!-- Theme 1: Obsidian Studio -->
         <div class="direction-card-5">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="dir-badge-chip" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">&starf; DEFAULT THEME</span>
-            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 18:1</span>
+            <span class="dir-badge-chip" style="background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--badge-border);">&starf; DEFAULT THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--status-success);">Text 17.8:1 (AAA) &middot; Button 9.1:1 (AAA)</span>
           </div>
-          <h3 class="dir-title-text" style="font-family: 'Plus Jakarta Sans', sans-serif;">1. Obsidian Studio</h3>
+          <h3 class="dir-title-text" style="font-family: var(--font-display);">1. Obsidian Studio</h3>
           <p class="dir-desc-text">Warm analog audio preamps, brushed slate listening desks, and the amber tube glow of a cozy late-night listening session.</p>
           
           <div class="palette-swatches-row">
             <div class="swatch-chip" style="background: #0b0c10;">#0b0c10</div>
             <div class="swatch-chip" style="background: #14161f;">#14161f</div>
             <div class="swatch-chip" style="background: #f59e0b; color: #000;">#f59e0b</div>
-            <div class="swatch-chip" style="background: #d97706;">#d97706</div>
+            <div class="swatch-chip" style="background: #d97706; color: #000;">#d97706</div>
           </div>
 
           <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('obsidian-studio')">
@@ -1513,14 +1548,14 @@
         <div class="direction-card-5">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span class="dir-badge-chip" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">AURORA GLASS</span>
-            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 19:1</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--status-success);">Text 18.9:1 (AAA) &middot; Button 8.2:1 (AAA)</span>
           </div>
           <h3 class="dir-title-text" style="font-family: 'Space Grotesk', sans-serif;">2. Nordic Aurora</h3>
           <p class="dir-desc-text">Scandinavian atmospheric minimalism, midnight dark canvas, and bioluminescent aurora cyan and emerald accents.</p>
           
           <div class="palette-swatches-row">
-            <div class="swatch-chip" style="background: #08090d;">#08090d</div>
-            <div class="swatch-chip" style="background: #10131d;">#10131d</div>
+            <div class="swatch-chip" style="background: #070a12;">#070a12</div>
+            <div class="swatch-chip" style="background: #131c2e;">#131c2e</div>
             <div class="swatch-chip" style="background: #06b6d4; color: #000;">#06b6d4</div>
             <div class="swatch-chip" style="background: #10b981; color: #000;">#10b981</div>
           </div>
@@ -1533,17 +1568,17 @@
         <!-- Theme 3: Editorial Vinyl -->
         <div class="direction-card-5">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="dir-badge-chip" style="background: rgba(204, 255, 0, 0.15); color: #ccff00; border: 1px solid rgba(204, 255, 0, 0.3);">SWISS CATALOG</span>
-            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AAA 19:1</span>
+            <span class="dir-badge-chip" style="background: rgba(190, 242, 100, 0.15); color: #bef264; border: 1px solid rgba(190, 242, 100, 0.3);">SWISS CATALOG</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--status-success);">Text 19.0:1 (AAA) &middot; Button 15.2:1 (AAA)</span>
           </div>
           <h3 class="dir-title-text" style="font-family: 'Syne', sans-serif;">3. Editorial Vinyl</h3>
           <p class="dir-desc-text">Swiss typography, independent record label catalog styling, structured micro-borders, and electric acid-lime accents.</p>
           
           <div class="palette-swatches-row">
-            <div class="swatch-chip" style="background: #0d0e11;">#0d0e11</div>
-            <div class="swatch-chip" style="background: #14161d;">#14161d</div>
-            <div class="swatch-chip" style="background: #ccff00; color: #000;">#ccff00</div>
-            <div class="swatch-chip" style="background: #3b82f6;">#3b82f6</div>
+            <div class="swatch-chip" style="background: #090a0d;">#090a0d</div>
+            <div class="swatch-chip" style="background: #161920;">#161920</div>
+            <div class="swatch-chip" style="background: #bef264; color: #000;">#bef264</div>
+            <div class="swatch-chip" style="background: #a3e635; color: #000;">#a3e635</div>
           </div>
 
           <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('editorial-vinyl')">
@@ -1554,17 +1589,17 @@
         <!-- Theme 4: Crimson Vigil (Daredevil-inspired) -->
         <div class="direction-card-5">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="dir-badge-chip" style="background: rgba(225, 29, 72, 0.15); color: #f43f5e; border: 1px solid rgba(225, 29, 72, 0.3);">INSPIRED THEME</span>
-            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AA 4.6:1</span>
+            <span class="dir-badge-chip" style="background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3);">INSPIRED THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--status-success);">Text 18.2:1 (AAA) &middot; Button 4.7:1 (AA)</span>
           </div>
-          <h3 class="dir-title-text" style="font-family: 'Plus Jakarta Sans', sans-serif;">4. Crimson Vigil</h3>
+          <h3 class="dir-title-text" style="font-family: var(--font-display);">4. Crimson Vigil</h3>
           <p class="dir-desc-text">Atmospheric Daredevil and Hell's Kitchen inspiration: deep shadow backgrounds, dark oxblood surfaces, and serious crimson accents.</p>
           
           <div class="palette-swatches-row">
-            <div class="swatch-chip" style="background: #09070a;">#09070a</div>
-            <div class="swatch-chip" style="background: #1a0f16;">#1a0f16</div>
-            <div class="swatch-chip" style="background: #e11d48;">#e11d48</div>
-            <div class="swatch-chip" style="background: #be123c;">#be123c</div>
+            <div class="swatch-chip" style="background: #08080a;">#08080a</div>
+            <div class="swatch-chip" style="background: #16161c;">#16161c</div>
+            <div class="swatch-chip" style="background: #e11d48; color: #fff;">#e11d48</div>
+            <div class="swatch-chip" style="background: #be123c; color: #fff;">#be123c</div>
           </div>
 
           <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('crimson-vigil')">
@@ -1575,17 +1610,17 @@
         <!-- Theme 5: Cobalt Web (Spider-Man-inspired) -->
         <div class="direction-card-5">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="dir-badge-chip" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">INSPIRED THEME</span>
-            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #10b981;">WCAG AA 4.9:1</span>
+            <span class="dir-badge-chip" style="background: rgba(220, 38, 38, 0.15); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.3);">INSPIRED THEME</span>
+            <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--status-success);">Text 17.9:1 (AAA) &middot; Button 4.8:1 (AA)</span>
           </div>
-          <h3 class="dir-title-text" style="font-family: 'Inter', sans-serif;">5. Cobalt Web</h3>
+          <h3 class="dir-title-text" style="font-family: var(--font-display);">5. Cobalt Web</h3>
           <p class="dir-desc-text">Spider-Man color inspiration: deep midnight navy canvas, royal blue secondary chassis, dynamic vermilion red accents, and crisp white type.</p>
           
           <div class="palette-swatches-row">
-            <div class="swatch-chip" style="background: #070b14;">#070b14</div>
-            <div class="swatch-chip" style="background: #111a2e;">#111a2e</div>
-            <div class="swatch-chip" style="background: #ef4444;">#ef4444</div>
-            <div class="swatch-chip" style="background: #2563eb;">#2563eb</div>
+            <div class="swatch-chip" style="background: #080b14;">#080b14</div>
+            <div class="swatch-chip" style="background: #141d33;">#141d33</div>
+            <div class="swatch-chip" style="background: #dc2626; color: #fff;">#dc2626</div>
+            <div class="swatch-chip" style="background: #2563eb; color: #fff;">#2563eb</div>
           </div>
 
           <button type="button" class="btn-apply-theme-chip" onclick="applyTheme('cobalt-web')">
@@ -1603,10 +1638,10 @@
           <p style="color: var(--text-muted); font-size: 14px;">Select your preferred visual identity. Your theme is private to your user account and does not change what your friends see.</p>
         </div>
 
-        <!-- Theme Selection Cards Grid -->
-        <div class="theme-cards-gallery">
+        <!-- Theme Selection Cards Grid (WAI-ARIA Radio Group) -->
+        <div class="theme-cards-gallery" role="radiogroup" aria-label="Harmoni Visual Themes">
           <!-- Card 1 -->
-          <div class="theme-option-card selected" id="opt-obsidian-studio" onclick="applyTheme('obsidian-studio')">
+          <button type="button" role="radio" aria-checked="true" tabindex="0" class="theme-option-card selected" id="opt-obsidian-studio" onclick="applyTheme('obsidian-studio')" aria-label="Theme: Obsidian Studio (Default, Analog Hi-Fi)">
             <div class="theme-card-header">
               <div class="theme-title-group">
                 <span class="theme-title">Obsidian Studio</span>
@@ -1618,14 +1653,14 @@
               <div class="palette-box" style="background: #0b0c10;">#0b0c10</div>
               <div class="palette-box" style="background: #14161f;">#14161f</div>
               <div class="palette-box" style="background: #f59e0b; color: #000;">#f59e0b</div>
-              <div class="palette-box" style="background: #d97706;">#d97706</div>
+              <div class="palette-box" style="background: #d97706; color: #000;">#d97706</div>
             </div>
             <p class="theme-description-text">Warm obsidian charcoal, brushed slate surfaces, and glowing amber tube filaments for cozy studio listening.</p>
-            <div class="theme-contrast-badge">&check; WCAG AAA Verified (18:1 contrast ratio)</div>
-          </div>
+            <div class="theme-contrast-badge">&check; Verified: Text 17.8:1 (AAA) &middot; Button 9.1:1 (AAA)</div>
+          </button>
 
           <!-- Card 2 -->
-          <div class="theme-option-card" id="opt-nordic-aurora" onclick="applyTheme('nordic-aurora')">
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" class="theme-option-card" id="opt-nordic-aurora" onclick="applyTheme('nordic-aurora')" aria-label="Theme: Nordic Aurora (Ethereal Scandinavian Glass)">
             <div class="theme-card-header">
               <div class="theme-title-group">
                 <span class="theme-title">Nordic Aurora</span>
@@ -1634,17 +1669,17 @@
               <div class="theme-selected-indicator">&check;</div>
             </div>
             <div class="theme-palette-preview">
-              <div class="palette-box" style="background: #08090d;">#08090d</div>
-              <div class="palette-box" style="background: #10131d;">#10131d</div>
+              <div class="palette-box" style="background: #070a12;">#070a12</div>
+              <div class="palette-box" style="background: #131c2e;">#131c2e</div>
               <div class="palette-box" style="background: #06b6d4; color: #000;">#06b6d4</div>
               <div class="palette-box" style="background: #10b981; color: #000;">#10b981</div>
             </div>
             <p class="theme-description-text">Midnight ink canvas, subtle glass borders, and luminous cyan and emerald aurora reflections.</p>
-            <div class="theme-contrast-badge">&check; WCAG AAA Verified (19:1 contrast ratio)</div>
-          </div>
+            <div class="theme-contrast-badge">&check; Verified: Text 18.9:1 (AAA) &middot; Button 8.2:1 (AAA)</div>
+          </button>
 
           <!-- Card 3 -->
-          <div class="theme-option-card" id="opt-editorial-vinyl" onclick="applyTheme('editorial-vinyl')">
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" class="theme-option-card" id="opt-editorial-vinyl" onclick="applyTheme('editorial-vinyl')" aria-label="Theme: Editorial Vinyl (Swiss Record Club)">
             <div class="theme-card-header">
               <div class="theme-title-group">
                 <span class="theme-title">Editorial Vinyl</span>
@@ -1653,17 +1688,17 @@
               <div class="theme-selected-indicator">&check;</div>
             </div>
             <div class="theme-palette-preview">
-              <div class="palette-box" style="background: #0d0e11;">#0d0e11</div>
-              <div class="palette-box" style="background: #14161d;">#14161d</div>
-              <div class="palette-box" style="background: #ccff00; color: #000;">#ccff00</div>
-              <div class="palette-box" style="background: #3b82f6;">#3b82f6</div>
+              <div class="palette-box" style="background: #090a0d;">#090a0d</div>
+              <div class="palette-box" style="background: #161920;">#161920</div>
+              <div class="palette-box" style="background: #bef264; color: #000;">#bef264</div>
+              <div class="palette-box" style="background: #a3e635; color: #000;">#a3e635</div>
             </div>
             <p class="theme-description-text">High-contrast matte graphite, structured monospace metadata, and bold pops of electric acid-lime.</p>
-            <div class="theme-contrast-badge">&check; WCAG AAA Verified (19:1 contrast ratio)</div>
-          </div>
+            <div class="theme-contrast-badge">&check; Verified: Text 19.0:1 (AAA) &middot; Button 15.2:1 (AAA)</div>
+          </button>
 
           <!-- Card 4 -->
-          <div class="theme-option-card" id="opt-crimson-vigil" onclick="applyTheme('crimson-vigil')">
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" class="theme-option-card" id="opt-crimson-vigil" onclick="applyTheme('crimson-vigil')" aria-label="Theme: Crimson Vigil (Daredevil-inspired Noir)">
             <div class="theme-card-header">
               <div class="theme-title-group">
                 <span class="theme-title">Crimson Vigil</span>
@@ -1672,17 +1707,17 @@
               <div class="theme-selected-indicator">&check;</div>
             </div>
             <div class="theme-palette-preview">
-              <div class="palette-box" style="background: #09070a;">#09070a</div>
-              <div class="palette-box" style="background: #1a0f16;">#1a0f16</div>
-              <div class="palette-box" style="background: #e11d48;">#e11d48</div>
-              <div class="palette-box" style="background: #be123c;">#be123c</div>
+              <div class="palette-box" style="background: #08080a;">#08080a</div>
+              <div class="palette-box" style="background: #16161c;">#16161c</div>
+              <div class="palette-box" style="background: #e11d48; color: #fff;">#e11d48</div>
+              <div class="palette-box" style="background: #be123c; color: #fff;">#be123c</div>
             </div>
             <p class="theme-description-text">Deep shadow canvas, dark oxblood chassis, and restrained vigilante crimson for serious late-night sessions.</p>
-            <div class="theme-contrast-badge">&check; WCAG AA Verified (4.6:1 contrast ratio)</div>
-          </div>
+            <div class="theme-contrast-badge">&check; Verified: Text 18.2:1 (AAA) &middot; Button 4.7:1 (AA)</div>
+          </button>
 
           <!-- Card 5 -->
-          <div class="theme-option-card" id="opt-cobalt-web" onclick="applyTheme('cobalt-web')">
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" class="theme-option-card" id="opt-cobalt-web" onclick="applyTheme('cobalt-web')" aria-label="Theme: Cobalt Web (Spider-Man-inspired Cobalt)">
             <div class="theme-card-header">
               <div class="theme-title-group">
                 <span class="theme-title">Cobalt Web</span>
@@ -1691,27 +1726,33 @@
               <div class="theme-selected-indicator">&check;</div>
             </div>
             <div class="theme-palette-preview">
-              <div class="palette-box" style="background: #070b14;">#070b14</div>
-              <div class="palette-box" style="background: #111a2e;">#111a2e</div>
-              <div class="palette-box" style="background: #ef4444;">#ef4444</div>
-              <div class="palette-box" style="background: #2563eb;">#2563eb</div>
+              <div class="palette-box" style="background: #080b14;">#080b14</div>
+              <div class="palette-box" style="background: #141d33;">#141d33</div>
+              <div class="palette-box" style="background: #dc2626; color: #fff;">#dc2626</div>
+              <div class="palette-box" style="background: #2563eb; color: #fff;">#2563eb</div>
             </div>
             <p class="theme-description-text">Midnight navy backgrounds, royal blue surfaces, and dynamic vermilion red accents for an energetic modern feel.</p>
-            <div class="theme-contrast-badge">&check; WCAG AA Verified (4.9:1 contrast ratio)</div>
-          </div>
+            <div class="theme-contrast-badge">&check; Verified: Text 17.9:1 (AAA) &middot; Button 4.8:1 (AA)</div>
+          </button>
         </div>
 
         <div class="theme-actions-bar">
           <div style="font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
-            Active Session Theme: <strong id="currentThemeDisplay" style="color: var(--accent-primary);">Obsidian Studio</strong>
+            Active Preview Theme: <strong id="currentThemeDisplay" style="color: var(--accent-primary);">Obsidian Studio (Default)</strong>
           </div>
-          <div style="display: flex; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
             <button type="button" class="btn-reset-theme" onclick="applyTheme('obsidian-studio')">Reset to Default</button>
-            <button type="button" class="btn-save-theme" onclick="alert('Theme selection confirmed for this session! In production, this saves to User.themeKey via PATCH /api/users/me/theme.')">
+            <button type="button" class="btn-save-theme" onclick="showSimulatedSaveNotice()">
               <span>Save Theme Preference</span>
             </button>
           </div>
         </div>
+
+        <div id="simulatedSaveNotice" style="display: none; margin-top: 16px; padding: 14px 18px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--accent-primary); font-size: 12px; color: var(--text-primary); line-height: 1.5; font-family: 'JetBrains Mono', monospace;">
+          <strong style="color: var(--accent-primary);">[PROTOTYPE SIMULATION ONLY]</strong> Live preview applied in DOM memory. Theme preference saving is simulated in this visual prototype; no real database records or user accounts were modified. Milestone 3C.1 will implement persistent storage in PostgreSQL (<code>User.themeKey</code>) via <code>PATCH /api/users/me/theme</code>.
+        </div>
+      </div>
+    </section>
       </div>
     </section>
 
@@ -2222,46 +2263,46 @@
               <p style="font-size: 11px; color: var(--text-muted);">Select your mobile appearance:</p>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-              <div style="background: var(--bg-card); border: 2px solid var(--accent-primary); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('obsidian-studio')">
+            <div style="display: flex; flex-direction: column; gap: 12px;" role="radiogroup" aria-label="Mobile Theme Selection">
+              <button type="button" role="radio" aria-checked="true" id="mobile-opt-obsidian-studio" style="background: var(--bg-card); border: 2px solid var(--accent-primary); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; cursor: pointer; font-family: inherit; min-height: 48px;" onclick="applyTheme('obsidian-studio')">
                 <div>
                   <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">1. Obsidian Studio</div>
                   <div style="font-size: 10px; color: var(--text-muted);">Amber &middot; Analog Hi-Fi</div>
                 </div>
-                <div style="width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
-              </div>
+                <div class="mobile-check-pip" style="width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
+              </button>
 
-              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('nordic-aurora')">
+              <button type="button" role="radio" aria-checked="false" id="mobile-opt-nordic-aurora" style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; cursor: pointer; font-family: inherit; min-height: 48px;" onclick="applyTheme('nordic-aurora')">
                 <div>
                   <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">2. Nordic Aurora</div>
                   <div style="font-size: 10px; color: var(--text-muted);">Cyan &middot; Emerald Glass</div>
                 </div>
-                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
-              </div>
+                <div class="mobile-check-pip" style="display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
+              </button>
 
-              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('editorial-vinyl')">
+              <button type="button" role="radio" aria-checked="false" id="mobile-opt-editorial-vinyl" style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; cursor: pointer; font-family: inherit; min-height: 48px;" onclick="applyTheme('editorial-vinyl')">
                 <div>
                   <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">3. Editorial Vinyl</div>
                   <div style="font-size: 10px; color: var(--text-muted);">Acid Lime &middot; Swiss Poster</div>
                 </div>
-                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
-              </div>
+                <div class="mobile-check-pip" style="display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
+              </button>
 
-              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('crimson-vigil')">
+              <button type="button" role="radio" aria-checked="false" id="mobile-opt-crimson-vigil" style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; cursor: pointer; font-family: inherit; min-height: 48px;" onclick="applyTheme('crimson-vigil')">
                 <div>
                   <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">4. Crimson Vigil</div>
                   <div style="font-size: 10px; color: var(--text-muted);">Daredevil-inspired Noir</div>
                 </div>
-                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
-              </div>
+                <div class="mobile-check-pip" style="display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
+              </button>
 
-              <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between;" onclick="applyTheme('cobalt-web')">
+              <button type="button" role="radio" aria-checked="false" id="mobile-opt-cobalt-web" style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; cursor: pointer; font-family: inherit; min-height: 48px;" onclick="applyTheme('cobalt-web')">
                 <div>
                   <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">5. Cobalt Web</div>
                   <div style="font-size: 10px; color: var(--text-muted);">Spider-Man-inspired Cobalt</div>
                 </div>
-                <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-hairline);"></div>
-              </div>
+                <div class="mobile-check-pip" style="display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-primary); align-items: center; justify-content: center; font-size: 10px; color: var(--button-primary-text); font-weight: 800;">&check;</div>
+              </button>
             </div>
           </div>
 
@@ -2521,23 +2562,51 @@
     }
 
     function applyTheme(themeKey) {
-      if (!THEME_KEYS.includes(themeKey)) return;
+      // Robust fallback: if theme is missing or invalid, default to obsidian-studio
+      if (!THEME_KEYS.includes(themeKey)) {
+        themeKey = 'obsidian-studio';
+      }
 
-      // Set data-theme on body
-      document.body.setAttribute('data-theme', themeKey);
+      // Canonical production contract: set data-theme on root <html> element
+      document.documentElement.setAttribute('data-theme', themeKey);
+      document.body.removeAttribute('data-theme');
 
       // Update header dropdown
       const select = document.getElementById('quickThemeSelector');
       if (select) select.value = themeKey;
 
-      // Update selected card state in Appearance view
+      // Update selected card state in Appearance view (ARIA radiogroup)
       THEME_KEYS.forEach(function (key) {
         const card = document.getElementById('opt-' + key);
         if (card) {
-          if (key === themeKey) {
+          const isSelected = (key === themeKey);
+          if (isSelected) {
             card.classList.add('selected');
+            card.setAttribute('aria-checked', 'true');
+            card.setAttribute('tabindex', '0');
           } else {
             card.classList.remove('selected');
+            card.setAttribute('aria-checked', 'false');
+            card.setAttribute('tabindex', '-1');
+          }
+        }
+
+        // Also update mobile option card
+        const mobileCard = document.getElementById('mobile-opt-' + key);
+        if (mobileCard) {
+          const isSelected = (key === themeKey);
+          if (isSelected) {
+            mobileCard.setAttribute('aria-checked', 'true');
+            mobileCard.style.borderColor = 'var(--accent-primary)';
+            mobileCard.style.borderWidth = '2px';
+            const pip = mobileCard.querySelector('.mobile-check-pip');
+            if (pip) pip.style.display = 'flex';
+          } else {
+            mobileCard.setAttribute('aria-checked', 'false');
+            mobileCard.style.borderColor = 'var(--border-hairline)';
+            mobileCard.style.borderWidth = '1px';
+            const pip = mobileCard.querySelector('.mobile-check-pip');
+            if (pip) pip.style.display = 'none';
           }
         }
       });
@@ -2553,6 +2622,14 @@
           'cobalt-web': 'Cobalt Web (Spider-Man-inspired)'
         };
         displayLabel.textContent = readableNames[themeKey] || themeKey;
+      }
+    }
+
+    function showSimulatedSaveNotice() {
+      const notice = document.getElementById('simulatedSaveNotice');
+      if (notice) {
+        notice.style.display = 'block';
+        notice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 
@@ -2586,6 +2663,34 @@
             const nextTab = tabs[nextIndex];
             const viewId = nextTab.getAttribute('data-view');
             activateView(viewId, nextTab);
+          }
+        });
+      });
+
+      // Wire Appearance radio cards keyboard navigation
+      const themeCards = Array.from(document.querySelectorAll('.theme-option-card'));
+      themeCards.forEach(function (card, index) {
+        card.addEventListener('keydown', function (e) {
+          let nextIndex = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            nextIndex = (index + 1) % themeCards.length;
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            nextIndex = (index - 1 + themeCards.length) % themeCards.length;
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            nextIndex = 0;
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            nextIndex = themeCards.length - 1;
+          }
+
+          if (nextIndex !== null) {
+            const nextCard = themeCards[nextIndex];
+            const themeKey = THEME_KEYS[nextIndex];
+            applyTheme(themeKey);
+            nextCard.focus();
           }
         });
       });

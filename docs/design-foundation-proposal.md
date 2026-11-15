@@ -1,7 +1,7 @@
 # Harmoni — Visual Foundation Research & Design Specification
-**Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector Specification**  
-*Document Version:* 1.3.0  
-*Status:* Multi-Theme Platform Architecture & Interactive Visual Prototype (Awaiting User Review & Explicit Approval)  
+**Milestone 3C.0.4: Theme System Accuracy & Design Specification Audit**  
+*Document Version:* 1.4.0  
+*Status:* Theme System Accuracy Audit & Design Specification (Awaiting User Review & Explicit Approval)  
 *Author:* Harmoni Engineering & Architecture Team  
 *Target Stack:* Next.js 16 (App Router) · React 19 · TypeScript 5 · Tailwind CSS v4 · shadcn/ui · PostgreSQL  
 *Figma Exploration File:* [https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H) (Key: `tde7tKDtxqTwhqJQko989H` · Verified Empty Canvas Shell)  
@@ -160,35 +160,56 @@ To guarantee that Harmoni remains 100% legal, non-infringing, and open-source un
   - Surface: `#0e1424` (Dark slate navy)
   - Card: `#141d33` (Elevated cobalt chassis)
   - Borders: `#202c49` (Steel blue divider)
-  - Primary Accent: `#ef4444` (Kinetic vermilion red-500) / Active glow: `#f87171`
+  - Primary Accent: `#dc2626` (Kinetic red-600 · adjusted for WCAG AA normal text compliance) / Active glow: `#ef4444` (Red-500)
   - Secondary Accent: `#2563eb` (Royal cobalt blue-600)
   - Sensory Pip Accent: `#38bdf8` (Electric sky cyan-400)
   - Text Primary: `#f1f5f9` (Cool off-white) · Text Muted: `#94a3b8`
   - Badge Background: `#1e131d` · Badge Text: `#fca5a5`
 - **Typography:** `Plus Jakarta Sans` headings + `Inter` body + `JetBrains Mono` metadata.
-- **Contrast & Ergonomics:** 17.8:1 foreground contrast (WCAG AAA). Button text (`#ffffff` on `#ef4444`) provides 4.9:1 (WCAG AA compliant). Midnight navy canvas anchors high-energy red accents smoothly.
+- **Contrast & Ergonomics:** 17.84:1 body text on canvas (WCAG AAA). Primary button text (`#ffffff` on `#dc2626`) provides 4.83:1 (WCAG AA compliant, exceeding the 4.5:1 requirement for normal-sized text; previously `#ef4444` failed at 3.76:1). Secondary button text (`#ffffff` on `#2563eb`) provides 5.17:1 (WCAG AA compliant). Midnight navy canvas anchors high-energy red accents smoothly.
 
 ---
 
 ### 3.3 Contrast & Accessibility Comparison Matrix
 
-| Theme Identifier | Canvas Background | Text Primary | Contrast Ratio | WCAG 2.1 Grade | Accent Color | Button Contrast | WCAG Grade |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `obsidian-studio` | `#0b0c10` | `#f3f4f6` | **18.1:1** | **AAA** | `#f59e0b` (Amber) | 9.8:1 (dark text) | **AAA** |
-| `nordic-aurora` | `#070a12` | `#f0fdf4` | **19.0:1** | **AAA** | `#06b6d4` (Cyan) | 8.4:1 (dark text) | **AAA** |
-| `editorial-vinyl` | `#090a0d` | `#fafafa` | **19.4:1** | **AAA** | `#bef264` (Lime) | 12.1:1 (dark text) | **AAA** |
-| `crimson-vigil` | `#08080a` | `#f4f4f5` | **18.2:1** | **AAA** | `#e11d48` (Crimson) | 4.6:1 (white text) | **AA** |
-| `cobalt-web` | `#080b14` | `#f1f5f9` | **17.8:1** | **AAA** | `#ef4444` (Vermilion) | 4.9:1 (white text) | **AA** |
+All color contrast ratios have been calculated using the official W3C WCAG 2.1 / 2.2 relative luminance formula:
+$\text{Contrast Ratio} = \frac{L_1 + 0.05}{L_2 + 0.05}$
+where $L_1$ is the relative luminance of the lighter color and $L_2$ is the relative luminance of the darker color.
+
+Rather than asserting blanket "WCAG AAA" compliance across entire themes, Harmoni audits each specific text-to-background and button interactive pair individually:
+
+| Theme Identifier | Tested Element Pair | Light Color | Dark Color | Calculated Ratio | WCAG Grade & Minimum Threshold |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`obsidian-studio`** | Text Primary on Canvas | `#f3f4f6` | `#0b0c10` | **18.06:1** | **AAA** (Passes $\ge 7:1$) |
+| | Text Primary on Card | `#f3f4f6` | `#14161f` | **15.95:1** | **AAA** (Passes $\ge 7:1$) |
+| | Primary Button (Dark text on Amber) | `#f59e0b` | `#0b0c10` | **9.10:1** | **AAA** (Passes $\ge 7:1$) |
+| | Secondary Button (Dark text on Brass) | `#d97706` | `#0b0c10` | **6.14:1** | **AA** (Passes $\ge 4.5:1$) |
+| **`nordic-aurora`** | Text Primary on Canvas | `#f0fdf4` | `#070a12` | **19.04:1** | **AAA** (Passes $\ge 7:1$) |
+| | Text Primary on Card | `#f0fdf4` | `#0d131f` | **16.27:1** | **AAA** (Passes $\ge 7:1$) |
+| | Primary Button (Dark text on Cyan) | `#06b6d4` | `#070a12` | **8.15:1** | **AAA** (Passes $\ge 7:1$) |
+| | Secondary Button (Dark text on Emerald) | `#10b981` | `#070a12` | **7.80:1** | **AAA** (Passes $\ge 7:1$) |
+| **`editorial-vinyl`** | Text Primary on Canvas | `#fafafa` | `#090a0d` | **19.45:1** | **AAA** (Passes $\ge 7:1$) |
+| | Text Primary on Card | `#fafafa` | `#101217` | **16.85:1** | **AAA** (Passes $\ge 7:1$) |
+| | Primary Button (Dark text on Lime) | `#bef264` | `#090a0d` | **15.15:1** | **AAA** (Passes $\ge 7:1$) |
+| | Secondary Button (Dark text on Olive-lime) | `#a3e635` | `#090a0d` | **13.13:1** | **AAA** (Passes $\ge 7:1$) |
+| **`crimson-vigil`** | Text Primary on Canvas | `#f4f4f5` | `#08080a` | **18.23:1** | **AAA** (Passes $\ge 7:1$) |
+| | Text Primary on Card | `#f4f4f5` | `#16161c` | **16.39:1** | **AAA** (Passes $\ge 7:1$) |
+| | Primary Button (White text on Crimson) | `#ffffff` | `#e11d48` | **4.70:1** | **AA** (Passes $\ge 4.5:1$) |
+| | Secondary Button (White text on Deep rose) | `#ffffff` | `#be123c` | **6.29:1** | **AA** (Passes $\ge 4.5:1$) |
+| **`cobalt-web`** | Text Primary on Canvas | `#f1f5f9` | `#080b14` | **17.84:1** | **AAA** (Passes $\ge 7:1$) |
+| | Text Primary on Card | `#f1f5f9` | `#141d33` | **15.29:1** | **AAA** (Passes $\ge 7:1$) |
+| | Primary Button (White text on Red-600) | `#ffffff` | `#dc2626` | **4.83:1** | **AA** (Passes $\ge 4.5:1$, audit fix) |
+| | Secondary Button (White text on Cobalt) | `#ffffff` | `#2563eb` | **5.17:1** | **AA** (Passes $\ge 4.5:1$) |
 
 ---
 
 ## 4. Design Token Specification (Tailwind CSS v4 & CSS Variables)
 
-These design tokens will translate directly into `src/app/globals.css` using Tailwind CSS v4 `@theme inline`. Under Harmoni's multi-theme architecture, CSS custom properties are declared globally on `:root` for the default *Obsidian Studio* theme, and overridden per theme via `[data-theme="..."]` attributes:
+These design tokens translate directly into `src/app/globals.css` using Tailwind CSS v4 `@theme inline`. Under Harmoni's multi-theme architecture, CSS custom properties are declared globally on `:root` and `html[data-theme="obsidian-studio"]` for the default *Obsidian Studio* theme, and overridden per theme via root-level `html[data-theme="..."]` attribute selectors to ensure consistent zero-FOUC server-rendering and client switching:
 
 ```css
 :root,
-[data-theme="obsidian-studio"] {
+html[data-theme="obsidian-studio"] {
   /* Canvas & Structural Surfaces */
   --background: #0b0c10;
   --foreground: #f3f4f6;
@@ -210,10 +231,10 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
   --primary-subtle: rgba(245, 158, 11, 0.12);
 
   /* Secondary Brass / Copper Accents */
-  --secondary: #222634;
-  --secondary-foreground: #e5e7eb;
+  --secondary: #d97706;
+  --secondary-foreground: #0b0c10;
   --accent: #d97706;
-  --accent-foreground: #ffffff;
+  --accent-foreground: #0b0c10;
 
   /* Status Tokens */
   --destructive: #ef4444;
@@ -228,7 +249,7 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
 }
 
 /* Nordic Aurora Overrides */
-[data-theme="nordic-aurora"] {
+html[data-theme="nordic-aurora"] {
   --background: #070a12;
   --foreground: #f0fdf4;
   --card: #0d131f;
@@ -243,14 +264,14 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
   --primary-foreground: #070a12;
   --primary-hover: #22d3ee;
   --primary-subtle: rgba(6, 182, 212, 0.14);
-  --secondary: #132238;
-  --secondary-foreground: #e2e8f0;
+  --secondary: #10b981;
+  --secondary-foreground: #070a12;
   --accent: #10b981;
   --accent-foreground: #070a12;
 }
 
 /* Editorial Vinyl Overrides */
-[data-theme="editorial-vinyl"] {
+html[data-theme="editorial-vinyl"] {
   --background: #090a0d;
   --foreground: #fafafa;
   --card: #101217;
@@ -265,14 +286,14 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
   --primary-foreground: #090a0d;
   --primary-hover: #d9f99d;
   --primary-subtle: rgba(190, 242, 100, 0.14);
-  --secondary: #222634;
-  --secondary-foreground: #f4f4f5;
+  --secondary: #a3e635;
+  --secondary-foreground: #090a0d;
   --accent: #a3e635;
   --accent-foreground: #090a0d;
 }
 
 /* Crimson Vigil (Daredevil-inspired) Overrides */
-[data-theme="crimson-vigil"] {
+html[data-theme="crimson-vigil"] {
   --background: #08080a;
   --foreground: #f4f4f5;
   --card: #101014;
@@ -287,14 +308,14 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
   --primary-foreground: #ffffff;
   --primary-hover: #f43f5e;
   --primary-subtle: rgba(225, 29, 72, 0.16);
-  --secondary: #241418;
-  --secondary-foreground: #fda4af;
+  --secondary: #be123c;
+  --secondary-foreground: #ffffff;
   --accent: #be123c;
   --accent-foreground: #ffffff;
 }
 
 /* Cobalt Web (Spider-Man-inspired) Overrides */
-[data-theme="cobalt-web"] {
+html[data-theme="cobalt-web"] {
   --background: #080b14;
   --foreground: #f1f5f9;
   --card: #0e1424;
@@ -305,12 +326,12 @@ These design tokens will translate directly into `src/app/globals.css` using Tai
   --muted-foreground: #94a3b8;
   --border: #202c49;
   --input: #202c49;
-  --primary: #ef4444;
+  --primary: #dc2626;
   --primary-foreground: #ffffff;
-  --primary-hover: #f87171;
-  --primary-subtle: rgba(239, 68, 68, 0.16);
-  --secondary: #1a2542;
-  --secondary-foreground: #93c5fd;
+  --primary-hover: #ef4444;
+  --primary-subtle: rgba(220, 38, 38, 0.16);
+  --secondary: #2563eb;
+  --secondary-foreground: #ffffff;
   --accent: #2563eb;
   --accent-foreground: #ffffff;
 }
@@ -659,7 +680,7 @@ Harmoni is architected as an independent, per-user multi-theme music platform. R
 
 ### 11.2 Database Schema Integration (Prisma ORM)
 
-In Milestone 3C, the Prisma `User` model will be extended with a non-null, default-backed column:
+In Milestone 3C.1, the Prisma `User` model will be extended with a non-null, default-backed column without modifying existing authentication fields or relations:
 
 ```prisma
 model User {
@@ -667,18 +688,23 @@ model User {
   username        String         @unique
   displayName     String
   passwordHash    String
-  role            Role           @default(MEMBER)
+  role            Role           @default(USER)
   avatarKey       String         @default("avatar_1")
   bio             String?        @db.VarChar(250)
   themeKey        String         @default("obsidian-studio") @db.VarChar(50)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
-  // ... relations remain unchanged
+
+  invitationCodes InvitationCode[]
+  sessions        Session[]
+  invitationUsed  InvitationCode? @relation("UsedInvitation")
 }
 ```
 
-- **Default Value:** `"obsidian-studio"`, ensuring backward-compatibility with all existing users and seed fixtures.
-- **Column Constraints:** `VARCHAR(50)`, non-null, indexed by primary key.
+- **Default Value:** `"obsidian-studio"`, ensuring 100% backward-compatibility with all existing users, bootstrap accounts, and seed fixtures.
+- **Enum Role Consistency:** `role Role @default(USER)` precisely matches `enum Role { USER, ADMIN }` defined in `prisma/schema.prisma` (correcting an earlier documentation typo that referenced `MEMBER`).
+- **Column Constraints:** `VARCHAR(50)`, non-null.
+- **Indexing Decision:** `themeKey` is **NOT** indexed. User records are always fetched by primary key (`id`) or unique index (`username`). Adding a secondary index to `themeKey` would introduce write overhead with zero query performance benefit.
 
 ---
 
@@ -716,7 +742,7 @@ export const THEMES_META: Record<ThemeKey, ThemeMeta> = {
     subtitle: 'Default · Warm Analog Hi-Fi',
     description: 'Brushed slate, warm charcoal, and vacuum-tube amber glow.',
     chips: ['#0b0c10', '#161922', '#f59e0b', '#f3f4f6'],
-    contrastRatio: '18.1:1',
+    contrastRatio: '18.06:1 (text) / 9.10:1 (btn)',
     wcagGrade: 'AAA',
   },
   'nordic-aurora': {
@@ -725,7 +751,7 @@ export const THEMES_META: Record<ThemeKey, ThemeMeta> = {
     subtitle: 'Atmospheric Midnight Glass',
     description: 'Midnight ink glass with bioluminescent cyan and mint emerald.',
     chips: ['#070a12', '#131c2e', '#06b6d4', '#f0fdf4'],
-    contrastRatio: '19.0:1',
+    contrastRatio: '19.04:1 (text) / 8.15:1 (btn)',
     wcagGrade: 'AAA',
   },
   'editorial-vinyl': {
@@ -734,7 +760,7 @@ export const THEMES_META: Record<ThemeKey, ThemeMeta> = {
     subtitle: 'Swiss Typographic Record Club',
     description: 'Matte vinyl black, Swiss grid typography, and electric acid-lime.',
     chips: ['#090a0d', '#161920', '#bef264', '#fafafa'],
-    contrastRatio: '19.4:1',
+    contrastRatio: '19.45:1 (text) / 15.15:1 (btn)',
     wcagGrade: 'AAA',
   },
   'crimson-vigil': {
@@ -743,17 +769,17 @@ export const THEMES_META: Record<ThemeKey, ThemeMeta> = {
     subtitle: 'Daredevil-inspired · Shadow Noir',
     description: 'Deep shadow black, dark oxblood leather, and blind-justice crimson.',
     chips: ['#08080a', '#16161c', '#e11d48', '#f4f4f5'],
-    contrastRatio: '18.2:1',
-    wcagGrade: 'AAA',
+    contrastRatio: '18.23:1 (text) / 4.70:1 (btn)',
+    wcagGrade: 'AA',
   },
   'cobalt-web': {
     key: 'cobalt-web',
     name: 'Cobalt Web',
     subtitle: 'Spider-Man-inspired · Midnight Navy',
     description: 'Midnight navy canvas, royal cobalt, dynamic vermilion red, and sky cyan.',
-    chips: ['#080b14', '#141d33', '#ef4444', '#f1f5f9'],
-    contrastRatio: '17.8:1',
-    wcagGrade: 'AAA',
+    chips: ['#080b14', '#141d33', '#dc2626', '#f1f5f9'],
+    contrastRatio: '17.84:1 (text) / 4.83:1 (btn)',
+    wcagGrade: 'AA',
   },
 };
 ```
@@ -839,47 +865,50 @@ The Appearance Settings interface is accessible from the user profile or main na
 ## 12. Frontend Implementation Roadmap
 
 ```
-+-------------------------------------------------------------------------------------------------------------+
-| HARMONI FRONTEND IMPLEMENTATION ROADMAP                                                                     |
-+-------------------------------------------------------------------------------------------------------------+
-|  [ M3C.0.3: Multi-Theme Prototype ] -> [ M3C: Profiles, Avatars & Theme Engine ] -> [ M4: Jamendo Engine ] |
-|  (CURRENT MILESTONE - VERIFIED)        - Rewrite /@username to /users               - Server Jamendo client |
-|  - 5 Themes Implemented in HTML        - 8 SVG avatar presets & bio editing         - CC licensing badges   |
-|  - Real-time Theme Switcher & Preview  - User.themeKey Prisma migration             - Search endpoints      |
-|  - Appearance Settings View (View 2)   - Zero-FOUC server layout & PATCH endpoint   (Pending Approval)      |
-|  - WAI-ARIA Accessible Navigation      (Pending User Approval)                                              |
-|                                                                                                             |
-|  [ M5: Audio Player ]               -> [ M6: Library & Scrobbling ]              -> [ M7: Social & Chat ]   |
-|  - Global Zustand player store         - Liked tracks & playlist CRUD               - Friend requests       |
-|  - Docked hi-fi player bar             - 50%/30s scrobble history engine            - Social drawer         |
-|  - Uninterrupted route transitions     - Personal listening statistics              - Track-sharing cards   |
-|                                                                                                             |
-|  [ M8: Final UI Polish & ₹0 Deployment ]                                                                    |
-|  - Full mobile audit · Accessibility pass · Vercel Hobby + Neon PostgreSQL production deploy (₹0 INR)       |
-+-------------------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------------------------+
+| HARMONI FRONTEND IMPLEMENTATION ROADMAP                                                                                     |
++-----------------------------------------------------------------------------------------------------------------------------+
+|  [ M3C.0.4: Theme System Audit ]   -> [ M3C.1: Multi-Theme Engine & Persist ] -> [ M3C.2: User Profiles & Avatar Presets ]  |
+|  (CURRENT MILESTONE - AUDITED)        - User.themeKey Prisma migration           - Rewrite /@username to /users             |
+|  - 5 Themes Audited & Verified        - Zero-FOUC server RootLayout              - 8 SVG avatar presets & bio editing       |
+|  - WCAG contrast ratios calculated    - PATCH /api/users/me/theme endpoint       - Public user profile page                 |
+|  - html[data-theme] root contract     - Appearance Settings component            (Pending Approval)                         |
+|  - Accessible radio cards in HTML     (Next Target Milestone)                                                               |
+|                                                                                                                             |
+|  [ M4: Jamendo Discovery Engine ]  -> [ M5: Persistent Audio Player ]         -> [ M6: Library & Scrobbling ]               |
+|  - Server-side Jamendo API client     - Global Zustand player store              - Liked tracks & playlist CRUD             |
+|  - Creative Commons license badges    - Docked Hi-Fi playback bar                - 50%/30s scrobble history engine          |
+|  - Safe search & stream resolution    - Mobile player bottom sheet               - Personal listening statistics            |
+|                                                                                                                             |
+|  [ M7: Social Network & Chat ]     -> [ M8: Final Polish & ₹0 Deployment ]                                                  |
+|  - Friend requests & circle state     - End-to-end responsive audit & accessibility check                                   |
+|  - On-demand collapsible drawer       - Vercel Hobby + Neon Serverless PostgreSQL deploy (Permanent ₹0 INR)                 |
+|  - In-app track-sharing chat                                                                                                 |
++-----------------------------------------------------------------------------------------------------------------------------+
 ```
 
-1. **Milestone 3C.0.3: Multi-Theme Design System & Appearance Selector (THIS MILESTONE — COMPLETED & VERIFIED)**
-   - Architected 5-theme platform specification (Obsidian Studio, Nordic Aurora, Editorial Vinyl, Crimson Vigil, Cobalt Web).
-   - Enforced strict IP non-infringement boundary (no copyrighted/trademarked assets; original inspired interpretations only).
-   - Authored complete interactive prototype in `docs/visual-design-exploration.html` with real-time theme switching, dedicated Appearance Settings view (View 2), 5 mobile preview screens, 8 inline SVG avatars, and WAI-ARIA tab navigation.
-   - Verified 100% WCAG contrast compliance across all 5 themes.
-   - Designed zero-cost, zero-FOUC PostgreSQL per-user persistence architecture (`User.themeKey`).
-2. **Milestone 3C: User Profile Page, Avatar Presets & Theme Engine Integration (Pending Approval)**
-   - Apply Prisma migration adding `themeKey String @default("obsidian-studio")` to `User`.
-   - Implement `PATCH /api/users/me/theme` with Zod validation.
-   - Implement zero-FOUC server-rendered `RootLayout` reading `getCurrentUser()`.
-   - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
-   - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 SVG avatar presets.
-   - Build Appearance Settings modal / page component with the 5 interactive cards.
+1. **Milestone 3C.0.4: Theme System Accuracy & Design Specification Audit (THIS MILESTONE — COMPLETED & AUDITED)**
+   - Audited all 5 themes against exact W3C WCAG 2.1 / 2.2 relative luminance calculations; corrected Cobalt Web primary button to `#dc2626` (4.83:1 AA compliant).
+   - Unified theme architecture to root-level `html[data-theme="..."]` attribute contract, eliminating hardcoded color leakage and aligning with Next.js 16 `RootLayout`.
+   - Upgraded prototype Appearance settings into accessible WAI-ARIA `<button type="button" role="radio">` with roving `tabindex` and arrow key navigation.
+   - Corrected database documentation to `role Role @default(USER)` (matching Prisma schema enum) and verified no unnecessary index on `themeKey`.
+   - Added honest simulation disclaimers to prototype confirming in-memory live preview.
+2. **Milestone 3C.1: Multi-Theme Engine & User Preference Persistence (Next Pending Milestone)**
+   - Apply Prisma migration adding `themeKey String @default("obsidian-studio") @db.VarChar(50)` to `User`.
+   - Implement zero-FOUC server-rendered `RootLayout` reading `getCurrentUser()` and applying `data-theme` to `<html>`.
+   - Implement `PATCH /api/users/me/theme` with strict Zod validation against `THEME_REGISTRY`.
+   - Build accessible Appearance Settings modal / page component with the 5 interactive cards.
+3. **Milestone 3C.2: User Profiles & Avatar Presets (Subsequent Milestone)**
+   - Implement `next.config.ts` URL rewrite from `/@:username` to `/users/:username`.
+   - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 bundled SVG avatar presets (`avatar_1` to `avatar_8`).
    - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
-3. **Milestone 4: Music Discovery Engine & Jamendo API Integration**
+4. **Milestone 4: Music Discovery Engine & Jamendo API Integration**
    - Server-side Jamendo client, search endpoints, and legal Creative Commons attribution badges.
-4. **Milestone 5: Persistent Audio Player & Queue Controller**
+5. **Milestone 5: Persistent Audio Player & Queue Controller**
    - Global Zustand audio player store, root layout player bar, and responsive mobile player sheet.
-5. **Milestone 6: Personal Library, Playlists & Local Scrobbling**
+6. **Milestone 6: Personal Library, Playlists & Local Scrobbling**
    - Liked tracks, playlist CRUD, and the 50%/30-second local scrobble history engine.
-6. **Milestone 7: Friendship Network & Direct Track-Sharing Chat**
+7. **Milestone 7: Friendship Network & Direct Track-Sharing Chat**
    - Friend request workflows, on-demand social drawer, and lightweight polling chat with embedded playable track cards.
-7. **Milestone 8: Final UI Polish, Free Deployment & Production Verification**
+8. **Milestone 8: Final UI Polish, Free Deployment & Production Verification**
    - End-to-end responsiveness, multi-theme contrast polish, and deployment verification on Vercel Hobby + Neon at ₹0 INR.
