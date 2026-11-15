@@ -6,6 +6,7 @@ import {
   AVATARS_META,
   isAvatarKey,
   getValidAvatarKey,
+  isValidImageUrl,
   type AvatarKey,
 } from "@/lib/profile/constants";
 
@@ -77,5 +78,32 @@ describe("Avatar Presets & Profile Constants", () => {
       expect(meta.description).toBeTypeOf("string");
       expect(meta.description.length).toBeGreaterThan(0);
     }
+  });
+
+  describe("Artwork URL Protocol & Security Validation", () => {
+    it("accepts valid https and http URLs", () => {
+      expect(isValidImageUrl("https://images.unsplash.com/photo-1234.jpg")).toBe(true);
+      expect(isValidImageUrl("http://cdn.example.org/cover.png?size=large")).toBe(true);
+      expect(isValidImageUrl("https://usercontent.jamendo.com?trackid=123")).toBe(true);
+    });
+
+    it("strictly rejects dangerous, non-http, or malformed URL protocols", () => {
+      expect(isValidImageUrl("javascript:alert(1)")).toBe(false);
+      expect(isValidImageUrl("JAVASCRIPT:alert(document.cookie)")).toBe(false);
+      expect(isValidImageUrl("data:image/svg+xml;base64,PHN2Zz4=")).toBe(false);
+      expect(isValidImageUrl("file:///etc/passwd")).toBe(false);
+      expect(isValidImageUrl("ftp://example.com/image.jpg")).toBe(false);
+      expect(isValidImageUrl("blob:http://localhost/123")).toBe(false);
+    });
+
+    it("rejects non-string, empty, or whitespace-only inputs", () => {
+      expect(isValidImageUrl(null)).toBe(false);
+      expect(isValidImageUrl(undefined)).toBe(false);
+      expect(isValidImageUrl("")).toBe(false);
+      expect(isValidImageUrl("   ")).toBe(false);
+      expect(isValidImageUrl(12345)).toBe(false);
+      expect(isValidImageUrl({ url: "https://example.com" })).toBe(false);
+      expect(isValidImageUrl("not-a-valid-url")).toBe(false);
+    });
   });
 });

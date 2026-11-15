@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.2: User Profiles & Avatar Presets** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
+**Milestone 3C.2.1: Profile Accessibility, Artwork & Test Coverage Correction** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 4)
 
 ---
 
@@ -389,6 +389,49 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
   - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
   - Production build passes: `pnpm build` generates all dynamic routes including `/users/[username]` and `/api/users/me/profile`.
+- [x] Awaiting user review and explicit approval before initiating Milestone 4.
+
+### Milestone 3C.2.1: Profile Accessibility, Artwork & Test Coverage Correction (THIS MILESTONE — COMPLETED & VERIFIED)
+- [x] **Genuine Keyboard Focus Trap & Dismissal Guard (`src/components/profile/edit-profile-dialog.tsx`):**
+  - Implemented keyboard focus trap without external dependencies: Tab wraps from the last focusable element back to the first, and Shift+Tab wraps from the first focusable element to the last.
+  - Automatically moves focus to the dialog close button upon opening via accessible timeout.
+  - Centralized modal close behavior (`closeModal`) across the Escape key handler, backdrop overlay click, Cancel button, and Close (X) button.
+  - Strictly prevents dismissal and closing while a profile update request is in flight (`status === "saving"`).
+  - Preserves and restores keyboard focus to the originating "Edit Profile" trigger button whenever the dialog is dismissed or closed.
+- [x] **Safe Avatar Normalization & Radiogroup Accessibility (`src/components/profile/edit-profile-dialog.tsx` & `src/lib/profile/constants.ts`):**
+  - Removed unsafe `as AvatarKey` type assertion; initial state and dialog opening safely normalize any unknown or invalid avatar keys to `avatar_1` using `getValidAvatarKey()`.
+  - Added full keyboard arrow navigation across the 8-avatar preset grid (`ArrowRight` / `ArrowDown` to advance with wrap-around, `ArrowLeft` / `ArrowUp` to reverse with wrap-around, `Home` to jump to first, and `End` to jump to last).
+  - Implemented roving tabindex (`tabIndex={0}` on the currently selected preset, `tabIndex={-1}` on all other 7 presets), providing exactly one tab stop within the radiogroup per WAI-ARIA standards.
+  - Added distinct focus-visible rings (`focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`).
+- [x] **Profile Tabs WAI-ARIA Navigation & Panel Persistence (`src/app/users/[username]/profile-tabs.tsx`):**
+  - Implemented arrow-key navigation (`ArrowRight` / `ArrowDown`, `ArrowLeft` / `ArrowUp`, `Home`, `End`) across the three tabs ("Overview", "Playlists", "Listening History").
+  - Implemented roving tabindex: the active tab has `tabIndex={0}`, while inactive tabs have `tabIndex={-1}`.
+  - Rendered all three tab panels simultaneously in the DOM with matching `id`, `aria-controls`, and `aria-labelledby` attributes, using the HTML `hidden` attribute and CSS hidden classes on inactive panels to satisfy WAI-ARIA accessibility requirements.
+- [x] **Safe Artwork Display & Protocol Security (`src/components/profile/artwork-image.tsx` & `src/lib/profile/constants.ts`):**
+  - Created reusable, accessible `ArtworkImage` component displaying actual playlist covers (`Playlist.coverUrl`) and track artwork (`Track.coverUrl`).
+  - Implemented strict protocol validation (`isValidImageUrl`) permitting only `http:` and `https:` URLs, rejecting `javascript:`, `data:`, `file:`, and malformed payloads.
+  - Preserved fixed aspect ratio and dimensions (`w-9 h-9`, `w-10 h-10`, `w-12 h-12`) with `loading="lazy"` and `decoding="async"` to eliminate cumulative layout shifts (CLS).
+  - Handled network errors and missing images gracefully with client-side `onError` fallback to design-system icons (`♪` and `♫`).
+  - Preserved the ₹0 operating-cost constraint without arbitrary remote pattern wildcards or third-party image CDNs.
+- [x] **Deterministic UTC Date Formatting & Hydration Safety:**
+  - Audited date formatting in `src/app/users/[username]/profile-tabs.tsx` and `src/app/users/[username]/page.tsx`.
+  - Configured deterministic `timeZone: "UTC"` across all `Intl.DateTimeFormat` calls (`formatListenedDate`, `formatMonthYear`, `memberSinceFormatted`), eliminating timezone mismatches between server rendering and browser hydration.
+- [x] **Real Server Component Testing & Accessibility Coverage (`tests/profile/page.test.ts` & `tests/profile/components.test.ts`):**
+  - Upgraded `tests/profile/page.test.ts` (12 tests) to directly import and execute the actual `UserProfilePage` Server Component and `generateMetadata` function against live PostgreSQL test fixtures:
+    1. Verified existing usernames resolve to full profile data.
+    2. Verified nonexistent usernames trigger `notFound()` throwing `NEXT_NOT_FOUND`.
+    3. Verified authenticated owner mode renders `EditProfileDialog` and omits the visitor badge.
+    4. Verified visitor mode renders the neutral "Harmoni Member" badge and omits `EditProfileDialog`.
+    5. Verified visitor mode receives zero profile-editing controls even with `@` handle casing variations.
+    6. Verified only public playlists are passed to the UI while private playlists are strictly excluded.
+    7. Verified completed scrobbles are displayed while incomplete scrobbles are excluded.
+    8. Verified actual playlist and track artwork URLs reach the UI.
+    9. Verified sensitive fields (`passwordHash`, `sessions`) are never leaked in rendered HTML or props.
+    10. Verified empty profiles render genuine empty states.
+    11. Verified dynamic metadata generation for valid and 404 users.
+    12. Verified Next.js rewrite rule mapping `/@:username` to `/users/:username`.
+  - Created `tests/profile/components.test.ts` (14 tests) covering `ArtworkImage` protocol security, fallback symbols, `ProfileTabs` roving tabindex, panel DOM persistence, UTC formatting, avatar normalization, focus trap wrapping, and save in-flight dismissal guards.
+  - Full Vitest suite passes: **15 test files, 171 tests passed (100% pass rate)**.
 - [ ] Awaiting user review and explicit approval before initiating Milestone 4.
 
 ---
@@ -419,7 +462,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit tests pass (48 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`). When unsandboxed, all 14 test files and **all 148 tests pass cleanly with 0 errors in ~6.2s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit tests pass (62 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`). When unsandboxed, all 15 test files and **all 171 tests pass cleanly with 0 errors in ~7s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.

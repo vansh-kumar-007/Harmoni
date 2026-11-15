@@ -114,6 +114,7 @@ export default async function UserProfilePage({ params }: ProfilePageProps) {
   const memberSinceFormatted = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
+    timeZone: "UTC",
   }).format(new Date(user.createdAt));
 
   return (

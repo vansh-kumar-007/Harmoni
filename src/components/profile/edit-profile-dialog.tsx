@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { AVATAR_REGISTRY, AVATARS_META, MAX_BIO_LENGTH, type AvatarKey } from "@/lib/profile/constants";
+import {
+  AVATAR_REGISTRY,
+  AVATARS_META,
+  MAX_BIO_LENGTH,
+  getValidAvatarKey,
+  type AvatarKey,
+} from "@/lib/profile/constants";
 import { AvatarPreset } from "@/components/profile/avatar-preset";
 
 interface EditProfileDialogProps {
@@ -10,6 +16,23 @@ interface EditProfileDialogProps {
   initialBio: string | null;
   username: string;
   displayName: string;
+}
+
+function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
+  if (!container) return [];
+  const selector = [
+    'button:not([disabled]):not([tabindex="-1"])',
+    'a[href]:not([tabindex="-1"])',
+    'input:not([disabled]):not([tabindex="-1"])',
+    'select:not([disabled]):not([tabindex="-1"])',
+    'textarea:not([disabled]):not([tabindex="-1"])',
+    '[tabindex]:not([tabindex="-1"]):not([disabled])',
+  ].join(", ");
+
+  const elements = Array.from(container.querySelectorAll<HTMLElement>(selector));
+  return elements.filter((el) => {
+    return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+  });
 }
 
 export function EditProfileDialog({
@@ -20,7 +43,9 @@ export function EditProfileDialog({
 }: EditProfileDialogProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarKey>(initialAvatarKey as AvatarKey);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarKey>(() =>
+    getValidAvatarKey(initialAvatarKey)
+  );
   const [bioText, setBioText] = useState(initialBio || "");
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -28,9 +53,10 @@ export function EditProfileDialog({
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerButtonRef = useRef<HTMLButtonElement>(null);
+  const avatarButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const openModal = () => {
-    setSelectedAvatar((initialAvatarKey as AvatarKey) || "avatar_1");
+    setSelectedAvatar(getValidAvatarKey(initialAvatarKey));
     setBioText(initialBio || "");
     setStatus("idle");
     setErrorMessage(null);
@@ -38,29 +64,85 @@ export function EditProfileDialog({
   };
 
   const closeModal = () => {
+    if (status === "saving") return;
     setIsOpen(false);
-    triggerButtonRef.current?.focus();
+    setStatus("idle");
+    setErrorMessage(null);
+    // Restore focus to the trigger element that opened the dialog
+    setTimeout(() => {
+      triggerButtonRef.current?.focus();
+    }, 0);
   };
 
   // Focus close button for accessibility when modal opens
   useEffect(() => {
     if (isOpen) {
-      closeButtonRef.current?.focus();
+      const timer = setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  // Handle escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        if (status !== "saving") {
-          setIsOpen(false);
+  // Focus trap and escape key handler
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      if (status !== "saving") {
+        closeModal();
+      }
+      return;
+    }
+
+    if (e.key === "Tab") {
+      const focusable = getFocusableElements(modalRef.current);
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first || !modalRef.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last || !modalRef.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
         }
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, status]);
+    }
+  };
+
+  // Keyboard navigation within avatar radiogroup
+  const handleAvatarKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (status === "saving") return;
+    let targetIndex: number | null = null;
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      targetIndex = (index + 1) % AVATAR_REGISTRY.length;
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      targetIndex = (index - 1 + AVATAR_REGISTRY.length) % AVATAR_REGISTRY.length;
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      targetIndex = 0;
+    } else if (e.key === "End") {
+      e.preventDefault();
+      targetIndex = AVATAR_REGISTRY.length - 1;
+    }
+
+    if (targetIndex !== null) {
+      const nextKey = AVATAR_REGISTRY[targetIndex];
+      setSelectedAvatar(nextKey);
+      avatarButtonRefs.current[targetIndex]?.focus();
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,9 +220,10 @@ export function EditProfileDialog({
           role="dialog"
           aria-modal="true"
           aria-labelledby="edit-profile-title"
+          onKeyDown={handleDialogKeyDown}
           onClick={(e) => {
             if (e.target === e.currentTarget && status !== "saving") {
-              setIsOpen(false);
+              closeModal();
             }
           }}
         >
@@ -163,7 +246,7 @@ export function EditProfileDialog({
                 type="button"
                 onClick={closeModal}
                 disabled={status === "saving"}
-                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer disabled:opacity-50"
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label="Close dialog"
               >
                 <svg
@@ -200,7 +283,7 @@ export function EditProfileDialog({
                   Select Avatar Preset
                 </label>
                 <p className="text-[11px] text-muted-foreground">
-                  Handcrafted original SVG artwork stored locally at ₹0 cost.
+                  Handcrafted original SVG artwork stored locally at ₹0 cost. Use arrow keys to navigate.
                 </p>
 
                 <div
@@ -208,19 +291,24 @@ export function EditProfileDialog({
                   aria-label="Avatar preset choices"
                   className="grid grid-cols-4 gap-3 pt-1"
                 >
-                  {AVATAR_REGISTRY.map((key) => {
+                  {AVATAR_REGISTRY.map((key, idx) => {
                     const meta = AVATARS_META[key];
                     const isSelected = selectedAvatar === key;
 
                     return (
                       <button
                         key={key}
+                        ref={(el) => {
+                          avatarButtonRefs.current[idx] = el;
+                        }}
                         type="button"
                         role="radio"
                         aria-checked={isSelected}
+                        tabIndex={isSelected ? 0 : -1}
                         disabled={status === "saving"}
                         onClick={() => setSelectedAvatar(key)}
-                        className={`group relative p-2.5 rounded-xl border flex flex-col items-center text-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${
+                        onKeyDown={(e) => handleAvatarKeyDown(e, idx)}
+                        className={`group relative p-2.5 rounded-xl border flex flex-col items-center text-center transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card ${
                           isSelected
                             ? "border-primary bg-surface shadow-xs ring-1 ring-primary/40"
                             : "border-border bg-card hover:bg-surface-hover hover:border-border/80"
@@ -286,14 +374,14 @@ export function EditProfileDialog({
                   type="button"
                   onClick={closeModal}
                   disabled={status === "saving"}
-                  className="px-4 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground border border-border hover:bg-muted transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground border border-border hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={status === "saving" || isBioOverLimit}
-                  className="px-5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary-hover shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary-hover shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   {status === "saving" ? (
                     <>

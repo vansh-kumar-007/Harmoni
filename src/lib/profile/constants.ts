@@ -96,3 +96,20 @@ export function getValidAvatarKey(value: unknown): AvatarKey {
   }
   return DEFAULT_AVATAR;
 }
+
+/**
+ * Validates whether a given URL is a safe, valid HTTP or HTTPS image URL.
+ * Strictly disallows unexpected protocols such as javascript:, data:, file:, etc.
+ */
+export function isValidImageUrl(url: unknown): boolean {
+  if (typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
