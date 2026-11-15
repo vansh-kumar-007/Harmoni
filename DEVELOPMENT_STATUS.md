@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 4.2.1: Complete Creative Commons License Compatibility & Validation Audit** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 5)
+**Milestone 5: Persistent Audio Player & Queue Controller** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL FOR MILESTONE 6)
 
 ---
 
@@ -672,17 +672,73 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - [x] **Zero Admin Creation & Zero Cost Maintained:**
   - Database remains completely clean with 0 records.
   - ₹0 INR expenditure permanently maintained.
-- [ ] Awaiting user review and explicit approval before initiating Milestone 5.
+- [x] Milestone 4.2.1 approved and verified.
+
+### Milestone 5: Persistent Audio Player & Queue Controller
+- [x] **Dependency Installation:**
+  - Installed `zustand` (v5.1.0) under MIT License with zero cost.
+- [x] **Server-Side Audio Stream Resolution (`resolveJamendoTrackStream`):**
+  - Integrated `resolveJamendoTrackStream(trackId: string)` querying Jamendo `/v3.0/tracks/` with parameters `id=<trackId>`, `include=licenses`, `type=single albumtrack`, `audioformat=mp32` (strictly omitting `fullcount`).
+  - Enforced strict extraction exclusively from `audio` field (never `audiodownload` or download endpoints).
+  - Validated stream URLs with `isValidJamendoStreamUrl`: strictly HTTPS and restricted to verified Jamendo CDN domains (`storage.jamendo.com`, `prod-*.storage.jamendo.com`, `mp3d.jamendo.com`, `mp3l.jamendo.com`, `usercontent.jamendo.com`, `*.jamendo.com`, `*.jamendo-licensing.com`). Rejects IP addresses, HTTP, credentials, non-standard ports, and spoofed domains.
+  - Strictly enforced verified Creative Commons licenses via `parseCcLicense()`. Unverified or non-CC licenses (`isVerified: false`) refuse playback with HTTP 403.
+  - Server secrets (`JAMENDO_CLIENT_ID`) remain isolated server-side and are never exposed to browser bundles.
+- [x] **Protected Stream Resolution API (`GET /api/music/stream-url?trackId=...`):**
+  - Enforced authenticated user session guard via custom DAL (`getCurrentUser()`), returning 401 Unauthorized for unauthenticated requests.
+  - Validated `trackId` query parameter as non-empty positive integer string, returning 400 Bad Request on invalid input.
+  - Handled provider configuration status (`isJamendoConfigured()`), returning 503 Service Unavailable when missing.
+  - Returned short-lived ephemeral stream URL and track metadata with mandatory `Cache-Control: no-store, no-cache, must-revalidate, private` and `Pragma: no-cache` headers.
+- [x] **In-Memory Global Player Store (`src/lib/player/store.ts`):**
+  - Implemented Zustand player store managing `currentTrack`, `streamUrl`, `playbackState` (`idle` | `loading` | `playing` | `paused` | `error`), `errorMessage`, `currentTime`, `duration`, `volume`, `isMuted`, `queue`, `history`, `isQueueOpen`.
+  - **Zero Database Persistence:** No persistent scrobbles, stream URLs, or playback state in PostgreSQL; all state remains strictly in-memory.
+  - **Zero Storage Persistence Middleware:** Strictly avoided Zustand `persist` middleware (`localStorage`, `sessionStorage`, `IndexedDB`).
+  - **Race-Condition Protection:** Implemented generation ID (`resolutionId`) to safely drop stale asynchronous track stream resolutions when users rapidly switch or skip tracks.
+  - **Full Deterministic Queue Actions:** `playTrack`, `playQueue`, `addToQueue`, `playNextInQueue`, `removeFromQueue`, `clearQueue`, `nextTrack`, `previousTrack`, `togglePlayPause`, `retry`, `seek`, `setVolume`, `toggleMute`, `setQueueOpen`, `toggleQueueOpen`.
+- [x] **Persistent Audio Controller (`src/components/player/audio-controller.tsx`):**
+  - Mounted a single global `<audio>` element at RootLayout (`src/app/layout.tsx`).
+  - Audio playback persists continuously across client-side route transitions without interruption or restarts.
+  - Registered imperative audio handle with store; syncs time, duration, play, pause, buffer, error, and ended events.
+- [x] **Docked Player Bar & Queue Drawer UI (`src/components/player/`):**
+  - `PlayerBar`: Fixed at bottom, responsive, accessible (`role="region" aria-label="Audio player"`), fully integrated with all 5 themes using `--player-bg`, `--primary`, `--border`, `--foreground`.
+  - Displayed artwork thumbnail (with fallback), title, artist, Creative Commons badge link, and Jamendo canonical attribution link.
+  - Controls: Previous, Play/Pause/Loading/Retry, Next, volume slider, mute toggle, queue drawer toggle button with count badge.
+  - `ProgressScrubber`: Accessible interactive seek slider (`role="slider"`), keyboard arrow key seek (+/- 5s), drag scrub support, tabular formatted timestamps.
+  - `VolumeControl`: Accessible volume slider (`role="slider"`), keyboard adjustment (+/- 5%), mute/unmute toggle.
+  - `QueueDrawer`: Slide-over accessible dialog (`role="dialog" aria-modal="true"`) displaying Now Playing track, Up Next track list, "Play Now", "Remove", "Clear all", and friendly empty state. Keyboard Escape and backdrop dismissal.
+  - Updated page container padding (`pb-28`) in `src/app/layout.tsx` to prevent player bar from obscuring content.
+- [x] **Interactive Track Cards (`src/components/music/track-card.tsx`):**
+  - Added "Play Now" and "Queue" (Add to Queue) buttons and quick play artwork overlay.
+  - Synchronized with active player state (shows Pause when active track is playing).
+  - Explicitly disabled playback controls with tooltip notice when `!track.license.isVerified`.
+- [x] **Comprehensive Testing & Verification:**
+  - Added `tests/music/stream-resolver.test.ts` (12 tests).
+  - Added `tests/music/stream-route.test.ts` (11 tests).
+  - Added `tests/player/player-store.test.ts` (20 tests).
+  - Added `tests/player/player-ui.test.ts` (13 tests).
+  - Full Vitest suite passes: **29 test files, 351 tests passed (100% pass rate)**.
+  - Full PostgreSQL integration test passes: `pnpm db:test` (25 assertions passed).
+  - Full static checks pass: `pnpm typecheck` (0 errors), `pnpm lint` (0 errors, 0 warnings).
+  - Production build passes: `pnpm build` succeeds with 16 optimized routes.
+- [x] **Zero Admin Creation & Zero Cost Maintained:**
+  - Database remains completely clean with 0 records.
+  - ₹0 INR expenditure permanently maintained.
+- [ ] Awaiting user review and explicit approval before initiating Milestone 6.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 5: Persistent Audio Player & Queue Controller (Next Pending Milestone)**
-  - Implement global Zustand player store coordinating HTML5 audio state.
-  - Build docked root-layout player bar (play/pause, seek scrubber, volume control, queue drawer).
-  - Resolve ephemeral stream URLs dynamically without persisting transient CDN URLs as canonical data.
-  - Ensure audio playback persists uninterrupted across all route transitions.
-- **Milestone 6: Personal Library, Playlists & Local Scrobbling**
+- **Milestone 6: Personal Library, Playlists & Local Scrobbling (Next Pending Milestone)**
+  - Liked tracks collection and user playlist CRUD with track reordering.
+  - Build internal 50%-rule / 30-second listening history engine.
+  - Personal listening statistics dashboard (top tracks, top artists).
+- **Milestone 7: Friendship Network & Direct Track-Sharing Chat**
+  - Friend request sending, accepting, and mutual friend presence sidebar.
+  - 1-on-1 direct messaging drawer using lightweight HTTP polling (zero paid sockets).
+  - Share track functionality embedding an interactive **Track Card** in chat that plays directly inside the message.
+- **Milestone 8: Final UI Polish, Free Deployment & Production Verification**
+  - Responsive layout audit, dark studio theme polish, and accessibility pass.
+  - Deployment verification on Vercel Hobby + Neon PostgreSQL Free tier at ₹0 INR.
+  - Complete end-to-end user journey test.
   - Liked tracks collection and user playlist CRUD with track reordering.
   - Build internal 50%-rule / 30-second listening history engine.
   - Personal listening statistics dashboard (top tracks, top artists).
@@ -699,7 +755,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (176 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`). When unsandboxed, all 25 test files and **all 295 tests pass cleanly with 0 errors in ~9s**.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`, `route.test.ts`, `db-theme.test.ts`, `tests/profile/route.test.ts`, `tests/profile/page.test.ts`), while pure unit and rendered component tests pass (232 tests across `password.test.ts`, `http.test.ts`, `constants.test.ts`, `tests/profile/constants.test.ts`, `tests/profile/components.test.ts`, `tests/auth/redirect.test.ts`, `tests/auth/login-page.test.ts`, `tests/auth/register-page.test.ts`, `tests/auth/logout-component.test.ts`, `tests/auth/admin-invitations-page.test.ts`, `tests/auth/home-navigation.test.ts`, `tests/music/licenses.test.ts`, `tests/music/jamendo-provider.test.ts`, `tests/music/search-route.test.ts`, `tests/music/search-ui.test.ts`, `tests/music/stream-resolver.test.ts`, `tests/music/stream-route.test.ts`, `tests/player/player-store.test.ts`, `tests/player/player-ui.test.ts`). When unsandboxed, all 29 test files and **all 351 tests pass cleanly with 0 errors in ~10s**.
 3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
 4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
 5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
@@ -713,6 +769,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 - `react` / `react-dom` (19.3.0) — MIT License
 - `@node-rs/argon2` (2.2.2) — MIT License
 - `zod` (4.6.7) — MIT License
+- `zustand` (5.1.0) — MIT License
 - `@prisma/client` / `prisma` (7.10.1) — Apache-2.0 License
 - `@prisma/adapter-pg` (7.10.1) — Apache-2.0 License
 - `pg` (8.23.1) / `@types/pg` (8.23.1) — MIT License

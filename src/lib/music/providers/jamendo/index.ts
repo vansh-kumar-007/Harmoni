@@ -20,8 +20,19 @@ import {
   mapJamendoArtist,
   mapJamendoAlbum,
 } from "./mapper";
+import {
+  resolveJamendoTrackStream,
+  isValidJamendoStreamUrl,
+  type ResolvedTrackStream,
+} from "./stream";
 
-export { isJamendoConfigured, JamendoError };
+export {
+  isJamendoConfigured,
+  JamendoError,
+  resolveJamendoTrackStream,
+  isValidJamendoStreamUrl,
+  type ResolvedTrackStream,
+};
 
 export interface SearchOptions {
   query: string;

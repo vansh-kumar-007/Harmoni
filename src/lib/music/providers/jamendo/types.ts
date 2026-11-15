@@ -32,6 +32,8 @@ export const JamendoTrackItemSchema = z
     shorturl: z.string().optional().nullable(),
     license_ccurl: z.string().optional().nullable(),
     licenses: z.record(z.string(), z.unknown()).optional().nullable(),
+    audio: z.string().optional().nullable(),
+    audiodownload: z.string().optional().nullable(),
   })
   .passthrough();
 

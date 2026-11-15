@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/auth/dal";
 import { getValidThemeKey } from "@/lib/theme/constants";
 import { Navbar } from "@/components/layout/navbar";
+import { AudioController } from "@/components/player/audio-controller";
+import { PlayerBar } from "@/components/player/player-bar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +28,9 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Navbar user={user} />
-        <div className="flex-1 flex flex-col">{children}</div>
+        <div className="flex-1 flex flex-col pb-28">{children}</div>
+        <AudioController />
+        <PlayerBar />
       </body>
     </html>
   );
