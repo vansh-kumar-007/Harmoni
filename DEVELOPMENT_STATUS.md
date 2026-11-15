@@ -10,7 +10,7 @@ Harmoni is an open-source, personal-scale social music web application designed 
 ---
 
 ## 2. Current Milestone
-**Milestone 3C.0.1: Design Proposal Refinement & Figma Prototype** (REFINED & STAGED — AWAITING USER REVIEW & EXPLICIT APPROVAL)
+**Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup** (COMPLETED & VERIFIED — AWAITING USER REVIEW & EXPLICIT APPROVAL)
 
 ---
 
@@ -208,34 +208,43 @@ Harmoni is an open-source, personal-scale social music web application designed 
   - Total test suite expanded to **8 test files, 103 tests passing**.
 - [x] Re-verified full project pipeline: `pnpm db:validate`, `pnpm db:migrate:status`, `pnpm db:test`, `pnpm test:auth` (103 tests passing), `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
 
-### Milestone 3C.0.1: Design Proposal Refinement & Figma Prototype
+### Milestone 3C.0.1: Design Proposal Refinement & Visual Exploration
 - [x] Verified working tree and branch synchronization with `origin/main` at `fa21bc6a88d712072eade5bc903931300793ba11`.
-- [x] Audited Figma environment and Antigravity remote MCP server integration (`figma_figma`):
-  - Identified authenticated user: Vansh Kumar (`vanshkumar.fds@gmail.com`).
-  - Team: "Vansh Kumar's team" (`team::1697927119598855106`), Tier: `student`, Role: `admin`, Seat: `View`.
-  - Capabilities enabled: `code_layers_enabled: true`, `specs_enabled: true`.
-  - Identified tool boundaries: file creation and metadata inspection are supported and zero-cost; `use_figma` is not present; generative AI vector/image creation requires paid credits and is strictly prohibited under our ₹0 INR constraint.
-- [x] Created canonical Figma design file:
-  - File Name: `Harmoni — Visual Design Exploration`
-  - File Key: `tde7tKDtxqTwhqJQko989H`
-  - File URL: [https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H)
-  - Initialized session: `9ac1b3e9-1172-43d8-85ce-3d6b3ea7d042`.
-- [x] Created pixel-accurate interactive visual exploration prototype:
-  - Authored standalone prototype at [`docs/visual-design-exploration.html`](file:///d:/Projects/Harmoni/docs/visual-design-exploration.html).
-  - Staged for inspection in conversation scratch space.
-  - Modeled visual direction comparisons, 1440×900 desktop screens, 390×844 mobile screens, design tokens, and the 8 SVG avatar presets.
-- [x] Refined and updated Design Foundation Proposal ([`docs/design-foundation-proposal.md`](file:///d:/Projects/Harmoni/docs/design-foundation-proposal.md)):
-  - **A. Next.js Profile Routing:** Replaced invalid `app/@username` parallel-route assumption with valid `next.config.ts` rewrite (`source: '/@:username', destination: '/users/:username'`) backed by `src/app/users/[username]/page.tsx` with asynchronous `params = await props.params`.
-  - **B. Strict Milestone 3C Scope Boundary:** Restricted Milestone 3C strictly to profile presentation, 8 SVG avatar presets, and bio editing. Formally deferred all friendship mutations (requesting, accepting, declining, unfriending, blocking) and messaging to Milestone 7. Prevented deceptive UI action buttons.
-  - **C. Unsupported Presence Model Clarification:** Documented that PostgreSQL Prisma schema does not contain a presence or now-playing model; marked live presence strictly as an exploratory concept for future milestones.
-  - **D. Reassessed Application Shell:** Replaced rigid 3-column desktop layout with a spacious **2-column default layout** (240px sidebar + fluid main content) and an on-demand collapsible social slide-over drawer (`z-40`, 300px). Specified 48px+ touch targets and `pb-36` (144px) padding for mobile.
-  - **E. Accurate Claims & Licensing Obligations:** Replaced unverified eye-strain claims with accurate glare reduction and visual ergonomics in low-light environments. Formalized open-source source categorization: permissive code reuse (preserving MIT notice/disclaimer), architectural reference (Zustand player store pattern), and visual inspiration only (Infinitunes, Mice, Feishin). Marked all mockup data as design placeholders.
+- [x] Audited Figma environment via remote MCP server `figma_figma` under user Vansh Kumar (`vanshkumar.fds@gmail.com`), Student tier.
+- [x] Initialized remote Figma file: `Harmoni — Visual Design Exploration` ([https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H)).
+- [x] Authored initial HTML visual exploration prototype in `docs/visual-design-exploration.html`.
+- [x] Refined and updated Design Foundation Proposal ([`docs/design-foundation-proposal.md`](file:///d:/Projects/Harmoni/docs/design-foundation-proposal.md)) covering Next.js profile rewrite routing, strict Milestone 3C boundary, presence model clarification, 2-column studio layout, and glare reduction ergonomics.
+
+### Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup (THIS MILESTONE)
+- [x] **Accurate Figma Status Record:**
+  - Audited and documented that the remote Figma file (`https://www.figma.com/design/tde7tKDtxqTwhqJQko989H`) is an **empty document canvas shell** containing only an empty "Page 1".
+  - Corrected previous report: no native design frames or layers were generated in Figma.
+  - Documented tool boundaries: remote MCP server lacks `use_figma` plugin script execution, `send_code_to_figma` targets code layers only, and native generative AI tools consume paid credits prohibited under the ₹0 INR budget rule.
+  - Confirmed no duplicate empty files created and zero paid credits consumed.
+  - Established that `docs/visual-design-exploration.html` serves as the canonical high-fidelity visual deliverable.
+- [x] **Replaced Emoji Placeholders with 8 Handcrafted Inline SVGs:**
+  - Replaced all emoji placeholders with eight original inline SVG illustrations (`avatar_1` to `avatar_8`) matching the Obsidian Studio palette.
+  - Each SVG features consistent `viewBox="0 0 64 64"`, `role="img"`, `<title>`, accessible labels, clean vector geometry, and zero external icon or font dependencies.
+  - Integrated SVGs into View 5 (preset showcase cards), desktop profile hero (104px), mobile profile hero (80px), desktop sidebar user pill (34px), and mobile discover header (28px).
+- [x] **WAI-ARIA Tab Navigation & Script Hardening:**
+  - Completely eliminated reliance on deprecated global `event` / `window.event`.
+  - Refactored view switching into an accessible WAI-ARIA tablist pattern (`role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`, `aria-controls`, `tabindex`).
+  - Added full keyboard arrow navigation (`ArrowLeft`, `ArrowRight`, `Home`, `End`) with roving tabindex and focus management.
+  - Verified 0 browser console errors.
+- [x] **Prototype Scope & Limitations Banner:**
+  - Added prominent banner clearly distinguishing functional interactive features (view switching, comparison cards, token inspection) from non-functional visual mockups (decorative audio player controls, illustrative tracks without Jamendo API, fictional user profiles without DB).
+  - Fully preserved the three visual direction comparisons (Obsidian Studio, Nordic Aurora, Editorial Vinyl) and all 5 view stages.
+- [x] **Authentication Test Suite Investigation:**
+  - Documented exact failure mode in sandboxed environment (`connect EACCES 127.0.0.1:5432` across the 6 database test files) caused by agent sandbox network isolation blocking loopback TCP socket connections.
+  - Verified that pure unit tests (`tests/auth/password.test.ts`, `tests/auth/http.test.ts`) pass 100% in sandbox (33 tests passed).
+  - Verified that with network unblocked (`BypassSandbox: true`), all 8 test suites and **all 103 tests pass completely with 0 errors in 4.37s**.
+  - Classified as **Environmental Problem (Sandbox TCP Loopback Network Isolation)**.
 - [ ] Awaiting user review and explicit approval before initiating frontend implementation.
 
 ---
 
 ## 4. Remaining Milestones Roadmap
-- **Milestone 3C: User Profile Page & Avatar Presets**
+- **Milestone 3C: User Profile Page & Avatar Presets (Pending Approval)**
   - Implement `next.config.ts` rewrite from `/@:username` to `/users/:username`.
   - Build public user profile page (`src/app/users/[username]/page.tsx`) with 8 SVG avatar presets.
   - Build self-service profile bio editing modal (`User.bio` up to 250 characters).
@@ -265,10 +274,11 @@ Harmoni is an open-source, personal-scale social music web application designed 
 
 ## 5. Known Technical Limitations & Status
 1. **Local PostgreSQL Service State:** PostgreSQL 18.4 is installed at `E:\Win_Softwares\PostgreSQL` (Windows service `postgresql-x64-18`), running and connected on `127.0.0.1:5432` with database `harmoni` and role `harmoni_app`. Initial migration and constraint verifications are complete and passed.
-2. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
-3. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
-4. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
-5. **Figma MCP Server Capabilities:** Remote Figma MCP server (`figma_figma`) supports file creation and design context inspection; does not expose `use_figma` scene graph script execution; AI generative tools are strictly prohibited under ₹0 INR budget rule.
+2. **Windows Sandbox Network Isolation for Database Tests:** The agent's standard execution sandbox blocks all TCP network communication, including loopback connections to `127.0.0.1:5432`. As a result, running `pnpm test:auth` inside the sandbox fails with `connect EACCES 127.0.0.1:5432` for test files requiring a live PostgreSQL connection (`dal.test.ts`, `session.test.ts`, `register.test.ts`, `login.test.ts`, `invites.test.ts`, `bootstrap.test.ts`), while pure unit tests pass (33 tests). When unsandboxed, all 103 tests pass cleanly.
+3. **Turbopack IPC Loader on Windows:** Stable webpack compilation (`--webpack`) is configured and verified for both dev and production builds.
+4. **Neon PostgreSQL Free Scale-to-Zero:** Neon compute pauses after 5 minutes of idle time; the first incoming connection auto-wakes in ~300–500ms.
+5. **Authentication Rate Limiting Status:** Process-local in-memory rate limiting was intentionally not introduced because it does not reliably protect serverless or multi-instance deployments. Per ₹0 budget requirements, platform-level protection (e.g. Vercel firewall rules, free edge middleware) will be evaluated during final deployment hardening without paid Redis or SaaS dependencies.
+6. **Figma MCP Server Capabilities:** Remote Figma MCP server (`figma_figma`) creates files and queries metadata, but lacks `use_figma` scene-graph script execution. Native generative AI tools consume paid credits and are strictly prohibited. The canonical visual prototype is maintained in HTML.
 
 ---
 

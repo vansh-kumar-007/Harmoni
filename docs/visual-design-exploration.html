@@ -90,6 +90,7 @@
       color: #0b0c10;
       font-family: 'Plus Jakarta Sans', sans-serif;
       box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+      flex-shrink: 0;
     }
 
     .brand-title {
@@ -108,6 +109,7 @@
       padding: 3px 8px;
       border-radius: 9999px;
       border: 1px solid #252937;
+      white-space: nowrap;
     }
 
     .view-tabs {
@@ -130,10 +132,16 @@
       cursor: pointer;
       transition: all 0.15s ease;
       font-family: inherit;
+      white-space: nowrap;
     }
 
     .view-btn:hover {
       color: #f3f4f6;
+    }
+
+    .view-btn:focus-visible {
+      outline: 2px solid #f59e0b;
+      outline-offset: 1px;
     }
 
     .view-btn.active {
@@ -149,21 +157,62 @@
       font-size: 12px;
       color: #9ca3af;
       font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
     }
 
-    .status-dot {
+    .status-dot-shell {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      background: #eab308;
+      box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
+      flex-shrink: 0;
     }
 
     /* Container */
     .stage-container {
       max-width: 1560px;
       margin: 0 auto;
-      padding: 32px 24px 80px;
+      padding: 28px 24px 80px;
+    }
+
+    /* Prototype Notice Banner */
+    .prototype-notice-banner {
+      background: #11131a;
+      border: 1px solid #252937;
+      border-left: 4px solid #f59e0b;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .notice-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #f59e0b;
+      letter-spacing: 0.05em;
+    }
+
+    .notice-content strong {
+      color: #f3f4f6;
+    }
+
+    .notice-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #6b7280;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-top: 6px;
+      border-top: 1px solid #1c202c;
     }
 
     .section-title {
@@ -319,27 +368,12 @@
       width: 40px;
       height: 40px;
       border-radius: 6px;
+      background: #1f2330;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
       flex-shrink: 0;
-    }
-
-    .obsidian .mini-artwork {
-      background: linear-gradient(135deg, #252937, #14161f);
-      border: 1px solid #f59e0b;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
-    }
-
-    .aurora .mini-artwork {
-      background: linear-gradient(135deg, #06b6d4, #6366f1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .editorial .mini-artwork {
-      background: #21242e;
-      border: 1px solid #ccff00;
+      overflow: hidden;
     }
 
     .mini-track-info {
@@ -358,17 +392,22 @@
     .mini-track-artist {
       font-size: 11px;
       color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mini-play-btn {
       width: 32px;
       height: 32px;
       border-radius: 50%;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: none;
       cursor: pointer;
+      font-size: 12px;
       flex-shrink: 0;
     }
 
@@ -378,24 +417,23 @@
     }
 
     .aurora .mini-play-btn {
-      background: linear-gradient(135deg, #06b6d4, #10b981);
+      background: #06b6d4;
       color: #08090d;
     }
 
     .editorial .mini-play-btn {
       background: #ccff00;
       color: #0d0e11;
-      border-radius: 4px;
     }
 
-    /* Screen Frames */
+    /* Screen Stage Frame (Desktop 1440x900 simulated) */
     .screen-stage {
-      background: #090a0f;
+      background: #0b0c10;
       border: 1px solid #252937;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      margin-bottom: 48px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      margin-bottom: 40px;
     }
 
     .screen-stage-bar {
@@ -405,7 +443,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 11px;
       color: #9ca3af;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -421,16 +459,13 @@
       border-radius: 50%;
     }
 
-    /* Desktop Viewport (1440x900 simulated) */
     .desktop-frame {
-      width: 100%;
-      min-height: 860px;
       display: flex;
+      min-height: 720px;
       position: relative;
-      background: #0b0c10;
     }
 
-    /* Left Sidebar */
+    /* Desktop Sidebar (240px fixed) */
     .desktop-sidebar {
       width: 240px;
       background: #11131a;
@@ -447,31 +482,30 @@
     }
 
     .sidebar-heading {
-      font-size: 11px;
+      font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #6b7280;
-      margin-bottom: 10px;
-      padding-left: 10px;
+      padding: 0 10px 8px;
     }
 
     .sidebar-link {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 9px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       color: #9ca3af;
       text-decoration: none;
       font-size: 13px;
       font-weight: 500;
       transition: all 0.15s ease;
-      margin-bottom: 2px;
+      cursor: pointer;
     }
 
     .sidebar-link:hover {
-      background: #181b26;
+      background: #161922;
       color: #f3f4f6;
     }
 
@@ -483,20 +517,19 @@
 
     .sidebar-link-icon {
       font-size: 16px;
-      width: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 20px;
     }
 
-    /* User Profile Card in Sidebar */
     .sidebar-user {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 10px;
-      border-radius: 10px;
       background: #14161f;
+      border-radius: 10px;
       border: 1px solid #252937;
     }
 
@@ -504,12 +537,19 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: #252937;
+      background: #14161f;
       border: 1px solid #f59e0b;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-avatar svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .sidebar-user-text {
@@ -626,6 +666,7 @@
       justify-content: center;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       animation: spin 16s linear infinite;
+      flex-shrink: 0;
     }
 
     .hero-vinyl-center {
@@ -636,9 +677,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 11px;
       color: #0b0c10;
       font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     @keyframes spin {
@@ -697,8 +739,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .track-art svg {
+      width: 24px;
+      height: 24px;
+      display: block;
     }
 
     .track-name {
@@ -749,50 +797,78 @@
       100% { height: 100%; }
     }
 
-    /* Docked Bottom Audio Player */
+    /* Persistent Audio Player (Docked Bottom 80px) */
     .docked-player {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       height: 80px;
-      background: #11131a;
+      background: #0e1017;
       border-top: 1px solid #252937;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
-      gap: 24px;
+      padding: 0 24px;
       z-index: 50;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .docked-player::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 45%;
+      height: 2px;
+      background: #f59e0b;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
     }
 
     .player-left {
       display: flex;
       align-items: center;
       gap: 14px;
-      width: 280px;
+      width: 240px;
     }
 
-    .player-art {
+    .player-cover {
       width: 48px;
       height: 48px;
       border-radius: 8px;
-      background: #1e222d;
+      background: #1c202c;
       border: 1px solid #252937;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .player-cover svg {
+      width: 32px;
+      height: 32px;
+      display: block;
+    }
+
+    .player-track-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f3f4f6;
+    }
+
+    .player-track-artist {
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     .player-center {
       flex: 1;
-      max-width: 580px;
+      max-width: 600px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .player-controls {
@@ -974,6 +1050,9 @@
       font-size: 10px;
       color: #6b7280;
       text-decoration: none;
+      min-width: 48px;
+      min-height: 48px;
+      justify-content: center;
     }
 
     .mobile-nav-item.active {
@@ -1002,9 +1081,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 42px;
+      overflow: hidden;
       box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
       flex-shrink: 0;
+    }
+
+    .profile-avatar-large svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .profile-info {
@@ -1059,6 +1144,9 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .btn-edit-profile:hover {
@@ -1071,50 +1159,80 @@
     .avatar-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+      gap: 20px;
       margin-top: 24px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .avatar-preset-card {
       background: #14161f;
       border: 1px solid #252937;
       border-radius: 12px;
-      padding: 16px;
+      padding: 20px 16px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .avatar-preset-card:hover {
+      border-color: #f59e0b;
+      transform: translateY(-2px);
     }
 
     .avatar-preset-preview {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: #1a1d28;
+      background: #14161f;
       border: 2px solid #252937;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      transition: border-color 0.15s ease;
+      overflow: hidden;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .avatar-preset-preview svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .avatar-preset-card:hover .avatar-preset-preview {
       border-color: #f59e0b;
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
     }
 
     .avatar-preset-name {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       color: #f3f4f6;
     }
 
     .avatar-preset-key {
-      font-size: 10px;
+      font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      color: #6b7280;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .avatar-preset-desc {
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -1123,42 +1241,56 @@
   <!-- Top Sticky Navigation Bar -->
   <header class="prototype-header">
     <div class="brand-group">
-      <div class="brand-logo">H</div>
+      <div class="brand-logo" aria-hidden="true">H</div>
       <div>
         <div class="brand-title">Harmoni Design Exploration</div>
-        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.1 Visual Specification</div>
+        <div style="font-size: 11px; color: #6b7280;">Milestone 3C.0.2 Visual Prototype</div>
       </div>
       <span class="brand-badge">STUDIO HI-FI PROTOTYPE</span>
     </div>
 
-    <!-- View Switcher -->
-    <div class="view-tabs">
-      <button class="view-btn active" onclick="switchView('directions')">1. Visual Directions</button>
-      <button class="view-btn" onclick="switchView('desktop-discover')">2. Desktop Discover</button>
-      <button class="view-btn" onclick="switchView('desktop-profile')">3. Desktop Profile</button>
-      <button class="view-btn" onclick="switchView('mobile')">4. Mobile Screens</button>
-      <button class="view-btn" onclick="switchView('tokens')">5. Design Tokens & Avatars</button>
-    </div>
+    <!-- View Switcher (WAI-ARIA Tablist Pattern with Keyboard Navigation) -->
+    <nav class="view-tabs" role="tablist" aria-label="Prototype View Navigation">
+      <button type="button" class="view-btn active" role="tab" aria-selected="true" aria-controls="view-directions" id="tab-directions" data-view="directions" tabindex="0">1. Visual Directions</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-discover" id="tab-desktop-discover" data-view="desktop-discover" tabindex="-1">2. Desktop Discover</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-desktop-profile" id="tab-desktop-profile" data-view="desktop-profile" tabindex="-1">3. Desktop Profile</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-mobile" id="tab-mobile" data-view="mobile" tabindex="-1">4. Mobile Screens</button>
+      <button type="button" class="view-btn" role="tab" aria-selected="false" aria-controls="view-tokens" id="tab-tokens" data-view="tokens" tabindex="-1">5. Design Tokens & Avatars</button>
+    </nav>
 
     <div class="figma-status">
-      <span class="status-dot"></span>
-      <span>Figma Student File Linked</span>
+      <span class="status-dot-shell" aria-hidden="true"></span>
+      <span>Figma Shell Linked (Empty Document)</span>
     </div>
   </header>
 
   <main class="stage-container">
 
+    <!-- Prototype Capability & Limitation Notice -->
+    <div class="prototype-notice-banner" role="region" aria-label="Prototype Scope and Limitations">
+      <div class="notice-badge">// PROTOTYPE SCOPE &amp; BOUNDARY NOTICE</div>
+      <div class="notice-content">
+        <p><strong>Interactive Features in this Document:</strong> Accessible view switcher tabs (keyboard navigation with Arrow keys/Home/End), visual direction comparison cards, simulated 1440&times;900 desktop and 390&times;844 mobile frames, design token palette, and eight handcrafted inline SVG avatar illustrations.</p>
+        <p><strong>Design-Only Mockups (Non-Functional Placeholders):</strong> Audio scrubber, equalizer animations, volume sliders, and play/pause controls are decorative visual demonstrations and do not stream audio; track titles, albums, and duration metrics are illustrative placeholders without Jamendo API streaming; user profiles and listening counters are fictional mock data with zero live database queries or authentication sessions.</p>
+      </div>
+      <div class="notice-meta">
+        <span>Figma Shell: <a href="https://www.figma.com/design/tde7tKDtxqTwhqJQko989H" target="_blank" rel="noreferrer" style="color: #f59e0b; text-decoration: underline;">tde7tKDtxqTwhqJQko989H</a> (Verified Empty Canvas Shell)</span>
+        <span>Canonical Deliverable: This HTML Prototype Document</span>
+        <span>Budget Constraint: &yen;0 INR</span>
+      </div>
+    </div>
+
     <!-- VIEW 1: THREE VISUAL DIRECTIONS COMPARISON -->
-    <section id="view-directions">
+    <section id="view-directions" role="tabpanel" aria-labelledby="tab-directions">
       <div class="section-title">
         <span>Three Visual Directions for Harmoni</span>
       </div>
-      <p class="section-desc">Comparing three tailored aesthetic directions built for an intimate circle of 5–15 friends at ₹0 lifetime cost.</p>
+      <p class="section-desc">Comparing three tailored aesthetic directions built for an intimate circle of 5&ndash;15 friends at &yen;0 lifetime cost.</p>
 
       <div class="directions-grid">
         <!-- Direction 1: Obsidian Studio (Recommended) -->
         <div class="direction-card obsidian">
-          <span class="dir-badge">★ RECOMMENDED DIRECTION</span>
+          <span class="dir-badge">&starf; RECOMMENDED DIRECTION</span>
           <h3 class="dir-title">1. Obsidian Studio</h3>
           <p class="dir-desc">Warm analog audio preamps, vinyl listening rooms, and the cozy amber tube glow of a late-night private music session with friends.</p>
           
@@ -1173,14 +1305,21 @@
             Typography: Plus Jakarta Sans + Inter + JetBrains Mono
           </div>
 
-          <!-- Component preview -->
+          <!-- Component preview with SVG avatar -->
           <div class="mini-player-preview">
-            <div class="mini-artwork">📻</div>
+            <div class="mini-artwork">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Studio Turntable" style="width: 28px; height: 28px;">
+                <circle cx="28" cy="32" r="16" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                <circle cx="28" cy="32" r="6" fill="#f59e0b"/>
+                <circle cx="28" cy="32" r="2" fill="#0b0c10"/>
+                <path d="M48 18L44 32L38 34" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
             <div class="mini-track-info">
               <div class="mini-track-title">Solar Drift</div>
-              <div class="mini-track-artist">Tycho · CC BY-NC-SA 4.0</div>
+              <div class="mini-track-artist">Tycho &middot; CC BY-NC-SA 4.0</div>
             </div>
-            <button class="mini-play-btn">▶</button>
+            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
           </div>
         </div>
 
@@ -1203,12 +1342,18 @@
 
           <!-- Component preview -->
           <div class="mini-player-preview">
-            <div class="mini-artwork">🌌</div>
+            <div class="mini-artwork">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aurora Prism" style="width: 28px; height: 28px;">
+                <polygon points="32,14 18,46 46,46" fill="#111420" stroke="#06b6d4" stroke-width="1.5"/>
+                <path d="M36 30L52 20" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M36 34L52 42" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
             <div class="mini-track-info">
               <div class="mini-track-title">Solar Drift</div>
-              <div class="mini-track-artist">Tycho · Ambient Wash</div>
+              <div class="mini-track-artist">Tycho &middot; Ambient Wash</div>
             </div>
-            <button class="mini-play-btn">▶</button>
+            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
           </div>
         </div>
 
@@ -1231,23 +1376,29 @@
 
           <!-- Component preview -->
           <div class="mini-player-preview">
-            <div class="mini-artwork">🎛️</div>
+            <div class="mini-artwork">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Editorial Disc" style="width: 28px; height: 28px;">
+                <circle cx="32" cy="32" r="22" stroke="#ccff00" stroke-width="1.5"/>
+                <circle cx="32" cy="32" r="6" fill="#ccff00"/>
+                <circle cx="32" cy="32" r="2" fill="#0d0e11"/>
+              </svg>
+            </div>
             <div class="mini-track-info">
               <div class="mini-track-title">SOLAR DRIFT // 01</div>
               <div class="mini-track-artist">TYCHO // 320 KBPS</div>
             </div>
-            <button class="mini-play-btn">▶</button>
+            <button type="button" class="mini-play-btn" aria-label="Play sample track">&blacktriangleright;</button>
           </div>
         </div>
       </div>
     </section>
 
     <!-- VIEW 2: HIGH-FIDELITY DESKTOP DISCOVER SCREEN (1440x900) -->
-    <section id="view-desktop-discover" style="display: none;">
+    <section id="view-desktop-discover" role="tabpanel" aria-labelledby="tab-desktop-discover" style="display: none;">
       <div class="section-title">
-        <span>Desktop Discover Screen (1440 × 900 · Obsidian Studio)</span>
+        <span>Desktop Discover Screen (1440 &times; 900 &middot; Obsidian Studio)</span>
       </div>
-      <p class="section-desc">Uncluttered 2-column layout with fixed navigation sidebar, spacious listening viewport, and docked bottom Hi-Fi preamp player.</p>
+      <p class="section-desc">Spacious 2-column studio layout with fixed navigation sidebar, fluid listening viewport, and docked persistent preamp player.</p>
 
       <div class="screen-stage">
         <div class="screen-stage-bar">
@@ -1256,7 +1407,7 @@
             <div class="traffic-light" style="background: #f59e0b;"></div>
             <div class="traffic-light" style="background: #10b981;"></div>
           </div>
-          <span>Harmoni Desktop — 1440 × 900 — Obsidian Hi-Fi</span>
+          <span>Harmoni Desktop &mdash; 1440 &times; 900 &mdash; Obsidian Hi-Fi</span>
           <span>https://harmoni.local/discover</span>
         </div>
 
@@ -1265,18 +1416,18 @@
           <aside class="desktop-sidebar">
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
-                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;">H</div>
+                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;" aria-hidden="true">H</div>
                 <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
               </div>
 
               <div class="sidebar-nav-section">
                 <div class="sidebar-heading">// Explore</div>
                 <a href="#discover" class="sidebar-link active">
-                  <span class="sidebar-link-icon">🧭</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&cirf;</span>
                   <span>Discover</span>
                 </a>
                 <a href="#search" class="sidebar-link">
-                  <span class="sidebar-link-icon">🔍</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&telrec;</span>
                   <span>Search</span>
                 </a>
               </div>
@@ -1284,23 +1435,35 @@
               <div class="sidebar-nav-section">
                 <div class="sidebar-heading">// Library</div>
                 <a href="#liked" class="sidebar-link">
-                  <span class="sidebar-link-icon">❤️</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&hearts;</span>
                   <span>Liked Tracks</span>
                 </a>
                 <a href="#playlists" class="sidebar-link">
-                  <span class="sidebar-link-icon">📑</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&equiv;</span>
                   <span>Playlists</span>
                 </a>
                 <a href="#history" class="sidebar-link">
-                  <span class="sidebar-link-icon">⏳</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&infin;</span>
                   <span>Scrobble History</span>
                 </a>
               </div>
             </div>
 
-            <!-- Authenticated User Profile Pill -->
+            <!-- Authenticated User Profile Pill with SVG Avatar -->
             <div class="sidebar-user">
-              <div class="sidebar-avatar">🎧</div>
+              <div class="sidebar-avatar">
+                <!-- Avatar 1 SVG Inline -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar: Amber Studio Turntable">
+                  <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                  <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                  <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+                  <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
+                  <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
+                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
               <div class="sidebar-user-text">
                 <div class="sidebar-username">Elena Vance</div>
                 <div class="sidebar-userhandle">@elena</div>
@@ -1315,12 +1478,12 @@
             <div class="hero-banner">
               <div>
                 <span class="hero-tag">FEATURED CC RELEASE</span>
-                <h1 class="hero-title">Solar Drift — Single Cut</h1>
+                <h1 class="hero-title">Solar Drift &mdash; Single Cut</h1>
                 <p class="hero-desc">Atmospheric analog synthesizers and organic percussion recorded in California. Licensed under Creative Commons Attribution-NonCommercial-ShareAlike.</p>
-                <button class="hero-cta">▶ Listen Now</button>
+                <button type="button" class="hero-cta">&blacktriangleright; Listen Now</button>
               </div>
 
-              <div class="hero-vinyl">
+              <div class="hero-vinyl" aria-hidden="true">
                 <div class="hero-vinyl-center">TYCHO</div>
               </div>
             </div>
@@ -1328,14 +1491,14 @@
             <!-- Fresh Discoveries Track Table -->
             <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
               <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700;">Curated Vinyl Feed</h2>
-              <span style="font-size: 12px; color: #9ca3af; font-family: 'JetBrains Mono', monospace;">5 Tracks Loaded · CC Verified</span>
+              <span style="font-size: 12px; color: #9ca3af; font-family: 'JetBrains Mono', monospace;">5 Tracks Loaded &middot; CC Verified</span>
             </div>
 
             <table class="track-table">
               <thead>
                 <tr>
                   <th style="width: 50px;">#</th>
-                  <th>Title & Artist</th>
+                  <th>Title &amp; Artist</th>
                   <th>Album</th>
                   <th>License</th>
                   <th style="text-align: right; width: 80px;">Time</th>
@@ -1344,7 +1507,7 @@
               <tbody>
                 <tr class="track-row playing">
                   <td>
-                    <div class="equalizer-anim">
+                    <div class="equalizer-anim" aria-label="Now playing">
                       <div class="eq-bar"></div>
                       <div class="eq-bar"></div>
                       <div class="eq-bar"></div>
@@ -1352,86 +1515,137 @@
                   </td>
                   <td>
                     <div class="track-cell-title">
-                      <div class="track-art">☀️</div>
+                      <div class="track-art">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
+                          <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
+                          <circle cx="32" cy="32" r="10" fill="#f59e0b"/>
+                          <circle cx="32" cy="32" r="3" fill="#0b0c10"/>
+                        </svg>
+                      </div>
                       <div>
                         <div class="track-name">Solar Drift</div>
                         <div class="track-artist">Tycho</div>
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Simulate EP</td>
-                  <td><span class="track-license-badge">CC BY-NC-SA</span></td>
+                  <td style="color: #9ca3af;">Simulated Single</td>
+                  <td><span class="track-license-badge">CC BY-NC-SA 4.0</span></td>
                   <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #f59e0b;">03:42</td>
                 </tr>
+
                 <tr class="track-row">
-                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">02</td>
+                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">02</td>
                   <td>
                     <div class="track-cell-title">
-                      <div class="track-art">🌊</div>
+                      <div class="track-art">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
+                          <rect x="12" y="12" width="40" height="40" rx="6" fill="#141722" stroke="#252937" stroke-width="2"/>
+                          <path d="M18 36L28 24L38 34L46 26" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </div>
                       <div>
                         <div class="track-name">Coastal Grooves</div>
                         <div class="track-artist">Bonobo</div>
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Migration Cuts</td>
-                  <td><span class="track-license-badge">CC BY-SA</span></td>
+                  <td style="color: #9ca3af;">Migration Sessions</td>
+                  <td><span class="track-license-badge">CC BY-SA 4.0</span></td>
                   <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">04:18</td>
                 </tr>
+
                 <tr class="track-row">
-                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">03</td>
+                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">03</td>
                   <td>
                     <div class="track-cell-title">
-                      <div class="track-art">🌙</div>
+                      <div class="track-art">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
+                          <circle cx="32" cy="32" r="26" fill="#111420" stroke="#22293d" stroke-width="2"/>
+                          <polygon points="32,18 20,44 44,44" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="1.5"/>
+                        </svg>
+                      </div>
                       <div>
                         <div class="track-name">Midnight Frequency</div>
                         <div class="track-artist">Kiasmos</div>
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Looped Sessions</td>
-                  <td><span class="track-license-badge">CC BY-NC</span></td>
+                  <td style="color: #9ca3af;">Looped Horizon</td>
+                  <td><span class="track-license-badge">CC BY 4.0</span></td>
                   <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">05:02</td>
                 </tr>
+
                 <tr class="track-row">
-                  <td style="color: #6b7280; font-family: 'JetBrains Mono', monospace;">04</td>
+                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">04</td>
                   <td>
                     <div class="track-cell-title">
-                      <div class="track-art">🌲</div>
+                      <div class="track-art">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
+                          <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                          <path d="M16 32C22 20 28 44 34 32C40 20 44 44 48 32" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </div>
                       <div>
-                        <div class="track-name">Pinecone Reverberation</div>
-                        <div class="track-artist">Emancipator</div>
+                        <div class="track-name">Analog Reverie</div>
+                        <div class="track-artist">Nils Frahm</div>
                       </div>
                     </div>
                   </td>
-                  <td style="color: #9ca3af;">Soon It Will Be Cold</td>
-                  <td><span class="track-license-badge">CC BY 4.0</span></td>
-                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">03:55</td>
+                  <td style="color: #9ca3af;">Solo Works Vol. 1</td>
+                  <td><span class="track-license-badge">CC BY-NC 4.0</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">06:14</td>
+                </tr>
+
+                <tr class="track-row">
+                  <td style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">05</td>
+                  <td>
+                    <div class="track-cell-title">
+                      <div class="track-art">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cover Art">
+                          <rect x="12" y="16" width="40" height="32" rx="4" fill="#181b26" stroke="#252937" stroke-width="1.5"/>
+                          <circle cx="26" cy="32" r="4" stroke="#f59e0b" stroke-width="1.5"/>
+                          <circle cx="38" cy="32" r="4" stroke="#f59e0b" stroke-width="1.5"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="track-name">Tokyo Substation</div>
+                        <div class="track-artist">Four Tet</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color: #9ca3af;">Parallel Cuts</td>
+                  <td><span class="track-license-badge">CC BY-SA 4.0</span></td>
+                  <td style="text-align: right; font-family: 'JetBrains Mono', monospace; color: #9ca3af;">04:45</td>
                 </tr>
               </tbody>
             </table>
           </main>
 
           <!-- Docked Audio Player (Fixed Bottom 80px) -->
-          <div class="docked-player">
+          <div class="docked-player" role="region" aria-label="Persistent Audio Controller">
             <div class="player-left">
-              <div class="player-art">☀️</div>
+              <div class="player-cover">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Current Track Artwork">
+                  <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
+                  <circle cx="32" cy="32" r="10" fill="#f59e0b"/>
+                  <circle cx="32" cy="32" r="3" fill="#0b0c10"/>
+                </svg>
+              </div>
               <div style="min-width: 0;">
-                <div style="font-size: 13px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
-                <div style="font-size: 11px; color: #9ca3af;">Tycho · Jamendo CC</div>
+                <div class="player-track-title">Solar Drift</div>
+                <div class="player-track-artist">Tycho &middot; CC BY-NC-SA</div>
               </div>
             </div>
 
             <div class="player-center">
               <div class="player-controls">
-                <button class="btn-player">⏮</button>
-                <button class="btn-player btn-player-primary">⏸</button>
-                <button class="btn-player">⏭</button>
+                <button type="button" class="btn-player" aria-label="Previous track">&#9198;</button>
+                <button type="button" class="btn-player btn-player-primary" aria-label="Pause track">&#10074;&#10074;</button>
+                <button type="button" class="btn-player" aria-label="Next track">&#9197;</button>
               </div>
-
               <div class="scrubber-bar-container">
                 <span>01:40</span>
-                <div class="scrubber-track">
+                <div class="scrubber-track" role="slider" aria-label="Playback scrubber" aria-valuemin="0" aria-valuemax="222" aria-valuenow="100">
                   <div class="scrubber-progress">
                     <div class="scrubber-head"></div>
                   </div>
@@ -1441,23 +1655,23 @@
             </div>
 
             <div class="player-right">
-              <div class="scrobble-badge">
-                <span>✓</span>
-                <span>SCROBBLE ARMED (45%)</span>
+              <div class="scrobble-badge" title="Scrobble milestone achieved (&gt;= 50% played)">
+                <span style="font-size: 9px;">&check;</span>
+                <span>SCROBBLED</span>
               </div>
-              <button class="btn-player">🔊</button>
+              <button type="button" class="btn-player" aria-label="Toggle queue">&#9776;</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 3: HIGH-FIDELITY DESKTOP USER PROFILE (/@username) -->
-    <section id="view-desktop-profile" style="display: none;">
+    <!-- VIEW 3: DESKTOP PROFILE SCREEN (1440x900) -->
+    <section id="view-desktop-profile" role="tabpanel" aria-labelledby="tab-desktop-profile" style="display: none;">
       <div class="section-title">
-        <span>Desktop User Profile Screen (`/@username`)</span>
+        <span>Desktop Profile Screen (1440 &times; 900 &middot; /@elena)</span>
       </div>
-      <p class="section-desc">Grounded strictly in Harmoni's existing PostgreSQL Prisma schema. Features the 8 SVG avatar presets, bio editing, and public playlists.</p>
+      <p class="section-desc">Profile identity view with 104px SVG avatar preset, bio editor trigger, and zero deceptive friend buttons (Milestone 3C boundary).</p>
 
       <div class="screen-stage">
         <div class="screen-stage-bar">
@@ -1466,27 +1680,26 @@
             <div class="traffic-light" style="background: #f59e0b;"></div>
             <div class="traffic-light" style="background: #10b981;"></div>
           </div>
-          <span>Harmoni Profile — Desktop Viewport</span>
-          <span>https://harmoni.local/@elena (Mapped via next.config.ts rewrite to /users/elena)</span>
+          <span>Harmoni Profile &mdash; /@elena &mdash; User View</span>
+          <span>https://harmoni.local/@elena</span>
         </div>
 
         <div class="desktop-frame">
-          <!-- Left Sidebar -->
           <aside class="desktop-sidebar">
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-left: 6px;">
-                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;">H</div>
+                <div class="brand-logo" style="width: 28px; height: 28px; font-size: 14px;" aria-hidden="true">H</div>
                 <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;">Harmoni</div>
               </div>
 
               <div class="sidebar-nav-section">
                 <div class="sidebar-heading">// Explore</div>
                 <a href="#discover" class="sidebar-link">
-                  <span class="sidebar-link-icon">🧭</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&cirf;</span>
                   <span>Discover</span>
                 </a>
                 <a href="#search" class="sidebar-link">
-                  <span class="sidebar-link-icon">🔍</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&telrec;</span>
                   <span>Search</span>
                 </a>
               </div>
@@ -1494,18 +1707,25 @@
               <div class="sidebar-nav-section">
                 <div class="sidebar-heading">// Library</div>
                 <a href="#liked" class="sidebar-link">
-                  <span class="sidebar-link-icon">❤️</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&hearts;</span>
                   <span>Liked Tracks</span>
                 </a>
                 <a href="#playlists" class="sidebar-link">
-                  <span class="sidebar-link-icon">📑</span>
+                  <span class="sidebar-link-icon" aria-hidden="true">&equiv;</span>
                   <span>Playlists</span>
                 </a>
               </div>
             </div>
 
             <div class="sidebar-user">
-              <div class="sidebar-avatar">🎧</div>
+              <div class="sidebar-avatar">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar">
+                  <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                  <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                  <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
               <div class="sidebar-user-text">
                 <div class="sidebar-username">Elena Vance</div>
                 <div class="sidebar-userhandle">@elena</div>
@@ -1518,21 +1738,38 @@
           <main class="desktop-main">
             <!-- Profile Hero -->
             <div class="profile-hero">
-              <div class="profile-avatar-large">📻</div>
+              <div class="profile-avatar-large">
+                <!-- Large 104px SVG Avatar Preset (Amber Studio Turntable) -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Elena Vance's avatar: Amber Studio Turntable">
+                  <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                  <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                  <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+                  <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
+                  <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
+                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect x="34" y="34.5" width="4" height="3" rx="0.8" transform="rotate(-25 34 34.5)" fill="#f59e0b"/>
+                  <circle cx="12" cy="48" r="2" fill="#f59e0b"/>
+                </svg>
+              </div>
               <div class="profile-info">
                 <div class="profile-names">
                   <h1 class="profile-display-name">Elena Vance</h1>
                   <span class="role-badge">ADMINISTRATOR</span>
                 </div>
                 <div class="profile-meta">
-                  <span>@elena</span> · <span>Member since November 2026</span>
+                  <span>@elena</span> &middot; <span>Member since November 2026</span>
                 </div>
                 <p class="profile-bio">
-                  Curating warm analog synth waves, ambient jazz, and late-night vinyl sessions with close friends. Building personal listening archives at ₹0 cost.
+                  Curating warm analog synth waves, ambient jazz, and late-night vinyl sessions with close friends. Building personal listening archives at &yen;0 cost.
                 </p>
                 <div>
                   <!-- Milestone 3C Boundary: Profile editing action for authenticated user -->
-                  <button class="btn-edit-profile">✏️ Edit Avatar & Biography</button>
+                  <button type="button" class="btn-edit-profile">
+                    <span aria-hidden="true">&#9998;</span>
+                    <span>Edit Avatar &amp; Biography</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -1547,21 +1784,40 @@
             <!-- Public Playlists Cards Grid -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
               <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #252937, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">☕</div>
+                <div style="height: 120px; background: linear-gradient(135deg, #252937, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coffee cup icon" style="width: 44px; height: 44px;">
+                    <path d="M16 22H42V36C42 41 38 45 32 45H26C20 45 16 41 16 36V22Z" fill="#252937" stroke="#f59e0b" stroke-width="2"/>
+                    <path d="M42 26H46C49 26 51 28 51 31C51 34 49 36 46 36H42" stroke="#f59e0b" stroke-width="2"/>
+                    <path d="M22 15C22 13 24 13 24 11" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M30 15C30 13 32 13 32 11" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
                 <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Late Night Ambient</div>
-                <div style="font-size: 12px; color: #9ca3af;">18 tracks · Public Playlist</div>
+                <div style="font-size: 12px; color: #9ca3af;">18 tracks &middot; Public Playlist</div>
               </div>
 
               <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #2c2518, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">🎷</div>
+                <div style="height: 120px; background: linear-gradient(135deg, #2c2518, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Saxophone/Jazz icon" style="width: 44px; height: 44px;">
+                    <path d="M20 16L32 16L32 38C32 44 26 48 20 48C14 48 10 44 10 38C10 32 15 28 20 28" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="36" cy="20" r="3" fill="#fbbf24"/>
+                    <circle cx="42" cy="26" r="3" fill="#fbbf24"/>
+                    <circle cx="46" cy="34" r="4" fill="#d97706"/>
+                  </svg>
+                </div>
                 <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Tokyo Coffeehouse Jazz</div>
-                <div style="font-size: 12px; color: #9ca3af;">24 tracks · Public Playlist</div>
+                <div style="font-size: 12px; color: #9ca3af;">24 tracks &middot; Public Playlist</div>
               </div>
 
               <div style="background: #14161f; border: 1px solid #252937; border-radius: 12px; padding: 16px;">
-                <div style="height: 120px; background: linear-gradient(135deg, #182524, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 12px;">🌲</div>
+                <div style="height: 120px; background: linear-gradient(135deg, #182524, #181b26); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pine tree icon" style="width: 44px; height: 44px;">
+                    <polygon points="32,14 20,28 26,28 16,42 48,42 38,28 44,28" fill="#182524" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/>
+                    <rect x="29" y="42" width="6" height="8" fill="#78350f"/>
+                  </svg>
+                </div>
                 <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Pacific Northwest Drift</div>
-                <div style="font-size: 12px; color: #9ca3af;">12 tracks · Public Playlist</div>
+                <div style="font-size: 12px; color: #9ca3af;">12 tracks &middot; Public Playlist</div>
               </div>
             </div>
           </main>
@@ -1570,31 +1826,39 @@
     </section>
 
     <!-- VIEW 4: MOBILE SCREENS (390x844) -->
-    <section id="view-mobile" style="display: none;">
+    <section id="view-mobile" role="tabpanel" aria-labelledby="tab-mobile" style="display: none;">
       <div class="section-title">
-        <span>Mobile Screen Designs (390 × 844 · Obsidian Studio)</span>
+        <span>Mobile Screen Designs (390 &times; 844 &middot; Obsidian Studio)</span>
       </div>
       <p class="section-desc">Mobile viewport layouts with comfortable 48px+ touch targets, compact floating mini-player bar, and bottom navigation.</p>
 
       <div class="mobile-frame-container">
         <!-- Mobile Discover Screen -->
         <div class="mobile-device">
-          <div class="mobile-notch">9:41 · Harmoni Discover</div>
+          <div class="mobile-notch">9:41 &middot; Harmoni Discover</div>
 
           <div class="mobile-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="brand-logo" style="width: 26px; height: 26px; font-size: 13px;">H</div>
+              <div class="brand-logo" style="width: 26px; height: 26px; font-size: 13px;" aria-hidden="true">H</div>
               <span style="font-weight: 700; font-size: 15px;">Harmoni</span>
             </div>
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: #1c202c; border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 12px;">🎧</div>
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: #1c202c; border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <!-- Mini SVG Avatar -->
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="User avatar">
+                <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+                <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
           </div>
 
           <div class="mobile-content">
             <div style="background: linear-gradient(135deg, #181b26, #11131a); border: 1px solid #252937; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
               <span class="hero-tag" style="margin-bottom: 6px;">FEATURED SINGLE</span>
               <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Solar Drift</h3>
-              <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">Tycho · Ambient Synthesizers</p>
-              <button class="hero-cta" style="padding: 8px 16px; font-size: 12px;">▶ Play Single</button>
+              <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">Tycho &middot; Ambient Synthesizers</p>
+              <button type="button" class="hero-cta" style="padding: 8px 16px; font-size: 12px;">&blacktriangleright; Play Single</button>
             </div>
 
             <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #f3f4f6;">Today's Feed</h4>
@@ -1602,7 +1866,12 @@
             <div style="display: flex; flex-direction: column; gap: 8px;">
               <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="track-art" style="width: 38px; height: 38px;">☀️</div>
+                  <div class="track-art" style="width: 38px; height: 38px;">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
+                      <circle cx="32" cy="32" r="26" fill="#181b26" stroke="#252937" stroke-width="2"/>
+                      <circle cx="32" cy="32" r="8" fill="#f59e0b"/>
+                    </svg>
+                  </div>
                   <div>
                     <div style="font-size: 13px; font-weight: 600; color: #f59e0b;">Solar Drift</div>
                     <div style="font-size: 11px; color: #6b7280;">Tycho</div>
@@ -1617,7 +1886,12 @@
 
               <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="track-art" style="width: 38px; height: 38px;">🌊</div>
+                  <div class="track-art" style="width: 38px; height: 38px;">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
+                      <rect x="12" y="12" width="40" height="40" rx="6" fill="#141722" stroke="#252937" stroke-width="2"/>
+                      <path d="M18 36L28 24L38 34L46 26" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
                   <div>
                     <div style="font-size: 13px; font-weight: 600;">Coastal Grooves</div>
                     <div style="font-size: 11px; color: #6b7280;">Bonobo</div>
@@ -1628,7 +1902,12 @@
 
               <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #181b26;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="track-art" style="width: 38px; height: 38px;">🌙</div>
+                  <div class="track-art" style="width: 38px; height: 38px;">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Track artwork">
+                      <circle cx="32" cy="32" r="26" fill="#111420" stroke="#22293d" stroke-width="2"/>
+                      <polygon points="32,18 20,44 44,44" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="1.5"/>
+                    </svg>
+                  </div>
                   <div>
                     <div style="font-size: 13px; font-weight: 600;">Midnight Frequency</div>
                     <div style="font-size: 11px; color: #6b7280;">Kiasmos</div>
@@ -1639,37 +1918,42 @@
             </div>
           </div>
 
-          <!-- Floating Compact Player -->
+          <!-- Floating Compact Player (56px) -->
           <div class="mobile-docked-player">
             <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-              <div style="width: 32px; height: 32px; border-radius: 6px; background: #252937; display: flex; align-items: center; justify-content: center; font-size: 14px;">☀️</div>
+              <div style="width: 32px; height: 32px; border-radius: 6px; background: #252937; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mini cover" style="width: 22px; height: 22px;">
+                  <circle cx="32" cy="32" r="24" fill="#f59e0b"/>
+                  <circle cx="32" cy="32" r="8" fill="#0b0c10"/>
+                </svg>
+              </div>
               <div style="min-width: 0;">
                 <div style="font-size: 12px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Solar Drift</div>
                 <div style="font-size: 10px; color: #9ca3af;">Tycho</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
-              <button class="btn-player" style="font-size: 12px;">⏸</button>
-              <button class="btn-player" style="font-size: 12px;">⏭</button>
+              <button type="button" class="btn-player" style="font-size: 12px;" aria-label="Pause track">&#10074;&#10074;</button>
+              <button type="button" class="btn-player" style="font-size: 12px;" aria-label="Next track">&#9197;</button>
             </div>
           </div>
 
-          <!-- Mobile Bottom Navigation Bar -->
-          <nav class="mobile-nav-bar">
+          <!-- Mobile Bottom Navigation Bar (56px) -->
+          <nav class="mobile-nav-bar" aria-label="Mobile Navigation">
             <a href="#home" class="mobile-nav-item active">
-              <span style="font-size: 16px;">🏠</span>
+              <span style="font-size: 14px;" aria-hidden="true">&cirf;</span>
               <span>Home</span>
             </a>
             <a href="#search" class="mobile-nav-item">
-              <span style="font-size: 16px;">🔍</span>
+              <span style="font-size: 14px;" aria-hidden="true">&telrec;</span>
               <span>Search</span>
             </a>
             <a href="#library" class="mobile-nav-item">
-              <span style="font-size: 16px;">📚</span>
+              <span style="font-size: 14px;" aria-hidden="true">&equiv;</span>
               <span>Library</span>
             </a>
             <a href="#profile" class="mobile-nav-item">
-              <span style="font-size: 16px;">👤</span>
+              <span style="font-size: 14px;" aria-hidden="true">&odot;</span>
               <span>Profile</span>
             </a>
           </nav>
@@ -1677,7 +1961,7 @@
 
         <!-- Mobile Profile Screen -->
         <div class="mobile-device">
-          <div class="mobile-notch">9:41 · Profile /@elena</div>
+          <div class="mobile-notch">9:41 &middot; Profile /@elena</div>
 
           <div class="mobile-header">
             <span style="font-size: 14px; font-weight: 600;">/@elena</span>
@@ -1686,13 +1970,25 @@
 
           <div class="mobile-content">
             <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
-              <div class="profile-avatar-large" style="width: 80px; height: 80px; font-size: 32px; margin-bottom: 12px;">📻</div>
+              <div class="profile-avatar-large" style="width: 80px; height: 80px; margin-bottom: 12px;">
+                <!-- 80px SVG Avatar Preset -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Elena Vance avatar: Amber Studio Turntable">
+                  <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+                  <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+                  <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
+                  <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+                  <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
+                  <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
+                  <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
               <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Elena Vance</h2>
-              <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280; margin-bottom: 8px;">@elena · Nov 2026</div>
+              <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280; margin-bottom: 8px;">@elena &middot; Nov 2026</div>
               <p style="font-size: 12px; color: #9ca3af; line-height: 1.4; margin-bottom: 14px;">
                 Curating analog synth waves, ambient jazz, and late-night vinyl sessions with friends.
               </p>
-              <button class="btn-edit-profile" style="padding: 6px 14px; font-size: 11px;">Edit Profile & Avatar</button>
+              <button type="button" class="btn-edit-profile" style="padding: 6px 14px; font-size: 11px;">Edit Profile &amp; Avatar</button>
             </div>
 
             <div style="display: flex; justify-content: space-around; border-bottom: 1px solid #1c202c; padding-bottom: 8px; margin-bottom: 16px; font-size: 12px;">
@@ -1703,39 +1999,48 @@
 
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center; font-size: 20px;">☕</div>
+                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coffee icon" style="width: 24px; height: 24px;">
+                    <path d="M16 22H42V36C42 41 38 45 32 45H26C20 45 16 41 16 36V22Z" stroke="#f59e0b" stroke-width="2"/>
+                    <path d="M42 26H46C49 26 51 28 51 31C51 34 49 36 46 36H42" stroke="#f59e0b" stroke-width="2"/>
+                  </svg>
+                </div>
                 <div>
                   <div style="font-size: 13px; font-weight: 600;">Late Night Ambient</div>
-                  <div style="font-size: 11px; color: #6b7280;">18 tracks · Public</div>
+                  <div style="font-size: 11px; color: #6b7280;">18 tracks &middot; Public</div>
                 </div>
               </div>
 
               <div style="background: #14161f; border: 1px solid #252937; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎷</div>
+                <div style="width: 44px; height: 44px; border-radius: 6px; background: #1c202c; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jazz icon" style="width: 24px; height: 24px;">
+                    <path d="M20 16L32 16L32 38C32 44 26 48 20 48C14 48 10 44 10 38C10 32 15 28 20 28" stroke="#f59e0b" stroke-width="2"/>
+                  </svg>
+                </div>
                 <div>
                   <div style="font-size: 13px; font-weight: 600;">Tokyo Coffeehouse Jazz</div>
-                  <div style="font-size: 11px; color: #6b7280;">24 tracks · Public</div>
+                  <div style="font-size: 11px; color: #6b7280;">24 tracks &middot; Public</div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Bottom Mobile Navigation Bar -->
-          <nav class="mobile-nav-bar">
+          <nav class="mobile-nav-bar" aria-label="Mobile Navigation Profile">
             <a href="#home" class="mobile-nav-item">
-              <span style="font-size: 16px;">🏠</span>
+              <span style="font-size: 14px;" aria-hidden="true">&cirf;</span>
               <span>Home</span>
             </a>
             <a href="#search" class="mobile-nav-item">
-              <span style="font-size: 16px;">🔍</span>
+              <span style="font-size: 14px;" aria-hidden="true">&telrec;</span>
               <span>Search</span>
             </a>
             <a href="#library" class="mobile-nav-item">
-              <span style="font-size: 16px;">📚</span>
+              <span style="font-size: 14px;" aria-hidden="true">&equiv;</span>
               <span>Library</span>
             </a>
             <a href="#profile" class="mobile-nav-item active">
-              <span style="font-size: 16px;">👤</span>
+              <span style="font-size: 14px;" aria-hidden="true">&odot;</span>
               <span>Profile</span>
             </a>
           </nav>
@@ -1744,82 +2049,336 @@
     </section>
 
     <!-- VIEW 5: DESIGN TOKENS & AVATAR PRESETS -->
-    <section id="view-tokens" style="display: none;">
+    <section id="view-tokens" role="tabpanel" aria-labelledby="tab-tokens" style="display: none;">
       <div class="section-title">
-        <span>Design Tokens & Eight SVG Avatar Presets</span>
+        <span>Eight Handcrafted SVG Avatar Presets</span>
       </div>
-      <p class="section-desc">To maintain the absolute ₹0 INR lifetime budget constraint, Harmoni provides 8 built-in SVG presets avoiding costly S3/Cloudinary upload dependencies.</p>
+      <p class="section-desc">To maintain the absolute &yen;0 INR lifetime budget constraint, Harmoni provides 8 original, lightweight inline SVG avatars with zero external CDN dependencies.</p>
 
+      <!-- The 8 Handcrafted SVG Avatar Presets Grid -->
       <div class="avatar-grid">
+        <!-- Avatar 1 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">📻</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Amber Studio Turntable">
+              <title>Amber Studio Turntable</title>
+              <rect x="6" y="6" width="52" height="52" rx="10" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <circle cx="28" cy="32" r="18" fill="#0b0c10" stroke="#252937" stroke-width="1.5"/>
+              <circle cx="28" cy="32" r="13" stroke="#1f2330" stroke-width="1"/>
+              <circle cx="28" cy="32" r="8" stroke="#1f2330" stroke-width="1"/>
+              <circle cx="28" cy="32" r="5" fill="#f59e0b"/>
+              <circle cx="28" cy="32" r="1.5" fill="#0b0c10"/>
+              <circle cx="49" cy="17" r="3.5" fill="#252937" stroke="#f59e0b" stroke-width="1.5"/>
+              <path d="M49 17L44 33L37 36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="34" y="34.5" width="4" height="3" rx="0.8" transform="rotate(-25 34 34.5)" fill="#f59e0b"/>
+              <circle cx="12" cy="48" r="2" fill="#f59e0b"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Studio Turntable</div>
           <div class="avatar-preset-key">avatar_1 (Default)</div>
+          <div class="avatar-preset-desc">Analog vinyl platter, concentric sound grooves, tonearm &amp; amber spindle.</div>
         </div>
 
+        <!-- Avatar 2 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">🎛️</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Golden Tube Preamp">
+              <title>Golden Tube Preamp</title>
+              <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <circle cx="32" cy="27" r="14" fill="url(#tube-glow-v5)" opacity="0.4"/>
+              <path d="M22 47H42V51C42 52.1 41.1 53 40 53H24C22.9 53 22 52.1 22 51V47Z" fill="#1c202c" stroke="#252937" stroke-width="1.5"/>
+              <line x1="26" y1="53" x2="26" y2="56" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="32" y1="53" x2="32" y2="56" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="38" y1="53" x2="38" y2="56" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M21 47V23C21 16.9 25.9 12 32 12C38.1 12 43 16.9 43 23V47" stroke="#4b5563" stroke-width="1.5" fill="rgba(245, 158, 11, 0.04)"/>
+              <rect x="25" y="20" width="14" height="19" rx="2" fill="#1c202c" stroke="#374151" stroke-width="1"/>
+              <path d="M28 35L30 24L32 35L34 24L36 35" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="28" y1="23" x2="36" y2="23" stroke="#f59e0b" stroke-width="1.5"/>
+              <defs>
+                <radialGradient id="tube-glow-v5" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8"/>
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Tube Preamp</div>
           <div class="avatar-preset-key">avatar_2</div>
+          <div class="avatar-preset-desc">Glass envelope, socket base, and glowing amber vacuum tube filament.</div>
         </div>
 
+        <!-- Avatar 3 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">〰️</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Obsidian Waveform">
+              <title>Obsidian Waveform</title>
+              <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <line x1="12" y1="32" x2="52" y2="32" stroke="#252937" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="32" y1="12" x2="32" y2="52" stroke="#252937" stroke-width="1" stroke-dasharray="2 2"/>
+              <path d="M12 32C18 44 26 44 32 32C38 20 46 20 52 32" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+              <path d="M10 32C16 16 22 16 28 32C34 48 40 48 46 32C49 24 52 24 54 32" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M14 32C17 26 19 38 22 32C25 26 27 38 30 32C33 26 35 38 38 32C41 26 43 38 46 32C48 28 50 34 51 32" stroke="#fbbf24" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+              <circle cx="20" cy="21" r="2" fill="#fbbf24"/>
+              <circle cx="38" cy="43" r="2" fill="#f59e0b"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Obsidian Waveform</div>
           <div class="avatar-preset-key">avatar_3</div>
+          <div class="avatar-preset-desc">Intersecting sine sound waves, harmonic resonant curves, and peak nodes.</div>
         </div>
 
+        <!-- Avatar 4 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">💿</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Geometric Vinyl Disc">
+              <title>Geometric Vinyl Disc</title>
+              <circle cx="32" cy="32" r="26" fill="#0b0c10" stroke="#252937" stroke-width="2"/>
+              <circle cx="32" cy="32" r="22" stroke="#1c202c" stroke-width="1.2"/>
+              <circle cx="32" cy="32" r="18" stroke="#181b26" stroke-width="1.2"/>
+              <circle cx="32" cy="32" r="14" stroke="#1c202c" stroke-width="1.2"/>
+              <path d="M32 32L18 10C22.2 7.4 27 6 32 6C37 6 41.8 7.4 46 10L32 32Z" fill="white" fill-opacity="0.04"/>
+              <path d="M32 32L46 54C41.8 56.6 37 58 32 58C27 58 22.2 56.6 18 54L32 32Z" fill="white" fill-opacity="0.04"/>
+              <circle cx="32" cy="32" r="10" fill="#f59e0b" stroke="#fbbf24" stroke-width="1"/>
+              <circle cx="32" cy="32" r="3.2" fill="#0b0c10" stroke="#d97706" stroke-width="1"/>
+              <circle cx="32" cy="25" r="1" fill="#78350f"/>
+              <circle cx="32" cy="39" r="1" fill="#78350f"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Vinyl Groove Disc</div>
           <div class="avatar-preset-key">avatar_4</div>
+          <div class="avatar-preset-desc">Concentric disc grooves, central record label, gloss sheen &amp; spindle hole.</div>
         </div>
 
+        <!-- Avatar 5 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">💎</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nordic Aurora Prism">
+              <title>Nordic Aurora Prism</title>
+              <circle cx="32" cy="32" r="26" fill="#08090d" stroke="#22293d" stroke-width="2"/>
+              <path d="M8 35L26 31" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M36 29L56 18" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"/>
+              <path d="M37 32L57 32" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+              <path d="M36 35L56 46" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+              <polygon points="32,13 18,47 46,47" fill="#111420" stroke="#38435d" stroke-width="1.5"/>
+              <polygon points="32,13 28,47 46,47" fill="rgba(6, 182, 212, 0.08)"/>
+              <line x1="26" y1="31" x2="36" y2="32" stroke="#f8fafc" stroke-width="1.8" stroke-dasharray="2 1"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Aurora Prism</div>
           <div class="avatar-preset-key">avatar_5</div>
+          <div class="avatar-preset-desc">Refractive crystal prism dispersing amber light into cyan &amp; emerald rays.</div>
         </div>
 
+        <!-- Avatar 6 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">📼</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Neon Cassette Tape">
+              <title>Neon Cassette Tape</title>
+              <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <rect x="12" y="18" width="40" height="28" rx="4" fill="#181b26" stroke="#252937" stroke-width="1.5"/>
+              <rect x="16" y="21" width="32" height="15" rx="2" fill="#11131a" stroke="#252937" stroke-width="1"/>
+              <rect x="21" y="24" width="22" height="9" rx="1.5" fill="#0b0c10" stroke="#374151" stroke-width="1"/>
+              <circle cx="26" cy="28.5" r="3.2" fill="#1c202c" stroke="#f59e0b" stroke-width="1.2"/>
+              <circle cx="26" cy="28.5" r="1.2" fill="#fbbf24"/>
+              <circle cx="38" cy="28.5" r="3.2" fill="#1c202c" stroke="#f59e0b" stroke-width="1.2"/>
+              <circle cx="38" cy="28.5" r="1.2" fill="#fbbf24"/>
+              <line x1="29.2" y1="28.5" x2="34.8" y2="28.5" stroke="#d97706" stroke-width="1"/>
+              <polygon points="17,42 47,42 43,46 21,46" fill="#11131a" stroke="#252937" stroke-width="1"/>
+              <circle cx="24" cy="44" r="1" fill="#9ca3af"/>
+              <circle cx="40" cy="44" r="1" fill="#9ca3af"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Classic Cassette</div>
           <div class="avatar-preset-key">avatar_6</div>
+          <div class="avatar-preset-desc">Vintage compact cassette shell, label window, tape spools &amp; bridge.</div>
         </div>
 
+        <!-- Avatar 7 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">📊</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Audio Spectrum Equalizer">
+              <title>Audio Spectrum Equalizer</title>
+              <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <line x1="14" y1="46" x2="50" y2="46" stroke="#252937" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="18" y1="44" x2="18" y2="30" stroke="#d97706" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="18" cy="25" r="1.8" fill="#fbbf24"/>
+              <line x1="25" y1="44" x2="25" y2="22" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="25" cy="17" r="1.8" fill="#fbbf24"/>
+              <line x1="32" y1="44" x2="32" y2="16" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="32" cy="11" r="1.8" fill="#ffffff"/>
+              <line x1="39" y1="44" x2="39" y2="26" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="39" cy="21" r="1.8" fill="#fbbf24"/>
+              <line x1="46" y1="44" x2="46" y2="34" stroke="#d97706" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="46" cy="29" r="1.8" fill="#fbbf24"/>
+            </svg>
+          </div>
           <div class="avatar-preset-name">Audio Equalizer</div>
           <div class="avatar-preset-key">avatar_7</div>
+          <div class="avatar-preset-desc">Five-band frequency spectrum with peak indicator dots and dB baseline.</div>
         </div>
 
+        <!-- Avatar 8 -->
         <div class="avatar-preset-card">
-          <div class="avatar-preset-preview">🔔</div>
-          <div class="avatar-preset-name">Acoustic Bell</div>
+          <div class="avatar-preset-preview">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Acoustic Reverberation">
+              <title>Acoustic Reverberation</title>
+              <circle cx="32" cy="32" r="26" fill="#14161f" stroke="#252937" stroke-width="2"/>
+              <circle cx="32" cy="32" r="22" stroke="#374151" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+              <circle cx="32" cy="32" r="17" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.7"/>
+              <circle cx="32" cy="32" r="11" stroke="#f59e0b" stroke-width="1.6" opacity="0.9"/>
+              <circle cx="32" cy="32" r="6" stroke="#fbbf24" stroke-width="1.8"/>
+              <circle cx="32" cy="32" r="2.5" fill="#ffffff"/>
+              <line x1="32" y1="7" x2="32" y2="9" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="32" y1="55" x2="32" y2="57" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="7" y1="32" x2="9" y2="32" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="55" y1="32" x2="57" y2="32" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="avatar-preset-name">Acoustic Reverberation</div>
           <div class="avatar-preset-key">avatar_8</div>
+          <div class="avatar-preset-desc">Expanding concentric soundwave propagation rings with directional ticks.</div>
         </div>
+      </div>
+
+      <!-- Design Token Palette Reference Section -->
+      <div class="section-title" style="margin-top: 48px;">
+        <span>Obsidian Studio CSS Variables &amp; Tokens</span>
+      </div>
+      <p class="section-desc">Tailwind CSS v4 inline theme declarations configured for zero-runtime performance.</p>
+
+      <div style="background: #11131a; border: 1px solid #252937; border-radius: 12px; padding: 24px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; font-family: 'JetBrains Mono', monospace;">
+          <thead>
+            <tr style="border-bottom: 1px solid #1f2432; color: #6b7280; text-align: left;">
+              <th style="padding: 8px 12px;">Token Name</th>
+              <th style="padding: 8px 12px;">Value</th>
+              <th style="padding: 8px 12px;">Visual Sample</th>
+              <th style="padding: 8px 12px;">Semantic Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #161922;">
+              <td style="padding: 10px 12px; color: #f59e0b;">--background</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#0b0c10</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #0b0c10; border-radius: 4px; border: 1px solid #252937;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Deep obsidian canvas</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #161922;">
+              <td style="padding: 10px 12px; color: #f59e0b;">--card</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#14161f</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #14161f; border-radius: 4px; border: 1px solid #252937;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Primary raised studio surface</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #161922;">
+              <td style="padding: 10px 12px; color: #f59e0b;">--primary</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#f59e0b</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #f59e0b; border-radius: 4px;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Amber tube glow &amp; active playheads</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #161922;">
+              <td style="padding: 10px 12px; color: #f59e0b;">--secondary</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#d97706</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #d97706; border-radius: 4px;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Burnished brass accent</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #161922;">
+              <td style="padding: 10px 12px; color: #f59e0b;">--border</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#252937</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #252937; border-radius: 4px;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Machined 1px chassis divider</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 12px; color: #f59e0b;">--success</td>
+              <td style="padding: 10px 12px; color: #9ca3af;">#10b981</td>
+              <td style="padding: 10px 12px;"><div style="width: 24px; height: 24px; background: #10b981; border-radius: 4px;"></div></td>
+              <td style="padding: 10px 12px; color: #9ca3af; font-family: 'Inter', sans-serif;">Creative Commons verified badge</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
   </main>
 
   <script>
-    function switchView(viewId) {
-      // Hide all views
-      document.getElementById('view-directions').style.display = 'none';
-      document.getElementById('view-desktop-discover').style.display = 'none';
-      document.getElementById('view-desktop-profile').style.display = 'none';
-      document.getElementById('view-mobile').style.display = 'none';
-      document.getElementById('view-tokens').style.display = 'none';
+    /**
+     * Accessible view-switching coordinator.
+     * Operates without reliance on the deprecated global `event` object.
+     * Manages ARIA states (aria-selected, tabindex) and keyboard arrows.
+     */
+    const VIEW_IDS = ['directions', 'desktop-discover', 'desktop-profile', 'mobile', 'tokens'];
 
-      // Show selected view
-      document.getElementById('view-' + viewId).style.display = 'block';
+    function activateView(viewId, triggerButton) {
+      if (!VIEW_IDS.includes(viewId)) return;
 
-      // Update tab active state
+      // 1. Hide all view sections
+      VIEW_IDS.forEach(function (id) {
+        const section = document.getElementById('view-' + id);
+        if (section) {
+          section.style.display = 'none';
+        }
+      });
+
+      // 2. Reset all tab buttons
       const buttons = document.querySelectorAll('.view-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      buttons.forEach(function (btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('tabindex', '-1');
+      });
+
+      // 3. Reveal target view
+      const targetSection = document.getElementById('view-' + viewId);
+      if (targetSection) {
+        targetSection.style.display = 'block';
+      }
+
+      // 4. Highlight target tab
+      const targetBtn = triggerButton || document.querySelector('.view-btn[data-view="' + viewId + '"]');
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+        targetBtn.setAttribute('aria-selected', 'true');
+        targetBtn.setAttribute('tabindex', '0');
+        targetBtn.focus();
+      }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const tabs = Array.from(document.querySelectorAll('.view-btn'));
+
+      tabs.forEach(function (tab, index) {
+        // Explicit click handler passing element reference
+        tab.addEventListener('click', function () {
+          const viewId = tab.getAttribute('data-view');
+          activateView(viewId, tab);
+        });
+
+        // WAI-ARIA keyboard navigation (ArrowLeft, ArrowRight, Home, End)
+        tab.addEventListener('keydown', function (e) {
+          let nextIndex = null;
+
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            nextIndex = (index + 1) % tabs.length;
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            nextIndex = (index - 1 + tabs.length) % tabs.length;
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            nextIndex = 0;
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            nextIndex = tabs.length - 1;
+          }
+
+          if (nextIndex !== null) {
+            const nextTab = tabs[nextIndex];
+            const viewId = nextTab.getAttribute('data-view');
+            activateView(viewId, nextTab);
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>

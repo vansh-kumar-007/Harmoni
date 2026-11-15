@@ -1,11 +1,11 @@
 # Harmoni — Visual Foundation Research & Design Specification
-**Milestone 3C.0.1: Refined Design Proposal & Figma Exploration Specification**  
-*Document Version:* 1.1.0  
-*Status:* Refined & Specified (Awaiting User Review & Explicit Approval)  
+**Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup Specification**  
+*Document Version:* 1.2.0  
+*Status:* Refined Visual Prototype & Accurate Verification Audit (Awaiting User Review & Explicit Approval)  
 *Author:* Harmoni Engineering & Architecture Team  
 *Target Stack:* Next.js 16 (App Router) · React 19 · TypeScript 5 · Tailwind CSS v4 · shadcn/ui · PostgreSQL  
-*Figma Exploration File:* [https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H) (Key: `tde7tKDtxqTwhqJQko989H`)  
-*Interactive Visual Prototype:* [`docs/visual-design-exploration.html`](file:///d:/Projects/Harmoni/docs/visual-design-exploration.html)
+*Figma Exploration File:* [https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H) (Key: `tde7tKDtxqTwhqJQko989H` · Verified Empty Canvas Shell)  
+*Canonical Interactive Visual Prototype:* [`docs/visual-design-exploration.html`](file:///d:/Projects/Harmoni/docs/visual-design-exploration.html)
 
 ---
 
@@ -20,7 +20,7 @@ To succeed, Harmoni avoids two critical pitfalls:
 Harmoni's visual foundation is **warm, tactile, intentional, and high-fidelity**—evoking the feeling of a private listening lounge where friends share vinyl records and discover independent artists. Every component, surface, and transition serves the listening experience.
 
 > [!NOTE]
-> **Design Mockup Data Disclaimer:** All track titles, artist names, album art covers, timestamps, scrobble tallies, and user profiles featured in this specification, in the Figma exploration file, and in the HTML prototype are **illustrative design placeholders**. They demonstrate layout density, typography scale, and responsive behavior, and do not represent real production database records.
+> **Design Mockup Data Disclaimer:** All track titles, artist names, album art covers, timestamps, scrobble tallies, and user profiles featured in this specification, in the Figma exploration shell, and in the HTML prototype are **illustrative design placeholders**. They demonstrate layout density, typography scale, and responsive behavior, and do not represent real production database records.
 
 ---
 
@@ -423,14 +423,14 @@ To maintain development discipline, avoid premature feature creep, and honor the
 
 To honor the **₹0 INR budget** and avoid recurring S3 or cloud image hosting charges, Harmoni provides **8 handcrafted, distinctive SVG preset avatars** stored as lightweight client-side assets:
 
-1. `avatar_1`: **Amber Studio Turntable** — Minimalist vinyl turntable with golden needle and spinning grooves.
-2. `avatar_2`: **Golden Tube Preamp** — Vacuum tube filament glowing warmly inside an audio amplifier chassis.
-3. `avatar_3`: **Obsidian Waveform** — Intersecting audio sine waves in copper and amber tones.
-4. `avatar_4`: **Geometric Vinyl Disc** — Concentric disc tracks with a central label and brushed brass spindle.
-5. `avatar_5`: **Nordic Aurora Prism** — Geometric crystal refracting cyan and emerald acoustic light.
-6. `avatar_6`: **Neon Cassette Tape** — Retro studio cassette shell with dual tape spools.
-7. `avatar_7`: **Soundwave Equalizer** — Five-band vertical studio frequency spectrum with peak indicators.
-8. `avatar_8`: **Acoustic Reverberation** — Concentric sound propagation rings expanding across a dark canvas.
+1. `avatar_1`: **Amber Studio Turntable** — Minimalist vinyl turntable deck, concentric grooves, tonearm & amber center spindle.
+2. `avatar_2`: **Golden Tube Preamp** — Glass dome vacuum tube envelope, socket base, and glowing amber tube filament.
+3. `avatar_3`: **Obsidian Waveform** — Intersecting audio sine waves in copper and amber with harmonic curves and peak nodes.
+4. `avatar_4`: **Geometric Vinyl Disc** — Concentric disc tracks, center label, gloss sheen reflection wedges & spindle hole.
+5. `avatar_5`: **Nordic Aurora Prism** — Triangular crystal prism splitting an amber acoustic beam into cyan & emerald rays.
+6. `avatar_6`: **Neon Cassette Tape** — Vintage studio cassette shell with dual tape reels, label window & magnetic tape bridge.
+7. `avatar_7`: **Soundwave Equalizer** — Five-band vertical frequency spectrum with floating peak indicator dots and baseline dB guide.
+8. `avatar_8`: **Acoustic Reverberation** — Concentric sound propagation ripples expanding from a central pulse with alignment ticks.
 
 - **Avatar Presentation:** 112px diameter circle on desktop (80px on mobile) enclosed in a 2px hairline brass ring (`#d97706`) with an amber ambient halo.
 - **Editing Modal:** When an authenticated user views their own profile (`getCurrentUser().id === profileUser.id`), an "Edit Profile" button opens an accessible modal with an 8-item visual avatar grid and a character-counted bio textarea.
@@ -447,24 +447,19 @@ We conducted a thorough capability audit of Antigravity's connected Figma integr
 - **Account Tier:** `student` (Verified Figma Student/Education Account)
 - **Role & Seat:** `admin` role, `View` seat.
 - **Enabled Capabilities:** `code_layers_enabled: true`, `specs_enabled: true`.
-- **Cost Audit at Execution Time:** Zero-cost execution confirmed for standard file creation, inspection, metadata querying, and code layer transmission.
-- **Strict Budget Safeguard:** Native Figma AI generation tools (`generate_vector_illustration`, `generate_image`) consume paid credits; under Harmoni's ₹0 INR rule, these tools are **strictly prohibited and never executed**.
 
-### 7.2 MCP Server Capabilities & Tool Boundaries
-1. **File Creation & Session Tools:**
-   - `create_new_file`: Successfully creates new Figma Design files under the student team workspace.
-   - `create_session`: Creates persistent live sessions for Figma interactions.
-   - `get_metadata` / `get_design_context` / `get_screenshot`: Fully functional for inspecting Figma file nodes and visual rendering.
-2. **Tool Limitations Discovered:**
-   - The remote MCP server does **not** expose `use_figma` (which executes arbitrary JavaScript inside the Figma plugin scene graph).
-   - `send_code_to_figma` creates runnable Code Layers / Make files; its schema explicitly clarifies: *"Does not create native Design shapes"*.
-3. **Dual Exploration Strategy:**
-   - **Canonical Figma Design File:** Created and verified under Vansh Kumar's student team workspace:
-     - **File Name:** `Harmoni — Visual Design Exploration`
-     - **File Key:** `tde7tKDtxqTwhqJQko989H`
-     - **File URL:** [https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H)
-     - **Session ID:** `9ac1b3e9-1172-43d8-85ce-3d6b3ea7d042`
-   - **Pixel-Accurate Interactive Visual Prototype:** Authored in [`docs/visual-design-exploration.html`](file:///d:/Projects/Harmoni/docs/visual-design-exploration.html), providing high-fidelity visual evaluation of all three directions, 1440×900 desktop screens, 390×844 mobile screens, and the complete token system.
+### 7.2 Accurate Figma Deliverable Status (Empty Canvas Shell)
+Independent inspection confirmed that the file generated at:
+[https://www.figma.com/design/tde7tKDtxqTwhqJQko989H](https://www.figma.com/design/tde7tKDtxqTwhqJQko989H) (Key: `tde7tKDtxqTwhqJQko989H`)
+is currently an **empty document canvas shell containing only an empty "Page 1" with no populated design frames or layers**.
+
+> [!IMPORTANT]
+> **Tool Boundaries & ₹0 Budget Safeguard:**
+> - The remote MCP server does **not** expose the `use_figma` tool (which executes scene-graph JavaScript inside a plugin).
+> - `send_code_to_figma` creates runnable Code/Make layers, explicitly documented as not creating native design frames.
+> - Native Figma AI generative tools (`generate_vector_illustration`, `generate_image`) consume paid credits, which is strictly prohibited under Harmoni's ₹0 INR rule.
+> - **We do not create duplicate empty files or retry unsupported operations.**
+> - For this milestone, the committed interactive HTML prototype (`docs/visual-design-exploration.html`) serves as the **actual, canonical visual exploration deliverable**.
 
 ---
 
@@ -474,13 +469,13 @@ The interactive visual exploration is staged in [`docs/visual-design-exploration
 
 1. **Direction Comparison Spectrum:** Interactive toggle comparing Direction 1 (Obsidian Studio), Direction 2 (Nordic Aurora), and Direction 3 (Editorial Vinyl) with token badges, typography metrics, and aesthetic rationales.
 2. **Desktop Discover Screen (1440 × 900 Viewport):**
-   - 240px fixed left sidebar with Harmoni logo, amber pulse pip, primary routes, and current user card.
+   - 240px fixed left sidebar with Harmoni logo, primary routes, and current user card with inline SVG avatar.
    - Fluid main scroll area with hero vinyl card (*"Late Night Studio Sessions"*), play button, and track metadata.
    - High-density track listing table with index-to-equalizer animation, album thumbnail, monospace duration, and Creative Commons badges (`CC BY-SA 4.0`).
    - Docked 80px hi-fi persistent player bar with hairline top scrubber, scrobble threshold milestone dot, rotary volume control, and queue button.
 3. **Desktop Profile Screen (1440 × 900 Viewport · `/@username`):**
-   - 112px circular preset avatar (`avatar_1: Amber Turntable`) in hairline brass ring.
-   - Display name, `@alex_beats` handle, `ADMIN` badge, member since date, and 250-character biography.
+   - 104px circular preset avatar (`avatar_1: Amber Studio Turntable`) in hairline brass ring.
+   - Display name, `@elena` handle, `ADMIN` badge, member since date, and 250-character biography.
    - `[ Edit Profile ]` trigger modal (avatar preset picker + bio textarea).
    - Zero deceptive action buttons (explicit note indicating friendship mutations are deferred to Milestone 7).
    - Tabbed layout: Overview, Playlists, Liked Tracks, History.
@@ -491,8 +486,8 @@ The interactive visual exploration is staged in [`docs/visual-design-exploration
    - 56px fixed bottom navigation bar (Home, Search, Library, Profile) with `z-50`.
    - Main content viewport with dedicated `pb-36` (144px) clearance.
 5. **Design System Tokens & 8 SVG Avatar Presets:**
+   - Eight original handcrafted inline SVG avatar illustrations with consistent `0 0 64 64` viewBoxes, Obsidian Studio styling, and zero external dependencies.
    - Complete CSS variable token palette with color chips and contrast values.
-   - Interactive 8-avatar preset gallery with copyable SVG keys and detailed musical descriptions.
 
 ---
 
@@ -544,28 +539,29 @@ All components will be built as accessible primitives using `shadcn/ui` (Radix U
 +---------------------------------------------------------------------------------------------------+
 | HARMONI FRONTEND IMPLEMENTATION ROADMAP                                                           |
 +---------------------------------------------------------------------------------------------------+
-|  [ M3C.0.1: Refined Spec ] --> [ M3C: Profiles & Avatars ]  -->  [ M4: Music Engine & Jamendo ]   |
-|  (Current Milestone)           - Rewrite /@username to /users    - Server Jamendo API client      |
-|  - Figma File Linked           - 8 SVG avatar presets            - Creative Commons validation    |
-|  - HTML Prototype Staged       - Bio editing & modal             - Search & discovery endpoints   |
+|  [ M3C.0.2: Accurate Prototype ] -> [ M3C: Profiles & Avatars ] ->  [ M4: Music Engine & Jamendo ]|
+|  (Current Milestone)                - Rewrite /@username to /users  - Server Jamendo API client   |
+|  - Figma Empty Shell Documented     - 8 SVG avatar presets          - Creative Commons validation |
+|  - 8 Inline SVGs Verified           - Bio editing & modal           - Search & discovery endpoints|
+|  - WAI-ARIA Tabs Verified           (Awaiting Approval)                                           |
 |                                                                                                   |
-|  [ M5: Audio Player ]    -->  [ M6: Library & Scrobble ]   -->  [ M7: Friendship & Social Chat ]  |
-|  - Zustand player store       - Liked tracks & playlists        - Friend request workflows        |
-|  - Docked hi-fi player bar    - 50%/30s scrobble engine         - Collapsible social drawer       |
-|  - Queue management drawer    - History & statistics            - Track-sharing conversations     |
+|  [ M5: Audio Player ]         -->   [ M6: Library & Scrobble ]  --> [ M7: Friendship & Social ]   |
+|  - Zustand player store             - Liked tracks & playlists      - Friend request workflows    |
+|  - Docked hi-fi player bar          - 50%/30s scrobble engine       - Collapsible social drawer   |
+|  - Queue management drawer          - History & statistics          - Track-sharing conversations |
 |                                                                                                   |
 |  [ M8: Polish & ₹0 Deploy ]                                                                       |
 |  - Responsive mobile audit · Accessibility pass · Vercel Hobby + Neon DB production deploy        |
 +---------------------------------------------------------------------------------------------------+
 ```
 
-1. **Milestone 3C.0.1: Refined Design Specification & Figma Prototype (THIS MILESTONE)**
-   - Reassess layout to 2-column default + on-demand social drawer.
-   - Detail Next.js `/@username` rewrite routing architecture.
-   - Formalize strict Milestone 3C scope boundary (defer social mutations to M7).
-   - Clarify lack of presence model in Prisma schema.
-   - Link verified Figma exploration file and stage interactive HTML prototype.
-2. **Milestone 3C: User Profile Page & Avatar Presets**
+1. **Milestone 3C.0.2: Prototype Accuracy & Verification Cleanup (THIS MILESTONE)**
+   - Accurately document the Figma file as an empty document shell.
+   - Refactor HTML prototype with 8 original inline SVG avatar illustrations.
+   - Implement WAI-ARIA tab navigation with explicit event handlers and keyboard arrows.
+   - Add explicit Prototype Scope & Limitations banner.
+   - Diagnose authentication test environment discrepancy (Sandbox TCP loopback EACCES).
+2. **Milestone 3C: User Profile Page & Avatar Presets (Pending Approval)**
    - Implement `next.config.ts` rewrite and `src/app/users/[username]/page.tsx`.
    - 8 SVG avatar presets component.
    - Bio editing modal and self-service profile update action.
